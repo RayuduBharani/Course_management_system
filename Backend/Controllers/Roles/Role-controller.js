@@ -38,11 +38,11 @@ const InstructureRole = async (req, res) => {
                 role: NewInstructorData.role
             }, process.env.JWT_KEY);
             await NewInstructorData.save()
-            res.cookie(process.env.JWT_KEY, token, {
+            return res.cookie(process.env.JWT_KEY, token, {
                 httpOnly: true,
                 secure: false,
                 expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-            }).send({
+            }).json({
                 role: NewInstructorData.role,
                 success: true,
                 message: "You are registered as a Instructor",
