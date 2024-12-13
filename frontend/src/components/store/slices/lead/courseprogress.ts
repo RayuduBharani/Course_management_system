@@ -9,7 +9,7 @@ export const FetchViewCourses = createAsyncThunk(
   "/mycourses/view-page",
   async (id:string) => {
     const response = await fetch(
-      `http://localhost:8000/lead/progress-page/viewcourse/${id}`,
+      `https://course-management-system-il4f.onrender.com/lead/progress-page/viewcourse/${id}`,
       {
         credentials: "include",
       }

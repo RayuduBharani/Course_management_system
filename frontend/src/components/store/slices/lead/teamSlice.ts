@@ -12,7 +12,7 @@ const initialState : initialStateInterfase = {
 export const FindTeamMembers = createAsyncThunk(
     "/lead/members",
     async()=>{
-        const response = await fetch("http://localhost:8000/lead/team/members" , {
+        const response = await fetch("https://course-management-system-il4f.onrender.com/lead/team/members" , {
             credentials :"include"
         })
         const data = await response.json()

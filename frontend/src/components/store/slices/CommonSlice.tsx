@@ -13,7 +13,7 @@ const initialState: AllCoursesinitialState = {
 export const fetchAllCourses = createAsyncThunk(
     "courses/fetchAll",
     async () => {
-        const response = await fetch("http://localhost:8000/courses/Allcourses");
+        const response = await fetch("https://course-management-system-il4f.onrender.com/courses/Allcourses");
         const data = await response.json();
         return data;
     }

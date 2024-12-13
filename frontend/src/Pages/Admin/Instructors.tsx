@@ -7,7 +7,7 @@ export default function AdminInstructors() {
     const [data, setData] = useState([]);
 
     async function fetchinstructors() {
-        const response = await fetch('http://localhost:8000/admin/instructor/all');
+        const response = await fetch('https://course-management-system-il4f.onrender.com/admin/instructor/all');
         const data = await response.json();
         console.log(data);
         setData(data);
