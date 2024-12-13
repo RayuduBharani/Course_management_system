@@ -14,10 +14,10 @@ export function LeadLayout() {
     const { profileInfo } = useSelector((state: RootState) => state.profile)
     const links = [
         {
-            label: "Dashboard",
+            label: "Home",
             href: "dashboard",
             icon: (
-                <i className="mt-1 fa-solid fa-chart-line"></i>
+                <i className="fa-solid fa-house mt-1"></i>
             ),
         },
         {

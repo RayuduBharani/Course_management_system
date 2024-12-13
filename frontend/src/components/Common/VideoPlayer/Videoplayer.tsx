@@ -112,7 +112,7 @@ export default function Videoplayer({ width = "100%", height = "100%", videoUrl,
     }
     
     return (
-        <div className={`relative border transition-all duration-400 ease-in-out overflow-hidden rounded-lg 
+        <div className={`relative border transition-all duration-400 ease-in-out overflow-hidden rounded-lg
             ${isFullScreen} ? "w-screen h-screen" : ""`}
             style={{ width, height }}
             ref={PlayerContainerRef}
@@ -145,13 +145,13 @@ export default function Videoplayer({ width = "100%", height = "100%", videoUrl,
                         onValueCommit={handleSeekMouseUp}
                     />
                     <div className='flex items-center justify-between'>
-                        <div className='flex items-center space-x-2'>
+                        <div className='flex items-center space-x-2 max-sm:space-x-0'>
                             <Button variant="ghost" size='icon' onClick={HandlePlaying} className='text-white'>
                                 {
                                     playing ? <i className="fa-solid fa-pause"></i> : <i className="fa-solid fa-play"></i>
                                 }
                             </Button>
-                            <div className='flex gap-3'>
+                            <div className='flex gap-3 max-sm:gap-0'>
                                 <Button variant="ghost" size='icon' onClick={handleRewind} className='text-white hover:bg-gray-400'>
                                     <i className="fa-solid fa-backward"></i>
                                 </Button>

@@ -69,7 +69,7 @@ export default function LeadMyCourses() {
                                 <p className="font-bold text-lg truncate text-start mt-1 ml-1">{course.course[0].courseId.title}</p>
                                 <p className="text-neutral-400 text-sm font-medium truncate mt-1 ml-1">{course.course[0].courseId.title}</p>
                                 <div className="w-full h-fit flex justify-between px-2 mt-2 items-center">
-                                    <p className="text-sm font-bold text-primary">20%</p>
+                                    <p className="text-sm font-bold text-primary"></p>
                                     <Link to={`view-page/${course._id}`}>
                                         <div className="flex justify-center items-center cursor-pointer gap-2">
                                             <p className="text-sm font-semibold">Continue</p>

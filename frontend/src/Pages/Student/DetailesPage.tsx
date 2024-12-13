@@ -28,13 +28,13 @@ export default function StudentCourseEnrollDetailesPage() {
   useEffect(() => {
     if (id) {
       dispatch(FetchStudentCourse(id))
-      .then((data)=>{
-        if(!data.payload.success){
-          toast({
-            title : data.payload.message
-          })
-        }
-      })
+        .then((data) => {
+          if (!data.payload.success) {
+            toast({
+              title: data.payload.message
+            })
+          }
+        })
     }
   }, [id]);
 
@@ -52,8 +52,8 @@ export default function StudentCourseEnrollDetailesPage() {
   }
   return (
     <>
-      <div className="w-full h-[100%] flex gap-4 max-sm:flex-col max-sm:h-fit ">
-        <div className="w-[25%] h-full max-sm:h-fit max-sm:w-full">
+      <div className="w-full h-[100%] flex gap-4 max-md:flex-col max-md:h-fit ">
+        <div className="w-[25%] h-full max-md:h-fit max-md:w-full">
           <div className="w-full h-[8%] flex justify-start items-start">
             <Button
               onClick={() => navigate(-1)}
@@ -63,23 +63,26 @@ export default function StudentCourseEnrollDetailesPage() {
               <i className="fa-solid fa-arrow-left"></i> Back
             </Button>
           </div>
-          <div className="border-2 w-full h-[92%] rounded-xl shadow-md max-sm:mt-3">
+          <div className="border-2 w-full h-[92%] rounded-xl shadow-md max-md:mt-3">
             <ScrollArea className="h-full w-full rounded-md">
               <div className="p-4">
                 <h4 className="mb-10 text-lg font-bold leading-none">
                   Course Videos List
                 </h4>
                 {courseData[0].course[0].courseId.files.map((data, index) => (
-                  <div onClick={() => {
-                    handleCourse(index);
-                  }}
+                  <div
+                    onClick={() => {
+                      handleCourse(index);
+                    }}
                     key={index}
-                    className={`${value && value-1 == index ? "bg-gray-200 rounded-lg" : null} text-sm font-semibold text-neutral-500 mt-2 truncate cursor-pointer py-1.5 px-4 hover:bg-gray-200 hover:rounded-lg`}
+                    className={`${value && value - 1 == index ? "bg-gray-200 rounded-lg" : null
+                      } text-sm font-semibold text-neutral-500 mt-2 truncate cursor-pointer py-1.5 px-4 hover:bg-gray-200 hover:rounded-lg`}
                   >
-                    {
-                      value && value-1 == index ? <i className="fa-solid fa-circle-pause mr-4"></i>: <i className="fa-regular fa-circle-play mr-4"></i>
-                      
-                    }
+                    {value && value - 1 == index ? (
+                      <i className="fa-solid fa-circle-pause mr-4"></i>
+                    ) : (
+                      <i className="fa-regular fa-circle-play mr-4"></i>
+                    )}
                     {data.title}
                   </div>
                 ))}
@@ -88,37 +91,36 @@ export default function StudentCourseEnrollDetailesPage() {
           </div>
         </div>
 
-        <div className="w-full shadow-md h-full border-2 border-gray-300 rounded-lg max-sm:mt-3 max-sm:h-fit">
-          {
-            courseData[0].course[0].courseId.files
-              .filter((_, index) => index + 1 === value)
-              .map((data) => (
-
-                <div key={data.title} className="w-full h-full py-5">
-
-                  <div className="w-full h-[95%] flex justify-center max-sm:h-[200px] max-sm:py-2">
-                    {videoLoad ? (
-                      <div className="h-[90%] flex justify-center items-center ">
-                        <BookLoader /></div>
-                    ) : (<Videoplayer
+        <div className="w-full shadow-md h-full border-2 border-gray-300 rounded-lg max-md:mt-3 max-md:h-fit">
+          {courseData[0].course[0].courseId.files
+            .filter((_, index) => index + 1 === value)
+            .map((data) => (
+              <div key={data.title} className="w-full h-full py-5">
+                <div className="w-full h-[95%] flex justify-center max-md:h-[350px] max-md:py-2 max-sm:h-[250px]">
+                  {videoLoad ? (
+                    <div className="h-[90%] flex justify-center items-center ">
+                      <BookLoader />
+                    </div>
+                  ) : (
+                    <Videoplayer
                       thumbnail={courseData[0].course[0].courseId.thumbnail}
                       width="95%"
                       height="96%"
                       videoUrl={data.videoUrl}
-                    />)}
-                  </div>
-
-                  <div className="w-full h-fit max-sm:pb-3">
-                    <h1 className="font-semibold text-primary/75 text-xl text-center">
-                      {data.title.toUpperCase()}
-                    </h1>
-                  </div>
-
+                    />
+                  )}
                 </div>
-              ))
-          }
+
+                <div className="w-full h-fit max-md:pb-3">
+                  <h1 className="font-semibold text-primary/75 text-xl text-center">
+                    {data.title.toUpperCase()}
+                  </h1>
+                </div>
+              </div>
+            ))}
         </div>
       </div>
+
     </>
   );
 }

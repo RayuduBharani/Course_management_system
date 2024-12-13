@@ -18,6 +18,7 @@ const StudentProfileRouter = require("./routes/student/profile-route")
 const AdminCourseAccessRouter = require("./routes/admin/courseAccess-route")
 const InstrctorProfile = require("./routes/Instructor/profile")
 const InstrctorEarnings = require("./routes/Instructor/earnings")
+const Instrctordetailes = require("./routes/admin/instructor-route")
 
 const app = express();
 app.use(express.json())
@@ -63,6 +64,7 @@ app.use("/student/progress-page",studentViewcourseRouter);
 // admin 
 app.use("/admin/course", AdminCourseAccessRouter)
 app.use("/admin/course",adminViewCourse);
+app.use("/admin/instructor" , Instrctordetailes)
 
 app.listen(process.env.PORT, '0.0.0.0', () => {
     console.log(`Server running on http://localhost/${process.env.PORT}`)

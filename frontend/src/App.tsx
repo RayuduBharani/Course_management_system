@@ -48,6 +48,8 @@ import ViewCourse from './components/Instructor/View-course'
 import InstructorCourseEnrollDetailesPage from './Pages/Instructor/DetailsPage'
 import InstructorProfileUpdate from './components/Instructor/ProfileUpdate'
 import EarningPage from './Pages/Instructor/EarningPage'
+import InstructorDetails from './components/Admin/instructorDetails'
+import Payment from './Pages/Admin/pay'
 
 function App() {
     const dispatch = useDispatch<AppDispatch>()
@@ -90,12 +92,14 @@ function App() {
                         <AdminLayout />
                     </PrivateComponent>}>
                     <Route path='courses' element={<AdminAllCourses />} />
+                    <Route path='pay/:id' element={<Payment />} />
                     <Route path='courseProviders' element={<AdminInstructors />} />
+                    <Route path='courseProviders/:id' element={<InstructorDetails />} />
                     <Route path='users' element={<AdminStudents />} />
                     <Route path='orders' element={<Orders />} />
                     <Route path='leads' element={<AdminLeads />} />
                     <Route path='courses/:id' element={<AdminCourseDetailesView />} />
-                    <Route path='courses/coureview/:id' element={<AdminCourseDetailesPage/>}/>
+                    <Route path='courses/coureview/:id' element={<AdminCourseDetailesPage />} />
                 </Route>
                 <Route path='/student' element={
                     <PrivateComponent IsLoading={IsLoading} IsAuthenticated={IsAuthenticated} user={user}>

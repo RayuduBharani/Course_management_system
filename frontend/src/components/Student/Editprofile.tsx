@@ -114,7 +114,7 @@ export default function StudentEditProfile() {
     }
 
     return (
-        <div>
+        <div className="max-sm:mt-5">
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger>
                     <i className="fa-solid fa-pen-to-square bg-muted p-3 rounded-full mr-8"></i>
@@ -124,7 +124,7 @@ export default function StudentEditProfile() {
                         <DialogTitle className="text-center text-primary">Edit your Profile</DialogTitle>
                         <DialogDescription>
                         </DialogDescription>
-                        <form onSubmit={handleProfileSubmit} className="w-full h-full px-10 py-5 flex flex-col items-center gap-3">
+                        <form onSubmit={handleProfileSubmit} className="w-full h-full px-10 py-5 flex flex-col items-center gap-3 max-sm:px-0">
                             <FileUpload onChange={handleProfileImg} />
                             <div className="w-full flex gap-5 mt-6"></div>
                             <div className="gap-3 w-full flex">

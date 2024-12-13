@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ArrowRight } from "lucide-react";
 import { useEffect } from "react";
@@ -7,14 +6,6 @@ import { AppDispatch, RootState } from "@/components/store/store";
 import { fetchAllCourses } from "@/components/store/slices/CommonSlice";
 import Loader from "@/components/Loading";
 import { Link } from "react-router-dom";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 export default function AdminAllcourses() {
@@ -28,31 +19,7 @@ export default function AdminAllcourses() {
         <div className="w-full h-fit ">
             <div className="w-full h-fit flex items-center">
                 <h1 className="w-[50%] font-bold text-xl">All Courses</h1>
-                <div className="w-full h-full flex justify-end gap-3">
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild><Button variant={"outline"}>Sort By</Button></DropdownMenuTrigger>
-                        <DropdownMenuContent className="p-2">
-                            <DropdownMenuLabel>Sort By</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem>Price -- Low to High</DropdownMenuItem>
-                            <DropdownMenuItem>Price -- High to Low</DropdownMenuItem>
-                            <DropdownMenuItem>a to z</DropdownMenuItem>
-                            <DropdownMenuItem>z to a</DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild><Button>Filter</Button></DropdownMenuTrigger>
-                        <DropdownMenuContent className="">
-                            <DropdownMenuLabel>Sort By</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem>Price -- Low to High</DropdownMenuItem>
-                            <DropdownMenuItem>Price -- High to Low</DropdownMenuItem>
-                            <DropdownMenuItem>a to z</DropdownMenuItem>
-                            <DropdownMenuItem>z to a</DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                </div>
+                
             </div>
             <Separator className="mt-3" />
 

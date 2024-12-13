@@ -12,10 +12,10 @@ export function StudentLayout() {
     const dispatch = useDispatch<AppDispatch>()
     const links = [
         {
-            label: "Dashboard",
+            label: "Home",
             href: "dashboard",
             icon: (
-                <i className="fa-solid fa-chart-line mt-2"></i>
+                <i className="mt-1 fa-solid fa-house"></i>
             ),
         },
         {

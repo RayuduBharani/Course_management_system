@@ -40,7 +40,7 @@ export default function LeadMyCourses() {
         <div className="w-full h-full">
             <div className="w-full h-fit flex justify-between max-sm:flex-col max-sm:gap-3">
                 <p className="font-bold text-xl max-sm:text-center max-sm:mb-2">My Journey</p>
-                <form onSubmit={handleSearch} className="w-[60%] flex gap-5 justify-end max-sm:w-full">
+                <form onSubmit={handleSearch} className="w-[60%] flex gap-5 justify-end max-sm:w-full max-sm:justify-center">
                     <Input
                         onChange={(e) => setSearch(e.target.value)}
                         value={search}
