@@ -67,11 +67,11 @@ export default function Signup() {
     }
     return (
         <div className="w-full h-screen flex justify-center items-center">
-            <div className="w-[50%] h-[90%] rounded-xl flex pr-32 items-center max-sm:hidden">
+            <div className="w-[50%] h-[90%] rounded-xl flex pr-32 items-center max-md:hidden max-sm:hidden">
                 <img src="https://static.vecteezy.com/system/resources/thumbnails/021/666/130/small_2x/login-and-password-concept-3d-illustration-computer-and-account-login-and-password-form-page-on-screen-sign-in-to-account-user-authorization-login-authentication-page-concept-png.png" alt="" />
             </div>
 
-            <form onSubmit={handleSubmit} className="w-[30%] h-[80%] rounded-xl p-6 border max-sm:w-[90%] max-sm:h-[70%]">
+            <form onSubmit={handleSubmit} className="w-[30%] h-[80%] rounded-xl p-6 border max-md:w-[60%] max-sm:border-0 max-sm:w-[90%] max-sm:h-[70%]">
                 <p className="font-bold text-xl">Welcome to <span className="text-primary">CMS</span></p>
 
                 <div className="mt-8 flex flex-col gap-2">

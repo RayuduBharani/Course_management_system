@@ -1,64 +1,72 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Sidebar, SidebarBody, SidebarLink } from "../ui/sidebar";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Link, Outlet } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../store/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../store/store";
 import { Logout } from "../store/slices/authSlice";
-// import { StudentProfileInfo } from "../store/slices/student/profileSlice";
+import { StudentProfileInfo } from "../store/slices/student/profileSlice"; // Assuming the profile slice is set up
 
 export function StudentLayout() {
-    const dispatch = useDispatch<AppDispatch>()
+    const dispatch = useDispatch<AppDispatch>();
+    const { profileInfo } = useSelector((state: RootState) => state.studentProfile); // Get the student profile from the Redux store
+
     const links = [
         {
             label: "Home",
             href: "dashboard",
-            icon: (
-                <i className="mt-1 fa-solid fa-house"></i>
-            ),
+            icon: <i className="mt-1 fa-solid fa-house"></i>,
         },
         {
             label: "Explore Courses",
             href: "courses",
-            icon: (
-                <i className="fa-regular fa-folder-open mt-1"></i>
-            ),
+            icon: <i className="fa-regular fa-folder-open mt-1"></i>,
         },
         {
             label: "My Courses",
             href: "mycourses",
-            icon: (
-                <i className="fa-solid fa-folder-closed mt-1"></i>
-            ),
+            icon: <i className="fa-solid fa-folder-closed mt-1"></i>,
         }
     ];
-    const [open, setOpen] = useState(false);
-    const handleLogout = () => {
-        dispatch(Logout())
-    }
-    // const { profileInfo } = useSelector((state: RootState) => state.studentProfile)
 
-    // useEffect(() => {
-    //     dispatch(StudentProfileInfo())
-    // }, [dispatch])
+    const [open, setOpen] = useState(false);
+
+    useEffect(() => {
+        // Dispatch action to fetch profile info if not already available
+        if (!profileInfo) {
+            dispatch(StudentProfileInfo());
+        }
+    }, [dispatch, profileInfo]);
+
+    const handleLogout = () => {
+        dispatch(Logout());
+    };
+
+    const handleLinkClick = () => {
+        if (window.innerWidth <= 768) { 
+            setOpen(false);
+        }
+    };
+
     return (
-        <div
-            className={cn(
-                "flex h-screen w-screen max-w-full flex-col md:flex-row overflow-hidden"
-            )}
-        >
+        <div className={cn("flex h-screen w-screen max-w-full flex-col md:flex-row overflow-hidden")}>
             <Sidebar open={open} setOpen={setOpen}>
                 <SidebarBody className="justify-between gap-10">
                     <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
-                        {open ? <Logo /> :
+                        {open ? <Logo /> : 
                             <img
                                 className="rounded-full w-7 h-7"
                                 src="https://media.licdn.com/dms/image/v2/D560BAQEdNp5niau0Rw/company-logo_200_200/company-logo_200_200/0/1683745552013?e=1735171200&v=beta&t=5ykcq9A8xtYhhFFdbeRTpzs8JjbqEQL_P5dkkE70rOs"
-                            />}
+                            />
+                        }
                         <div className="mt-24 flex flex-col gap-3">
                             {links.map((link, idx) => (
-                                <SidebarLink key={idx} link={link} />
+                                <SidebarLink
+                                    key={idx}
+                                    link={link}
+                                    onClick={handleLinkClick}
+                                />
                             ))}
                             <div className="flex gap-3 mt-3 cursor-pointer" onClick={handleLogout}>
                                 <i className="fa-solid fa-reply-all"></i>
@@ -73,8 +81,7 @@ export function StudentLayout() {
                                 href: "profile",
                                 icon: (
                                     <img
-                                        // src={profileInfo ? profileInfo.profileImg : ""}
-                                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRNKfj6RsyRZqO4nnWkPFrYMmgrzDmyG31pFQ&s"
+                                        src={profileInfo ? profileInfo.profileImg : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRNKfj6RsyRZqO4nnWkPFrYMmgrzDmyG31pFQ&s"}
                                         className="h-7 w-7 flex-shrink-0 rounded-full"
                                         width={50}
                                         height={50}
@@ -82,6 +89,7 @@ export function StudentLayout() {
                                     />
                                 ),
                             }}
+                            onClick={handleLinkClick}
                         />
                     </div>
                 </SidebarBody>

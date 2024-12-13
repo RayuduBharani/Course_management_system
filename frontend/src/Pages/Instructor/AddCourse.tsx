@@ -189,7 +189,7 @@ const AddCourse = () => {
     return (
         <form onSubmit={handleSubmit} className="w-full h-full p-3 flex gap-1 max-sm:block">
             {/* Course Details */}
-            <div className="w-1/2 h-fit flex flex-col items-center">
+            <div className="w-1/2 h-fit flex flex-col items-center max-sm:w-full">
                 <h1 className="text-lg font-bold text-center mb-2">Add Course</h1>
                 {courseSchemaFields.map((field, index) => (
                     <div key={field.label + index} className="flex w-full flex-col px-5 py-2">
@@ -246,7 +246,7 @@ const AddCourse = () => {
             </div>
 
             {/* Video Modules */}
-            <div className="w-1/2 h-fit flex items-center flex-col px-10">
+            <div className="w-1/2 h-fit flex items-center flex-col px-10 max-sm:w-full">
                 <h1 className="font-bold text-lg text-center">Video Modules</h1>
                 {sections.map((section) => (
                     <div
@@ -294,7 +294,7 @@ const AddCourse = () => {
                         </div>
                     </div>
                 ))}
-                <Button className="w-[95%] mt-3" type="button" onClick={addSection}>
+                <Button className="w-[95%] mt-3 max-sm:mb-14" type="button" onClick={addSection}>
                     Add Section
                 </Button>
             </div>

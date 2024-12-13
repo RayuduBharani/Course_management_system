@@ -29,23 +29,21 @@ export default function Orders() {
     }, []);
 
     return (
-        <div className="w-full h-full px-10">
-            <div className="w-full h-[20%] flex justify-around">
-                <div className="justify-center items-center p-4 w-[30%] h-full rounded-lg flex border-2">
-                    <p className="font-bold text-lg">
-                        Total Earning<span className="pl-3">:</span>
-                    </p>
+        <div className="w-full h-full p-4 sm:p-10">
+            <div className="w-full h-[20%] flex flex-col sm:flex-row justify-between sm:justify-around">
+                <div className="justify-center items-center p-4 w-full sm:w-[30%] h-full rounded-lg flex border-2 mb-4 sm:mb-0">
+                    <p className="font-bold text-lg">Total Earning<span className="pl-3">:</span></p>
                     <p className="font-medium text-primary pl-3">{totalAmount} /-</p>
                 </div>
-                <div className="justify-center items-center p-4 w-[30%] h-full rounded-lg flex border-2">
-                    <p className="font-bold text-lg">
-                        Total Orders<span className="pl-3">:</span>
-                    </p>
+                <div className="justify-center items-center p-4 w-full sm:w-[30%] h-full rounded-lg flex border-2">
+                    <p className="font-bold text-lg">Total Orders<span className="pl-3">:</span></p>
                     <p className="font-medium text-primary pl-3">{earningData.length}</p>
                 </div>
             </div>
-            <Separator className="mt-4 h-0.5" />
-            <div className="w-full h-full">
+
+            <Separator className="mt-4 h-0.5 max-sm:mt-4" />
+
+            <div className="w-full h-full mt-4">
                 <Table>
                     <TableCaption>Earnings Details</TableCaption>
                     <TableHeader>
@@ -58,7 +56,7 @@ export default function Orders() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {earningData.map((data : any, index) => (
+                        {earningData.map((data: any, index) => (
                             <TableRow key={index}>
                                 <TableCell className="font-medium">{index + 1}</TableCell>
                                 <TableCell>{data.orderStatus}</TableCell>

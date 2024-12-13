@@ -1,6 +1,7 @@
 import Loader from "@/components/Loading";
 import { FetchProfileInfo } from "@/components/store/slices/Instructor/profile";
 import { AppDispatch, RootState } from "@/components/store/store";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Label } from "@/components/ui/label";
 import { Pencil } from "lucide-react";
 import { useEffect } from "react";
@@ -18,13 +19,15 @@ export default function InstructorProfile() {
     }
     console.log(profileInfo)
     return (
-        <div className="px-10 w-full h-full max-sm:flex flex-col gap-y-10">
+        <div className="px-10 w-full h-full max-sm:flex flex-col gap-y-10 max-sm:px-0">
             <div className="w-full h-[30%] flex items-center ">
                 <div className="w-full h-full items-center flex max-sm:flex-col ">
-                    <div className="w-[15%] h-full flex items-center max-sm:w-[50%]">
-                        <img className="rounded-full object-cover w-[90%] h-[70%] max-sm:h-[60%]  " src={profileInfo.profileImg} alt="" />
+                <div className="w-[190px] max-sm:mt-3">
+                        <AspectRatio ratio={16 / 9}>
+                            <img src={profileInfo?.profileImg} alt="Image" className="rounded-md object-cover" />
+                        </AspectRatio>
                     </div>
-                    <div className="max-sm:w-full max-sm:ml-14 ml-10">
+                    <div className="max-sm:w-full max-sm:ml-14 ml-10 max-sm:mt-5">
                         <p className="text-lg font-bold ">{profileInfo.name}</p>
                         <p>{profileInfo.email}</p>
                     </div>

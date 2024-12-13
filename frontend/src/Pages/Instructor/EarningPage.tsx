@@ -29,23 +29,23 @@ export default function EarningPage() {
     }, []);
 
     return (
-        <div className="w-full h-full p-10">
-            <div className="w-full h-[20%] flex justify-around">
-                <div className="justify-center items-center p-4 w-[30%] h-full rounded-lg flex border-2">
+        <div className="w-full h-full p-4 md:p-10">
+            <div className="w-full h-[20%] flex flex-wrap justify-around gap-4 md:gap-8">
+                <div className="p-4 w-full md:w-[30%] h-full rounded-lg flex border-2 justify-center items-center">
                     <p className="font-bold text-lg">
                         Total Earning<span className="pl-3">:</span>
                     </p>
                     <p className="font-medium text-primary pl-3">{totalAmount} /-</p>
                 </div>
-                <div className="justify-center items-center p-4 w-[30%] h-full rounded-lg flex border-2">
+                <div className="p-4 w-full md:w-[30%] h-full rounded-lg flex border-2 justify-center items-center">
                     <p className="font-bold text-lg">
                         Total Orders<span className="pl-3">:</span>
                     </p>
                     <p className="font-medium text-primary pl-3">{earningData.length}</p>
                 </div>
             </div>
-            <Separator className="mt-4 h-0.5" />
-            <div className="w-full h-full">
+            <Separator className="mt-4 h-0.5 max-md:mt-40 max-sm:mt-52" />
+            <div className="w-full h-full mt-6">
                 <Table>
                     <TableCaption>Earnings Details</TableCaption>
                     <TableHeader>
@@ -58,7 +58,7 @@ export default function EarningPage() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {earningData.map((data : any, index) => (
+                        {earningData.map((data: any, index) => (
                             <TableRow key={index}>
                                 <TableCell className="font-medium">{index + 1}</TableCell>
                                 <TableCell>{data.orderStatus}</TableCell>

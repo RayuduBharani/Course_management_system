@@ -8,34 +8,36 @@ import { AppDispatch } from "../store/store";
 import { Logout } from "../store/slices/authSlice";
 
 export function AdminLayout() {
-    const dispatch = useDispatch<AppDispatch>()
+    const dispatch = useDispatch<AppDispatch>();
     const links = [
         {
             label: "All Courses",
             href: "courses",
-            icon: (
-                <i className="fa-solid fa-book-open-reader mt-2"></i>
-            ),
+            icon: <i className="fa-solid fa-book-open-reader mt-2"></i>,
         },
         {
             label: "Instructors",
             href: "courseProviders",
-            icon: (
-                <i className="fa-solid fa-users mt-1"></i>
-            ),
+            icon: <i className="fa-solid fa-users mt-1"></i>,
         },
         {
             label: "Orders",
             href: "orders",
-            icon: (
-                <i className="fa-solid fa-cart-shopping mt-1 mr-1"></i>
-            )
+            icon: <i className="fa-solid fa-cart-shopping mt-1 mr-1"></i>,
         }
     ];
     const [open, setOpen] = useState(false);
+
     const handleLogout = () => {
-        dispatch(Logout())
-    }
+        dispatch(Logout());
+    };
+
+    const handleLinkClick = () => {
+        if (window.innerWidth <= 768) {
+            setOpen(false);
+        }
+    };
+
     return (
         <div className={cn("flex h-screen w-screen max-w-full flex-col md:flex-row overflow-hidden")}>
             <Sidebar open={open} setOpen={setOpen}>
@@ -48,7 +50,11 @@ export function AdminLayout() {
                             />}
                         <div className="mt-24 flex flex-col gap-3">
                             {links.map((link, idx) => (
-                                <SidebarLink key={idx} link={link} />
+                                <SidebarLink
+                                    key={idx}
+                                    link={link}
+                                    onClick={() => handleLinkClick()}
+                                />
                             ))}
                             <div className="flex gap-3 mt-3 cursor-pointer" onClick={handleLogout}>
                                 <i className="fa-solid fa-reply-all"></i>

@@ -50,11 +50,11 @@ export default function SignIn() {
 
         <div className="w-full sm:h-screen flex justify-center items-center max-sm:min-h-svh ">
 
-            <div className="w-[50%] h-[90%] rounded-xl  flex pr-32 items-center max-sm:hidden">
+            <div className="w-[50%] h-[90%] rounded-xl  flex pr-32 items-center max-sm:hidden max-md:hidden">
                 <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.webp" alt="" />
             </div>
 
-            <form onSubmit={handleSubmit} className="w-[30%] mt-3 h-[70%] rounded-xl p-6 border max-sm:w-full max-sm:h-fit max-sm:border-0">
+            <form onSubmit={handleSubmit} className="w-[30%] mt-3 h-[70%] rounded-xl p-6 border max-sm:w-full max-sm:h-fit max-md:w-[60%] max-sm:border-0">
                 <p className="font-bold text-xl">Welcome to <span className="text-primary">CMS</span></p> 
                 <div className="mt-10 flex flex-col gap-2">
                     <Label htmlFor="email">Mail ID</Label>
