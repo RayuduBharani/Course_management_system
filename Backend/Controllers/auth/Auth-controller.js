@@ -39,9 +39,9 @@ const signin = async (req, res) => {
     await db();
     const UserInfo = req.body;
     try {
-        const SignInData = await userModel.findOne({ email: UserInfo.email })
+        const SignInData = await userModel.findOne({ email: UserInfo.email });
         if (SignInData) {
-            const CheckPassword = bcrypt.compareSync(UserInfo.password, SignInData.password)
+            const CheckPassword = bcrypt.compareSync(UserInfo.password, SignInData.password);
             if (CheckPassword) {
                 const token = jwt.sign({
                     email: SignInData.email,
@@ -49,23 +49,34 @@ const signin = async (req, res) => {
                     userId: SignInData._id,
                     role: SignInData.role,
                     image: SignInData.image
-                }, process.env.JWT_KEY)
-                res.cookie(process.env.JWT_KEY, token, { httpOnly: true, secure: false , expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) })
-                    .json({ success: true, token: token, role: SignInData.role, message: "Login Success" , user :SignInData })
+                }, process.env.JWT_KEY);
+
+                // Ensure only one response is sent
+                if (!res.headersSent) {
+                    res.cookie(process.env.JWT_KEY, token, { httpOnly: true, secure: false, expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) })
+                        .json({ success: true, token: token, role: SignInData.role, message: "Login Success", user: SignInData });
+                }
+            } else {
+                // Ensure only one response is sent
+                if (!res.headersSent) {
+                    res.status(400).send({ success: false, message: "Password Incorrect" });
+                }
             }
-            else {
-                res.send({ success: false, message: "Password Incorrect" })
+        } else {
+            // Ensure only one response is sent
+            if (!res.headersSent) {
+                res.status(404).send({ success: false, message: "User not found" });
             }
         }
-        else {
-            res.send({ success: false, message: "User not found" })
+    } catch (err) {
+        // Ensure only one response is sent
+        if (!res.headersSent) {
+            res.status(500).send({ success: false, message: err.message });
         }
-    }
-    catch (err) {
-        res.status(500).send({ success: false, message: err.message });
-        console.log(err)
+        console.log(err);
     }
 };
+
 
 // logout 
 
