@@ -27,7 +27,7 @@ export const LeadTeamMembers = () => {
     }
     return (
         <div className="w-full h-full">
-            <div className="w-full h-fit flex items-center  justify-between px-1 max-sm:px-2">
+            <div className="w-full h-fit flex items-center  justify-between px-1 max-sm:px-2 max-sm:flex-col max-sm:gap-5">
                 <h1 className="text-xl font-bold">Your Team Members</h1>
                 <form className="w-[60%] flex gap-5 justify-end max-sm:w-full">
                     <Input

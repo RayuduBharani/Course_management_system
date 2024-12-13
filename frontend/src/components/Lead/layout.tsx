@@ -9,9 +9,9 @@ import { Sidebar, SidebarBody, SidebarLink } from "../ui/sidebar";
 import { cn } from "@/lib/utils";
 
 export function LeadLayout() {
-    const dispatch = useDispatch<AppDispatch>()
-    
-    const { profileInfo } = useSelector((state: RootState) => state.profile)
+    const dispatch = useDispatch<AppDispatch>();
+
+    const { profileInfo } = useSelector((state: RootState) => state.profile);
     const links = [
         {
             label: "Home",
@@ -42,14 +42,22 @@ export function LeadLayout() {
             ),
         }
     ];
+
     useEffect(() => {
-        dispatch(LeadProfileInfo())
-    }, [dispatch])
+        dispatch(LeadProfileInfo());
+    }, [dispatch]);
 
     const [open, setOpen] = useState(false);
+
     const handleLogout = () => {
-        dispatch(Logout())
-    }
+        dispatch(Logout());
+    };
+
+    const handleLinkClick = () => {
+        if (open) {
+            setOpen(false); // Close the sidebar on link click (for mobile view)
+        }
+    };
 
     return (
         <div
@@ -67,7 +75,11 @@ export function LeadLayout() {
                             />}
                         <div className="mt-24 flex flex-col gap-3">
                             {links.map((link, idx) => (
-                                <SidebarLink key={idx} link={link} />
+                                <SidebarLink 
+                                    key={idx} 
+                                    link={link} 
+                                    onClick={handleLinkClick}  // Close sidebar on link click
+                                />
                             ))}
                             <div className="flex gap-3 mt-3 cursor-pointer" onClick={handleLogout}>
                                 <i className="fa-solid fa-reply-all"></i>
@@ -90,6 +102,7 @@ export function LeadLayout() {
                                     />
                                 ),
                             }}
+                            onClick={handleLinkClick}  // Close sidebar when profile link is clicked
                         />
                     </div>
                 </SidebarBody>
