@@ -74,7 +74,6 @@ export default {
         }
     },
     plugins: [
-        require("tailwindcss-animate"),
         function ({ addUtilities }) {
             addUtilities({
                 '.no-scrollbar': {
