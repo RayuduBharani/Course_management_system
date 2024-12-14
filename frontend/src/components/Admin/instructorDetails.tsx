@@ -19,7 +19,7 @@ export default function InstructorDetails() {
     const param = location.pathname.split("/")[3];
 
     const fetchInstructorEarnings = async () => {
-        const response = await fetch(`https://course-management-system-il4f.onrender.com/admin/instructor/oneuser/${param}`, {
+        const response = await fetch(`http://localhost:8000/admin/instructor/oneuser/${param}`, {
             credentials: "include",
         });
         const data = await response.json();

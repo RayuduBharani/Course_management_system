@@ -15,7 +15,7 @@ const initialState: IAuthenticatedProps = {
 export const LoginUser = createAsyncThunk(
     "/auth/signin",
     async (formData: IRegistrationCredentials) => {
-        const response = await fetch("https://course-management-system-il4f.onrender.com/api/auth/signin", {
+        const response = await fetch("http://localhost:8000/api/auth/signin", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -31,7 +31,7 @@ export const LoginUser = createAsyncThunk(
 export const CheckAuthentication = createAsyncThunk(
     "auth/check-auth",
     async () => {
-        const response = await fetch("https://course-management-system-il4f.onrender.com/api/auth/check-auth", {
+        const response = await fetch("http://localhost:8000/api/auth/check-auth", {
             method: "GET",
             credentials: "include"
         });
@@ -43,7 +43,7 @@ export const CheckAuthentication = createAsyncThunk(
 export const FetchInstructor = createAsyncThunk(
     "/check/verify-instructor",
     async (formData: instructorFormData) => {
-        const response = await fetch("https://course-management-system-il4f.onrender.com/api/check-verify/instructor", {
+        const response = await fetch("http://localhost:8000/api/check-verify/instructor", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -59,7 +59,7 @@ export const FetchInstructor = createAsyncThunk(
 export const FetchLead = createAsyncThunk(
     "/check/verify-Lead",
     async (formData: LeadFormData) => {
-        const response = await fetch("https://course-management-system-il4f.onrender.com/api/check-verify/lead", {
+        const response = await fetch("http://localhost:8000/api/check-verify/lead", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -75,7 +75,7 @@ export const FetchLead = createAsyncThunk(
 export const FetchStudent = createAsyncThunk(
     "/check/verify-student",
     async (formData: StudentFormData) => {
-        const response = await fetch("https://course-management-system-il4f.onrender.com/api/check-verify/student", {
+        const response = await fetch("http://localhost:8000/api/check-verify/student", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -91,7 +91,7 @@ export const FetchStudent = createAsyncThunk(
 export const Logout = createAsyncThunk(
     "/" ,
     async () =>{
-        const response = await fetch("https://course-management-system-il4f.onrender.com/api/auth/logout" , {
+        const response = await fetch("http://localhost:8000/api/auth/logout" , {
             credentials : "include"
         })
         const data = await response.json()
@@ -102,7 +102,7 @@ export const Logout = createAsyncThunk(
 export const GoogleAuth = createAsyncThunk(
     "/check/google",
     async (formData : IGoogleLogin) => {
-        const response = await fetch("https://course-management-system-il4f.onrender.com/api/auth/google", {
+        const response = await fetch("http://localhost:8000/api/auth/google", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

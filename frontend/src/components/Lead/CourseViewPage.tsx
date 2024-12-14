@@ -23,7 +23,7 @@ export default function LeadCourseDetailesView() {
     const [approvalUrl, setApprovalUrl] = useState("")
     const [isProcessing, setIsProcessing] = useState(false)
     const FetchCourseInfo = async () => {
-        const response = await fetch(`https://course-management-system-il4f.onrender.com/courses/get/${id}`)
+        const response = await fetch(`http://localhost:8000/courses/get/${id}`)
         const data = await response.json()
         setCourseInfo(data)
     }
@@ -54,7 +54,7 @@ export default function LeadCourseDetailesView() {
             courseTitle: courseInfo?.title
         }
         try {
-            const response = await fetch("https://course-management-system-il4f.onrender.com/lead/order/create", {
+            const response = await fetch("http://localhost:8000/lead/order/create", {
                 method: "POST",
                 headers: {
                     "Content-type": "application/json"

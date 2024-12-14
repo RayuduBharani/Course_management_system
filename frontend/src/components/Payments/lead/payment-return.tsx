@@ -22,7 +22,7 @@ export default function PaymentReturn() {
                     orderId: currentOrderId,
                     leadId : user.userId
                 }
-                const respose = await fetch("https://course-management-system-il4f.onrender.com/lead/order/caputre", {
+                const respose = await fetch("http://localhost:8000/lead/order/caputre", {
                     method: "POST",
                     headers: {
                         "Content-type": "application/json"

@@ -16,7 +16,7 @@ const initialState:Admininitialstate={
 export const FetchAdminCourseView = createAsyncThunk(
     'admin/mycourses/view-page',
     async(id:string)=>{
-        const response = await fetch(`https://course-management-system-il4f.onrender.com/admin/course/viewcourse/${id}`,{
+        const response = await fetch(`http://localhost:8000/admin/course/viewcourse/${id}`,{
             credentials:'include'
         })
         const data = await response.json();

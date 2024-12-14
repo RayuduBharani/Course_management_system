@@ -15,7 +15,7 @@ export default function Orders() {
     const [totalAmount, setTotalAmount] = useState<number>(0);
 
     const fetchInstructorEarnings = async () => {
-        const response = await fetch("https://course-management-system-il4f.onrender.com/admin/course/orders", {
+        const response = await fetch("http://localhost:8000/admin/course/orders", {
             credentials: "include",
         });
         const data = await response.json();
