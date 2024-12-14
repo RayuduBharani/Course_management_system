@@ -24,7 +24,7 @@ const app = express();
 app.use(express.json())
 app.use(cookieParser())
 app.use(cors({
-    origin: 'https://course-management-system-blue.vercel.app',
+    origin: 'https://cms-five-ochre.vercel.app',
     credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     allowedHeaders: 'Content-Type, Authorization',
