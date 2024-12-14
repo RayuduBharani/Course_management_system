@@ -51,6 +51,7 @@ import EarningPage from './Pages/Instructor/EarningPage'
 import InstructorDetails from './components/Admin/instructorDetails'
 import Payment from './Pages/Admin/pay'
 
+
 function App() {
     const dispatch = useDispatch<AppDispatch>()
     const { IsAuthenticated, user, IsLoading } = useSelector((state: RootState) => state.auth);
