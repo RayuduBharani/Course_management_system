@@ -67,6 +67,7 @@ export default function StudentForm() {
                 dispatch(FetchStudent(newStudentData))
                     .then((data) => {
                         setLoading(false)
+                        console.log(data)
                         if(data.payload){
                             toast({
                                 title : data.payload.message

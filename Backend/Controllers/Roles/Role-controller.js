@@ -57,6 +57,7 @@ const InstructureRole = async (req, res) => {
         }
     }
     catch (err) {
+        console.log(err)
         res.send({ success: false, message: err.message })
     }
 }
@@ -104,6 +105,7 @@ const TeamLeadRole = async (req, res) => {
             })
         }
         else {
+            console.log(err)
             res.send({
                 success: true,
                 message: "Unautharized user !"
@@ -175,6 +177,7 @@ const StudentRole = async (req, res) => {
         }
     }
     catch (err) {
+        console.log(err)
         res.send({ success: false, message: err.message })
     }
 }

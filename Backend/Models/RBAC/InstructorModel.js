@@ -10,8 +10,7 @@ const InstuctureSchema = new mongoose.Schema({
     },
     rollNumber: {
         type: String,
-        required: true,
-        unique: true
+        required: true
     },
     branch: {
         type: String,
