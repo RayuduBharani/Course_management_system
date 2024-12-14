@@ -1,10 +1,4 @@
 {
-    "projects": [
-        {
-            "name": "cms-frontend",
-            "root": "frontend"
-        }
-    ],
     "builds": [
         {
             "src": "frontend/index.html",
