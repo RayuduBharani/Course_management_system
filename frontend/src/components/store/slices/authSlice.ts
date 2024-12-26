@@ -73,7 +73,7 @@ export const FetchLead = createAsyncThunk(
 )
 
 export const FetchStudent = createAsyncThunk(
-    "/check/verify-student",
+    "/check/verify",
     async (formData: StudentFormData) => {
         const response = await fetch("https://cms-nij0.onrender.com/api/check-verify/student", {
             method: "POST",

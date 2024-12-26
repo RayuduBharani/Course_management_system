@@ -124,7 +124,9 @@ const StudentRole = async (req, res) => {
     console.log(UserInfo)
     try {
         const cookiename = process.env.JWT_KEY
+        console.log(cookiename)
         const token = req.cookies[cookiename]
+        console.log(token)
         const decode = jwt.verify(token, "BHARANI")
         const existingStudent = await StudentModel.findOne({ email: decode.email });
         if (existingStudent) {
