@@ -67,8 +67,8 @@ const TeamLeadRole = async (req, res) => {
     await db()
     const UserInfo = req.body
     try {
-        const cookiename = "BHARANI"
-        const token = req.cookies[cookiename]
+        // const cookiename = "BHARANI"
+        const token = req.cookies.BHARANI
         const decode = jwt.verify(token, "BHARANI")
         const NewLeadData = new LeadModel({
             userId: decode.userId,
@@ -113,7 +113,8 @@ const TeamLeadRole = async (req, res) => {
         }
     }
     catch (err) {
-        res.send({ success: false, message: err.message })
+        console.log(err)
+        res.send({ success: false, message: err})
     }
 }
 
