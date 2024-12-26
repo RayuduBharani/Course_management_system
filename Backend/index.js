@@ -24,7 +24,7 @@ const app = express();
 app.use(express.json())
 app.use(cookieParser())
 app.use(cors({
-    origin: ['http://localhost:5173', "https://course-management-system-iota-wheat.vercel.app"] ,
+    origin: 'http://localhost:5173' ,
     credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     allowedHeaders: 'Content-Type, Authorization',
@@ -66,6 +66,6 @@ app.use("/admin/course", AdminCourseAccessRouter)
 app.use("/admin/course",adminViewCourse);
 app.use("/admin/instructor" , Instrctordetailes)
 
-app.listen(process.env.PORT, '0.0.0.0', () => {
+app.listen(process.env.PORT || 8000, '0.0.0.0', () => {
     console.log(`Server running on http://localhost/${process.env.PORT}`)
 })
