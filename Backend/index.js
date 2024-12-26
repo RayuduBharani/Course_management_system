@@ -29,7 +29,7 @@ app.use(cors({
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     allowedHeaders: 'Content-Type, Authorization',
 }))
-
+app.options('*', cors());
 app.get("/", (req, res) => {
     res.send({ success: true, message: "It's Working" })
 })

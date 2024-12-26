@@ -26,7 +26,7 @@ const initialState : InitialState = {
 export const StudentProfileInfo = createAsyncThunk(
     "/student/profile",
     async () => {
-        const response = await fetch("http://localhost:8000/student/profile/info" , {
+        const response = await fetch("https://cms-nij0.onrender.com/student/profile/info" , {
             credentials : "include"
         })
         const data = await response.json()
@@ -37,7 +37,7 @@ export const StudentProfileInfo = createAsyncThunk(
 export const StudentUpdateProfileInfo = createAsyncThunk(
     "/student/profile/edit",
     async (formData : IUpdateProfileData) => {
-        const response = await fetch("http://localhost:8000/student/profile/update", {
+        const response = await fetch("https://cms-nij0.onrender.com/student/profile/update", {
             credentials: "include",
             method: "PUT",
             headers: {

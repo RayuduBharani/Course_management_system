@@ -10,8 +10,8 @@ export default function LeadMyCourses() {
     const [search, setSearch] = useState<string>('');
     const FetchMyCourses = async () => {
         const url = search
-            ? `http://localhost:8000/lead/mycourse/search/${search}`
-            : "http://localhost:8000/lead/mycourse/all";
+            ? `https://cms-nij0.onrender.com/lead/mycourse/search/${search}`
+            : "https://cms-nij0.onrender.com/lead/mycourse/all";
 
         const response = await fetch(url,{
                 credentials: "include"

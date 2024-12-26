@@ -22,7 +22,7 @@ export default function StudentPaymentReturn() {
                     studentId : user.userId
                 }
                 try {
-                    const respose = await fetch("http://localhost:8000/lead/order/caputre/stu", {
+                    const respose = await fetch("https://cms-nij0.onrender.com/lead/order/caputre/stu", {
                         method: "POST",
                         headers: {
                             "Content-type": "application/json"

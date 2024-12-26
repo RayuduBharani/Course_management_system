@@ -42,7 +42,7 @@ export default function Signup() {
             email: email,
             password: password
         }
-        const response = await fetch("http://localhost:8000/api/auth/signup", {
+        const response = await fetch("https://cms-nij0.onrender.com/api/auth/signup", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

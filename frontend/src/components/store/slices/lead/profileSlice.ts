@@ -9,7 +9,7 @@ const initialState: InitialState = {
 export const LeadProfileInfo = createAsyncThunk(
     "/lead/dashboard",
     async () => {
-        const response = await fetch("http://localhost:8000/lead/profile/info", {
+        const response = await fetch("https://cms-nij0.onrender.com/lead/profile/info", {
             credentials: "include"
         })
         const data = await response.json()
@@ -20,7 +20,7 @@ export const LeadProfileInfo = createAsyncThunk(
 export const UpdateLeadProfileInfo = createAsyncThunk(
     "/lead/profile",
     async (formData: IUpdateProfileData) => {
-        const response = await fetch("http://localhost:8000/lead/profile/update", {
+        const response = await fetch("https://cms-nij0.onrender.com/lead/profile/update", {
             credentials: "include",
             method: "PUT",
             headers: {

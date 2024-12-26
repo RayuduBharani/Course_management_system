@@ -15,7 +15,7 @@ export default function EarningPage() {
     const [totalAmount, setTotalAmount] = useState<number>(0);
 
     const fetchInstructorEarnings = async () => {
-        const response = await fetch("http://localhost:8000/instructor/earning/orders", {
+        const response = await fetch("https://cms-nij0.onrender.com/instructor/earning/orders", {
             credentials: "include",
         });
         const data = await response.json();

@@ -160,7 +160,7 @@ const AddCourse = () => {
         };
 
         console.log("Submitting form data: ", formSubmissionData);
-        fetch('http://localhost:8000/instructor/course/add', {
+        fetch('https://cms-nij0.onrender.com/instructor/course/add', {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
