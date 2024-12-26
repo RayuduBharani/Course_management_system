@@ -1,9 +1,9 @@
-const jwt = require('jsonwebtoken');
 const InstuctureModel = require('../../Models/RBAC/InstructorModel');
 const userModel = require('../../Models/RBAC/userModel');
 const db = require('../../Utils/DB/db');
 const LeadModel = require('../../Models/RBAC/LeadModel');
 const StudentModel = require('../../Models/RBAC/StudentModel');
+const jwt = require("jsonwebtoken");
 
 // Instucture Role 
 const InstructureRole = async (req, res) => {
