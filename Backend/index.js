@@ -22,14 +22,25 @@ const Instrctordetailes = require("./routes/admin/instructor-route")
 
 const app = express();
 app.use(express.json())
-app.use(cookieParser())
 app.use(cors({
-    origin: 'http://localhost:5173' ,
+    origin: 'http://localhost:5173',
     credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    allowedHeaders: "*",
-}))
-app.options('*', cors());
+    allowedHeaders: [
+        'Content-Type',
+        'Authorization',
+        'Origin',
+        'X-Requested-With',
+        'Accept',
+        'x-auth-token',
+        'x-auth-token-lead',
+        'x-auth-token-student',
+        'x-auth-token-admin',
+        'x-auth-token-instructor'
+    ]
+}));
+
+app.use(cookieParser())
 app.get("/", (req, res) => {
     res.send({ success: true, message: "It's Working" })
 })
