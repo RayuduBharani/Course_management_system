@@ -58,7 +58,7 @@ const InstructureRole = async (req, res) => {
     }
     catch (err) {
         console.log(err)
-        res.send({ success: false, message: err.message })
+        res.send({ success: false, message: err })
     }
 }
 
@@ -125,7 +125,7 @@ const StudentRole = async (req, res) => {
     try {
         const cookiename = process.env.JWT_KEY
         const token = req.cookies[cookiename]
-        const decode = jwt.verify(token, process.env.JWT_KEY)
+        const decode = jwt.verify(token, "BHARANI")
         const existingStudent = await StudentModel.findOne({ email: decode.email });
         if (existingStudent) {
             return res.status(400).send({
