@@ -10,9 +10,9 @@ const InstructureRole = async (req, res) => {
     await db()
     const UserInfo = req.body
     try {
-        const cookiename = process.env.JWT_KEY
+        const cookiename = "BHARANI"
         const token = req.cookies[cookiename]
-        const decode = jwt.verify(token, process.env.JWT_KEY)
+        const decode = jwt.verify(token, "BHARANI")
         const NewInstructorData = new InstuctureModel({
             userId: decode.userId,
             name: decode.name,
@@ -36,9 +36,9 @@ const InstructureRole = async (req, res) => {
                 image: NewInstructorData.image,
                 email: NewInstructorData.email,
                 role: NewInstructorData.role
-            }, process.env.JWT_KEY);
+            }, "BHARANI");
             await NewInstructorData.save()
-            return res.cookie(process.env.JWT_KEY, token, {
+            return res.cookie("BHARANI", token, {
                 httpOnly: true,
                 secure: false,
                 expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
@@ -67,9 +67,9 @@ const TeamLeadRole = async (req, res) => {
     await db()
     const UserInfo = req.body
     try {
-        const cookiename = process.env.JWT_KEY
+        const cookiename = "BHARANI"
         const token = req.cookies[cookiename]
-        const decode = jwt.verify(token, process.env.JWT_KEY)
+        const decode = jwt.verify(token, "BHARANI")
         const NewLeadData = new LeadModel({
             userId: decode.userId,
             name: decode.name,
@@ -91,9 +91,9 @@ const TeamLeadRole = async (req, res) => {
                 email: NewLeadData.email,
                 role: NewLeadData.role,
                 team: NewLeadData.teamNo
-            }, process.env.JWT_KEY);
+            }, "BHARANI");
             await NewLeadData.save()
-            res.cookie(process.env.JWT_KEY, token, {
+            res.cookie("BHARANI", token, {
                 httpOnly: true,
                 expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
                 secure: false,
@@ -123,7 +123,7 @@ const StudentRole = async (req, res) => {
     const UserInfo = req.body
     console.log(UserInfo)
     try {
-        const cookiename = process.env.JWT_KEY
+        const cookiename = "BHARANI"
         console.log(cookiename)
         const token = req.cookies[cookiename]
         console.log(token)
@@ -159,8 +159,8 @@ const StudentRole = async (req, res) => {
                 email: NewStudentData.email,
                 role: NewStudentData.role,
                 team: NewStudentData.teamNum
-            }, process.env.JWT_KEY);
-            res.cookie(process.env.JWT_KEY, token, {
+            }, "BHARANI");
+            res.cookie("BHARANI", token, {
                 httpOnly: true,
                 secure: false,
                 expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)

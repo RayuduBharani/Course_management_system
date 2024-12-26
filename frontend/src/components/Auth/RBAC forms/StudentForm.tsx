@@ -68,7 +68,7 @@ export default function StudentForm() {
                     .then((data) => {
                         setLoading(false)
                         console.log(data)
-                        if(data.payload){
+                        if(data.payload.success){
                             toast({
                                 title : data.payload.message
                             })
