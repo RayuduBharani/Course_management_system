@@ -22,14 +22,13 @@ const Instrctordetailes = require("./routes/admin/instructor-route")
 
 const app = express();
 app.use(express.json())
-app.use(cookieParser())
-app.options('*', cors());
 app.use(cors({
     origin: 'http://localhost:5173' ,
     credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     allowedHeaders: "*",
 }))
+app.use(cookieParser())
 app.get("/", (req, res) => {
     res.send({ success: true, message: "It's Working" })
 })
