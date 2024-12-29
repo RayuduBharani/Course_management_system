@@ -22,10 +22,10 @@ const InstructureRole = async (req, res) => {
             profileImg: UserInfo.profileImg,
             role: "Instructor",
             linkedIn: UserInfo.linkedIn,
-            gitHub: UserInfo.gitHub, 
-            UPI : UserInfo.UPI ,
-            gender : UserInfo.gender ,
-            college : UserInfo.college
+            gitHub: UserInfo.gitHub,
+            UPI: UserInfo.UPI,
+            gender: UserInfo.gender,
+            college: UserInfo.college
         })
         const FindUpdateUserRole = await userModel.findOne({ _id: decode.userId })
         if (FindUpdateUserRole) {
@@ -114,7 +114,7 @@ const TeamLeadRole = async (req, res) => {
     }
     catch (err) {
         console.log(err)
-        res.send({ success: false, message: err})
+        res.send({ success: false, message: err })
     }
 }
 
@@ -124,10 +124,11 @@ const StudentRole = async (req, res) => {
     const UserInfo = req.body
     console.log(UserInfo)
     try {
-        const cookiename = "BHARANI"
-        console.log(cookiename)
-        const token = req.cookies[cookiename]
-        console.log(token)
+        const cookieName = "BHARANI";
+        console.log("Cookie name:", cookieName);
+
+        const token = req.cookies[cookieName];
+        console.log("Token:", token);
         const decode = jwt.verify(token, "BHARANI")
         const existingStudent = await StudentModel.findOne({ email: decode.email });
         if (existingStudent) {
@@ -147,7 +148,7 @@ const StudentRole = async (req, res) => {
             teamNum: UserInfo.teamNum,
             gender: UserInfo.gender
         })
-       
+
         const FindUpdateUserRole = await userModel.findOne({ _id: decode.userId })
         console.log(FindUpdateUserRole)
         if (FindUpdateUserRole) {
