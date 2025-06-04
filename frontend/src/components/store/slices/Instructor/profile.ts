@@ -23,7 +23,7 @@ const initialState : InstructorProfileInitialstate= {
 export const FetchProfileInfo = createAsyncThunk(
     "instructor/profile",
     async () => {
-        const response = await fetch("https://cms-nij0.onrender.com/instructor/profile/view", {
+        const response = await fetch("http://localhost:8000/instructor/profile/view", {
             method: "GET",
             credentials: "include"
         })
@@ -36,7 +36,7 @@ export const FetchProfileInfo = createAsyncThunk(
 export const UpdateInstructorProfileInfo = createAsyncThunk(
     "instructor/profile/update",
     async (formData : FORMDATA) => {
-        const response = await fetch("https://cms-nij0.onrender.com/instructor/profile/update", {
+        const response = await fetch("http://localhost:8000/instructor/profile/update", {
             method: "PUT",
             credentials: "include",
             headers : {

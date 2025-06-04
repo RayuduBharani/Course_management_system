@@ -22,30 +22,10 @@ const Instrctordetailes = require("./routes/admin/instructor-route")
 
 const app = express();
 app.use(express.json())
-const allowedOrigins = ['http://localhost:5173', "https://course-management-system-iota-wheat.vercel.app"];
 
 app.use(cors({
-    origin: function (origin, callback) {
-        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    credentials: true,
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    allowedHeaders: [
-        'Content-Type',
-        'Authorization',
-        'Origin',
-        'X-Requested-With',
-        'Accept',
-        'x-auth-token',
-        'x-auth-token-lead',
-        'x-auth-token-student',
-        'x-auth-token-admin',
-        'x-auth-token-instructor'
-    ]
+    origin: 'http://localhost:5173', // or whatever port your Vite frontend runs on
+    credentials: true
 }));
 
 app.use(cookieParser())
@@ -86,5 +66,5 @@ app.use("/admin/course",adminViewCourse);
 app.use("/admin/instructor" , Instrctordetailes)
 
 app.listen(process.env.PORT || 8000, '0.0.0.0', () => {
-    console.log(`Server running on http://localhost/${process.env.PORT}`)
+    console.log(`Server running on http://localhost/${process.env.PORT || 8000}`);
 })

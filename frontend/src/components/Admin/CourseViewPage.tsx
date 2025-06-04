@@ -18,7 +18,7 @@ export default function AdminCourseDetailesView() {
     const [courseInfo, setCourseInfo] = useState<ICourse>()
 
     const FetchCourseInfo = async () => {
-        const response = await fetch(`https://cms-nij0.onrender.com/courses/get/${id}`)
+        const response = await fetch(`http://localhost:8000/courses/get/${id}`)
         const data = await response.json()
         setCourseInfo(data)
     }
@@ -33,7 +33,7 @@ export default function AdminCourseDetailesView() {
     }
 
     const handleDelete = async (id: string) => {
-        const response = await fetch(`https://cms-nij0.onrender.com/admin/course/delete/${id}`, {
+        const response = await fetch(`http://localhost:8000/admin/course/delete/${id}`, {
             method: "PUT"
         })
         const data = await response.json();

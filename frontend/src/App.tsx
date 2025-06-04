@@ -65,7 +65,7 @@ function App() {
             <Loader />;
         </div>
     }
-
+    console.log("User Role:", user.role);
     return (
         <>
             <Routes>

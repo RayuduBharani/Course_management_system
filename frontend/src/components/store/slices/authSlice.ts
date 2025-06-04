@@ -15,7 +15,7 @@ const initialState: IAuthenticatedProps = {
 export const LoginUser = createAsyncThunk(
     "/auth/signin",
     async (formData: IRegistrationCredentials) => {
-        const response = await fetch("https://cms-nij0.onrender.com/api/auth/signin", {
+        const response = await fetch("http://localhost:8000/api/auth/signin", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -31,19 +31,40 @@ export const LoginUser = createAsyncThunk(
 export const CheckAuthentication = createAsyncThunk(
     "auth/check-auth",
     async () => {
-        const response = await fetch("https://cms-nij0.onrender.com/api/auth/check-auth", {
-            method: "GET",
-            credentials: "include"
-        });
-        const data = await response.json();
-        return data
+        try {
+            const response = await fetch("http://localhost:8000/api/auth/check-auth", {
+                method: "GET",
+                credentials: "include",
+                headers: {
+                    "Accept": "application/json",
+                }
+            });
+            
+            if (!response.ok) {
+                console.error('Auth check failed:', {
+                    status: response.status,
+                    statusText: response.statusText
+                });
+                
+                const errorData = await response.json().catch(() => ({}));
+                console.error('Error details:', errorData);
+                
+                throw new Error(`Auth check failed: ${response.status} ${response.statusText}`);
+            }
+            
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Auth check error:', error);
+            throw error;
+        }
     }
 );
 
 export const FetchInstructor = createAsyncThunk(
     "/check/verify-instructor",
     async (formData: instructorFormData) => {
-        const response = await fetch("https://cms-nij0.onrender.com/api/check-verify/instructor", {
+        const response = await fetch("http://localhost:8000/api/check-verify/instructor", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -59,7 +80,7 @@ export const FetchInstructor = createAsyncThunk(
 export const FetchLead = createAsyncThunk(
     "/check/verify-Lead",
     async (formData: LeadFormData) => {
-        const response = await fetch("https://cms-nij0.onrender.com/api/check-verify/lead", {
+        const response = await fetch("http://localhost:8000/api/check-verify/lead", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -76,7 +97,7 @@ export const FetchStudent = createAsyncThunk(
     "/check/verify-student",
     async (formData: StudentFormData) => {
         console.log(formData)
-        const response = await fetch("https://cms-nij0.onrender.com/api/check-verify/student", {
+        const response = await fetch("http://localhost:8000/api/check-verify/student", {
             method: "POST",
             credentials: 'include',
             headers: {
@@ -93,7 +114,7 @@ export const FetchStudent = createAsyncThunk(
 export const Logout = createAsyncThunk(
     "/" ,
     async () =>{
-        const response = await fetch("https://cms-nij0.onrender.com/api/auth/logout" , {
+        const response = await fetch("http://localhost:8000/api/auth/logout" , {
             credentials : "include"
         })
         const data = await response.json()
@@ -104,7 +125,7 @@ export const Logout = createAsyncThunk(
 export const GoogleAuth = createAsyncThunk(
     "/check/google",
     async (formData : IGoogleLogin) => {
-        const response = await fetch("https://cms-nij0.onrender.com/api/auth/google", {
+        const response = await fetch("http://localhost:8000/api/auth/google", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -132,6 +153,7 @@ export const authSlice = createSlice({
                 state.IsLoading = true
             })
             .addCase(LoginUser.fulfilled, (state, action) => {
+                // eslint-disable-next-line @typescript-eslint/no-unused-expressions
                 state.IsLoading = false,
                     state.IsAuthenticated = action.payload.success,
                     state.user = action.payload.user
@@ -144,6 +166,8 @@ export const authSlice = createSlice({
                 state.IsLoading = true
             })
             .addCase(GoogleAuth.fulfilled, (state, action) => {
+                
+                // eslint-disable-next-line @typescript-eslint/no-unused-expressions
                 state.IsLoading = false,
                 state.IsAuthenticated = action.payload.success,
                 state.user = action.payload.user
@@ -157,12 +181,14 @@ export const authSlice = createSlice({
                 state.IsLoading = true
             })
             .addCase(CheckAuthentication.fulfilled, (state, action) => {
+                // eslint-disable-next-line @typescript-eslint/no-unused-expressions
                 state.IsAuthenticated = action.payload.success ? true : false,
                 state.IsLoading = false
                 state.user = action.payload.user
             })
             .addCase(CheckAuthentication.rejected, (state) => {
                 state.IsLoading = false
+                // eslint-disable-next-line @typescript-eslint/no-unused-expressions
                 state.IsAuthenticated = false ,
                 state.user.role = "Empty",
                 state.user.userId = "" 
@@ -173,6 +199,7 @@ export const authSlice = createSlice({
                 state.IsLoading = true
             })
             .addCase(FetchInstructor.fulfilled, (state, action) => {
+                // eslint-disable-next-line @typescript-eslint/no-unused-expressions
                 state.IsLoading = false,
                     state.IsAuthenticated = action.payload.success,
                     state.user.role = action.payload.success ? action.payload.role : "Instructor"
@@ -186,6 +213,7 @@ export const authSlice = createSlice({
                 state.IsLoading = true
             })
             .addCase(FetchLead.fulfilled, (state, action) => {
+                // eslint-disable-next-line @typescript-eslint/no-unused-expressions
                 state.IsLoading = false,
                     state.IsAuthenticated = action.payload.success,
                     state.user.role = action.payload.success ? action.payload.role : "Lead"
@@ -198,6 +226,7 @@ export const authSlice = createSlice({
                 state.IsLoading = true
             })
             .addCase(FetchStudent.fulfilled, (state, action) => {
+                // eslint-disable-next-line @typescript-eslint/no-unused-expressions
                 state.IsLoading = false,
                     state.IsAuthenticated = action.payload.success,
                     state.user.role = action.payload.success ? action.payload.role : "Student"
@@ -211,6 +240,7 @@ export const authSlice = createSlice({
                 state.IsLoading = true
             })
             .addCase(Logout.fulfilled, (state, action) => {
+                // eslint-disable-next-line @typescript-eslint/no-unused-expressions
                 state.IsLoading = false,
                     state.IsAuthenticated = action.payload.success ? false : true
             })
