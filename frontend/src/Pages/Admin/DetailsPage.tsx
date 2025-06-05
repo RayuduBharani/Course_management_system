@@ -41,37 +41,47 @@ export default function StudentCourseEnrollDetailesPage() {
   }
 
   return (
-    <div className="w-full h-full flex flex-col lg:flex-row gap-4 p-4">
-      {/* Left Sidebar */}
-      <div className="lg:w-1/4 w-full lg:h-auto h-fit bg-white rounded-lg shadow-md mb-4 lg:mb-0">
-        <div className="p-4 flex items-center">
+    <div className="w-full h-full flex flex-col lg:flex-row gap-4 p-4 bg-background">
+      {/* Course Navigation Sidebar */}
+      <div className="lg:w-1/4 w-full lg:h-auto h-fit bg-white rounded-lg shadow-sm">
+        <div className="p-4">
           <Button
             onClick={() => navigate(-1)}
-            variant="link"
-            className="flex gap-2 shadow-md w-full border-2"
+            variant="ghost"
+            className="flex gap-2 w-full hover:bg-gray-100"
           >
-            <i className="fa-solid fa-arrow-left"></i> Back
+            <i className="fa-solid fa-arrow-left"></i> Back to Course
           </Button>
         </div>
-        <div className="border-t-2 mt-4">
-          <ScrollArea className="h-full w-full rounded-md">
+        <div className="border-t">
+          <ScrollArea className="h-[calc(100vh-180px)]">
             <div className="p-4">
-              <h4 className="mb-6 text-lg font-semibold">Course Videos List</h4>
+              <h4 className="mb-4 text-lg font-semibold text-gray-900">
+                Course Content
+              </h4>
               {courseData?.files &&
                 courseData.files.map((data, index) => (
                   <div
                     onClick={() => handleCourse(index)}
                     key={index}
-                    className={`${
-                      value && value - 1 === index ? "bg-gray-200 rounded-lg" : ""
-                    } text-sm font-semibold text-neutral-500 mt-2 truncate cursor-pointer py-1.5 px-4 hover:bg-gray-200 hover:rounded-lg`}
+                    className={`
+                      flex items-center gap-3 px-4 py-3 my-1 rounded-lg cursor-pointer
+                      transition-colors duration-200
+                      ${
+                        value && value - 1 === index
+                          ? "bg-blue-50 text-blue-600"
+                          : "text-gray-600 hover:bg-gray-50"
+                      }
+                    `}
                   >
                     {value && value - 1 === index ? (
-                      <i className="fa-solid fa-circle-pause mr-4"></i>
+                      <i className="fa-solid fa-circle-pause"></i>
                     ) : (
-                      <i className="fa-regular fa-circle-play mr-4"></i>
+                      <i className="fa-regular fa-circle-play"></i>
                     )}
-                    {data.title}
+                    <span className="text-sm font-medium truncate">
+                      {data.title}
+                    </span>
                   </div>
                 ))}
             </div>
@@ -79,26 +89,28 @@ export default function StudentCourseEnrollDetailesPage() {
         </div>
       </div>
 
-      {/* Right Video Player */}
-      <div className="lg:w-3/4 w-full shadow-md h-full border-2 border-gray-300 rounded-lg">
+      {/* Video Player Section */}
+      <div className="lg:w-3/4 w-full bg-white shadow-sm rounded-lg">
         {courseData?.files &&
           courseData.files
             .filter((_, index) => index + 1 === value)
             .map((data) => (
-              <div key={data.title} className="w-full h-full p-4">
-                <div className="text-center mb-4">
-                  <h1 className="font-bold text-2xl sm:text-xl">{data.title}</h1>
+              <div key={data.title} className="w-full h-full p-6">
+                <div className="mb-6">
+                  <h1 className="text-2xl font-semibold text-gray-900">
+                    {data.title}
+                  </h1>
                 </div>
-                <div className="w-full flex justify-center items-center h-[400px] sm:h-[300px] lg:h-[500px] mb-4">
+                <div className="w-full aspect-video rounded-lg overflow-hidden bg-gray-100">
                   {videoLoad ? (
-                    <div className="h-full flex justify-center items-center ">
+                    <div className="h-full flex justify-center items-center">
                       <BookLoader />
                     </div>
                   ) : (
                     <Videoplayer
                       thumbnail={courseData.thumbnail}
-                      width="95%"
-                      height="95%"
+                      width="100%"
+                      height="100%"
                       videoUrl={data.videoUrl}
                     />
                   )}

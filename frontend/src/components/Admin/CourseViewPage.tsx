@@ -1,64 +1,141 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import Loader from "../Loading"
 import { Button } from "../ui/button"
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
 import Videoplayer from "../Common/VideoPlayer/Videoplayer"
 
+interface ICourse {
+    _id: string;
+    title: string;
+    subtitle?: string;
+    description: string;
+    instructor: {
+        name: string;
+    };
+    updatedAt?: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    students: any[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    leads: any[];
+    objectives: string;
+    thumbnail: string;
+    files: Array<{
+        videoUrl: string;
+        title: string;
+        freePreview: boolean;
+    }>;
+    price: number;
+}
+
 export default function AdminCourseDetailesView() {
     const { id } = useParams()
     const navigate = useNavigate()
-    const [courseInfo, setCourseInfo] = useState<ICourse>()
+    const [courseInfo, setCourseInfo] = useState<ICourse | null>(null)
+    const [isLoading, setIsLoading] = useState(true)
+    const [error, setError] = useState<string | null>(null)
 
-    const FetchCourseInfo = async () => {
-        const response = await fetch(`http://localhost:8000/courses/get/${id}`)
-        const data = await response.json()
-        setCourseInfo(data)
-    }
+    const FetchCourseInfo = useCallback(async () => {
+        if (!id) return
+        
+        try {
+            setIsLoading(true)
+            setError(null)
+            const response = await fetch(`http://localhost:8000/courses/get/${id}`)
+            if (!response.ok) {
+                throw new Error('Failed to fetch course information')
+            }
+            const data = await response.json()
+            setCourseInfo(data)
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'An error occurred')
+            setCourseInfo(null)
+        } finally {
+            setIsLoading(false)
+        }
+    }, [id])    
 
     useEffect(() => {
         FetchCourseInfo()
-    }, [id])
+    }, [FetchCourseInfo])
 
     const [open, setOpen] = useState(false)
     const handleDailog = () => {
         setOpen(!open)
     }
 
-    const handleDelete = async (id: string) => {
-        const response = await fetch(`http://localhost:8000/admin/course/delete/${id}`, {
-            method: "PUT"
-        })
-        const data = await response.json();
-        if (data.success) {
-            navigate("/Admin/courses")
+    const handleDelete = async (courseId: string) => {
+        try {
+            setIsLoading(true)
+            const response = await fetch(`http://localhost:8000/admin/course/delete/${courseId}`, {
+                method: "PUT"
+            })
+            const data = await response.json()
+            if (data.success) {
+                navigate("/Admin/courses")
+            } else {
+                throw new Error(data.message || 'Failed to delete course')
+            }
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Failed to delete course')
+        } finally {
+            setIsLoading(false)
         }
     }
 
-    if (courseInfo == undefined) {
+    if (isLoading) {
         return <Loader />
     }
 
+    if (error) {
+        return (
+            <div className="w-full h-full flex flex-col items-center justify-center gap-4 p-4">
+                <p className="text-red-500">{error}</p>
+                <Button onClick={() => FetchCourseInfo()}>Retry</Button>
+            </div>
+        )
+    }
+
+    if (!courseInfo) {
+        return (
+            <div className="w-full h-full flex flex-col items-center justify-center gap-4 p-4">
+                <p>Course not found</p>
+                <Button onClick={() => navigate(-1)}>Go Back</Button>
+            </div>
+        )
+    }
+
     return (
-        <div className="w-full h-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 overflow-y-scroll">
-            <div className="w-full flex justify-between col-span-1 md:col-span-2 lg:col-span-3">
-                <Button onClick={() => navigate(-1)} variant="link" className="flex gap-2 mb-5"><i className="fa-solid fa-arrow-left"></i> Back</Button>
-                <Button variant='destructive' onClick={() => handleDelete(courseInfo._id)}>Delete this Course</Button>
+        <div className="w-full h-full flex flex-col gap-6 p-4 bg-background">
+            <div className="w-full flex justify-between items-center">
+                <Button
+                    onClick={() => navigate(-1)}
+                    variant="ghost"
+                    className="flex gap-2"
+                >
+                    <i className="fa-solid fa-arrow-left"></i> Back
+                </Button>
+                <Button
+                    variant='outline'
+                    className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                    onClick={() => handleDelete(courseInfo._id)}
+                >
+                    Delete Course
+                </Button>
             </div>
 
-            <div className="w-full h-fit bg-black col-span-1 dark:bg-background text-background dark:text-white border shadow-md px-5 py-4 rounded-lg md:col-span-2 lg:col-span-3">
-                <p className="font-bold text-xl">{courseInfo.title}</p>
-                <p className="mt-4 text-gray-400 text-sm">{courseInfo?.subtitle}</p>
-                <div className="mt-4 flex gap-8 font-semibold">
-                    <p className="text-sm text-gray-400">created by {courseInfo?.instructor.name}</p>
-                    <p className="text-sm text-gray-400">created on  {courseInfo?.updatedAt
+            <div className="w-full bg-white rounded-lg shadow-sm p-6">
+                <h1 className="text-2xl font-semibold text-gray-900">{courseInfo.title}</h1>
+                <p className="mt-2 text-gray-600">{courseInfo.subtitle}</p>
+                <div className="mt-4 flex flex-wrap gap-4 text-sm text-gray-500">
+                    <p>Instructor: {courseInfo.instructor.name}</p>
+                    <p>Updated: {courseInfo.updatedAt
                         ? new Date(courseInfo.updatedAt).toLocaleDateString("en-US", {
                             year: "numeric",
                             month: "short",
@@ -68,76 +145,86 @@ export default function AdminCourseDetailesView() {
                             year: "numeric",
                             month: "short",
                             day: "numeric",
-                        })}</p>
-                    <p className="text-sm text-gray-400">students : {courseInfo.students.length}</p>
-                    <p className="text-sm text-gray-400">leads : {courseInfo.leads.length}</p>
+                        })}
+                    </p>
+                    <p>Students: {courseInfo.students.length}</p>
+                    <p>Leads: {courseInfo.leads.length}</p>
                 </div>
             </div>
 
-            <div className="shadow-sm w-full h-fit px-5 py-4 border-2 rounded-lg col-span-1 md:col-span-2 lg:col-span-2">
-                <p className="font-bold">Course Description</p>
-                <p className="mt-2">{courseInfo.description}</p>
-            </div>
-
-            <div className="w-full h-full col-span-1 md:col-span-2 lg:col-span-1">
-                <div className="w-full h-fit rounded-lg px-5 py-4">
-                    <div className="w-full h-full">
-                        <Videoplayer width="100%" height="250px" thumbnail={courseInfo.thumbnail} videoUrl="https://firebasestorage.googleapis.com/v0/b/coursemanagementsystem-ca033.appspot.com/o/52%20-%20Project%20Overview.mp4?alt=media&token=326d2820-70ca-4a4a-b4db-e165a282b234" />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2 space-y-6">
+                    <div className="bg-white rounded-lg shadow-sm p-6">
+                        <h2 className="text-lg font-semibold mb-4">Course Description</h2>
+                        <p className="text-gray-600">{courseInfo.description}</p>
                     </div>
-                    <div className="mt-1.5 flex flex-col gap-3">
-                        <p className="font-bold text-lg pl-3"> ₹ {courseInfo.price} </p>
-                        <Button className="w-full" onClick={() => {
-                            navigate(`/Admin/courses/coureview/${courseInfo._id}`)
-                        }}>View this Course</Button>
+
+                    <div className="bg-white rounded-lg shadow-sm p-6">
+                        <h2 className="text-lg font-semibold mb-4">What you'll learn</h2>
+                        <ul className="space-y-2">
+                            {courseInfo.objectives.split(',').map((objective, index) => (
+                                <li key={index} className="flex gap-2 text-gray-600">
+                                    <i className="fa-solid fa-check text-green-500 mt-1"></i>
+                                    <span>{objective.trim()}</span>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                </div>
+
+                <div className="lg:col-span-1">
+                    <div className="bg-white rounded-lg shadow-sm p-6 sticky top-4">
+                        <div className="aspect-video mb-4">
+                            <Videoplayer
+                                width="100%"
+                                height="100%"
+                                thumbnail={courseInfo.thumbnail}
+                                videoUrl={courseInfo.files[0]?.videoUrl || ""}
+                            />
+                        </div>
+                        <p className="text-2xl font-bold mb-4">₹ {courseInfo.price}</p>
+                        <Button
+                            className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                            onClick={() => navigate(`/Admin/courses/coureview/${courseInfo._id}`)}
+                        >
+                            View Course Content
+                        </Button>
                     </div>
                 </div>
             </div>
 
-            <div className="shadow-sm w-full h-fit px-5 py-4 border-2 rounded-lg col-span-1 md:col-span-2 lg:col-span-3">
-                <p className="font-bold">What you'll learn</p>
-                {
-                    courseInfo.objectives.split(',').map((object, index) => {
-                        return <li key={index} className="mt-2">{object}</li>
-                    })
-                }
-            </div>
-
-            <div className="shadow-sm w-full h-fit px-5 py-4 border-2 rounded-lg col-span-1 md:col-span-2 lg:col-span-3">
-                <p className="font-bold mb-2">Course Curriculum</p>
-                {
-                    courseInfo.files.map((video, index) => {
-                        return (
-                            <div key={index} className="h-full w-full flex gap-5">
-                                <Dialog open={open} onOpenChange={setOpen}>
-                                    <div className={`flex gap-5 mt-3 items-center h-full ${video.freePreview ? "cursor-pointer" : "cursor-not-allowed"}`}>
-                                        {video.freePreview ? (
-                                            <DialogTrigger asChild>
-                                                <div className="flex items-center gap-3 mt-1">
-                                                    <i className="fa-regular fa-circle-play"></i>
-                                                    <p className="text-gray-600">{video.title}</p>
-                                                </div>
-                                            </DialogTrigger>
-                                        ) : (
-                                            <div className="flex items-center gap-3 mt-1">
-                                                <i className="fa-solid fa-lock"></i>
-                                                <p className="text-gray-500">{video.title}</p>
-                                            </div>
-                                        )}
-                                        <DialogContent>
-                                            <DialogHeader>
-                                                <DialogTitle className="mb-6 text-center">{video.title}</DialogTitle>
-                                                <Videoplayer width={"100%"} height={"250px"} videoUrl={video.videoUrl} />
-                                                <DialogDescription>
-                                                </DialogDescription>
-                                            </DialogHeader>
-                                            <Button onClick={handleDailog} variant="secondary">close</Button>
-                                        </DialogContent>
+            <div className="bg-white rounded-lg shadow-sm p-6">
+                <h2 className="text-lg font-semibold mb-4">Course Curriculum</h2>
+                <div className="space-y-2">
+                    {courseInfo.files.map((video, index) => (
+                        <Dialog key={index} open={open} onOpenChange={setOpen}>
+                            <div className="border rounded-lg p-3 hover:bg-gray-50 transition-colors">
+                                {video.freePreview ? (
+                                    <DialogTrigger asChild>
+                                        <div className="flex items-center gap-3 cursor-pointer">
+                                            <i className="fa-regular fa-circle-play text-blue-500"></i>
+                                            <p className="text-gray-700">{video.title}</p>
+                                        </div>
+                                    </DialogTrigger>
+                                ) : (
+                                    <div className="flex items-center gap-3">
+                                        <i className="fa-solid fa-lock text-gray-400"></i>
+                                        <p className="text-gray-500">{video.title}</p>
                                     </div>
-                                </Dialog>
+                                )}
+                                <DialogContent className="sm:max-w-[600px]">
+                                    <DialogHeader>
+                                        <DialogTitle className="mb-6">{video.title}</DialogTitle>
+                                        <Videoplayer width="100%" height="300px" videoUrl={video.videoUrl} />
+                                    </DialogHeader>
+                                    <Button onClick={handleDailog} variant="secondary" className="w-full">
+                                        Close Preview
+                                    </Button>
+                                </DialogContent>
                             </div>
-                        )
-                    })
-                }
+                        </Dialog>
+                    ))}
+                </div>
             </div>
         </div>
     )

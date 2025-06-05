@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { IconUpload } from "@tabler/icons-react";
 import { useDropzone } from "react-dropzone";
@@ -25,143 +25,98 @@ const secondaryVariant = {
   },
 };
 
-export const FileUpload = ({
-  onChange,
-}: {
+interface FileUploadProps {
+  name?: string;
   onChange?: (files: File[]) => void;
-}) => {
-  const [files, setFiles] = useState<File[]>([]);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  accept?: Record<string, string[]>;
+  maxSize?: number;
+  maxFiles?: number;
+  value?: File[];
+}
 
-  const handleFileChange = (newFiles: File[]) => {
-    setFiles((prevFiles) => [...prevFiles, ...newFiles]);
-    onChange && onChange(newFiles);
+export const FileUpload = ({
+  name = "profile",
+  onChange,
+  accept = {
+    "image/*": [".jpeg", ".jpg", ".png", ".gif"],
+  },
+  maxSize = 5242880, // 5MB
+  maxFiles = 1,
+  value,
+}: FileUploadProps) => {
+  const [files, setFiles] = useState<File[]>(value || []);
+  const [error, setError] = useState<string>("");
+
+  const onDrop = (acceptedFiles: File[]) => {
+    setError("");
+    if (acceptedFiles?.length > 0) {
+      const newFiles = acceptedFiles.slice(0, maxFiles);
+      setFiles(newFiles);
+      onChange?.(newFiles);
+    }
   };
 
-  const handleClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const { getRootProps, isDragActive } = useDropzone({
-    multiple: false,
-    noClick: true,
-    onDrop: handleFileChange,
-    onDropRejected: (error) => {
-      console.log(error);
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept,
+    maxSize,
+    maxFiles,
+    onDropRejected: (rejections) => {
+      if (rejections[0]?.errors[0]?.code === "file-too-large") {
+        setError(`File is too large. Max size is ${maxSize / 1024 / 1024}MB`);
+      } else if (rejections[0]?.errors[0]?.code === "file-invalid-type") {
+        setError("Invalid file type. Please upload an image file.");
+      } else {
+        setError(rejections[0]?.errors[0]?.message || "Invalid file");
+      }
     },
   });
 
   return (
-    <div className="w-full" {...getRootProps()}>
-      <motion.div
-        onClick={handleClick}
-        whileHover="animate"
-        className="p-2 group/file block rounded-lg cursor-pointer w-full relative overflow-hidden"
+    <div className="w-full">
+      <div
+        {...getRootProps()}
+        className={cn(
+          "relative w-full h-32 border-2 border-dashed rounded-lg cursor-pointer transition-colors",
+          isDragActive
+            ? "border-primary/50 bg-primary/10"
+            : "border-muted-foreground/25",
+          error ? "border-destructive/50 bg-destructive/10" : ""
+        )}
       >
-        <input
-          ref={fileInputRef}
-          id="file-upload-handle"
-          type="file"
-          onChange={(e) => handleFileChange(Array.from(e.target.files || []))}
-          className="hidden"
-          name="profile"
-        />
-        <div className="absolute inset-0 [mask-image:radial-gradient(ellipse_at_center,white,transparent)]">
-          <GridPattern />
+        <input {...getInputProps({ name })} />
+        <div className="h-full flex flex-col items-center justify-center gap-2">
+          <motion.div
+            variants={mainVariant}
+            initial="initial"
+            whileHover="animate"
+            className="flex items-center justify-center"
+          >
+            <IconUpload className="w-8 h-8 text-muted-foreground/50" />
+          </motion.div>
+          <motion.div
+            variants={secondaryVariant}
+            initial="initial"
+            animate="animate"
+            className="text-xs text-muted-foreground text-center"
+          >
+            <p>Drop your image here, or click to browse</p>
+            <p className="text-xs text-muted-foreground/75">
+              Maximum file size: {maxSize / 1024 / 1024}MB
+            </p>
+          </motion.div>
         </div>
-        <div className="flex flex-col items-center justify-center">
-          <p className="relative z-20 font-sans font-bold text-neutral-700 dark:text-neutral-300 text-base">
-            Upload Your Profile Picture
-          </p>
-          <div className="relative w-full mt-10 max-w-xl mx-auto">
-            {files.length > 0 &&
-              files.map((file, idx) => (
-                <motion.div
-                  key={"file" + idx}
-                  layoutId={idx === 0 ? "file-upload" : "file-upload-" + idx}
-                  className={cn(
-                    "relative overflow-hidden z-40 bg-white dark:bg-neutral-900 flex flex-col items-start justify-start md:h-24 p-4 mt-4 w-full mx-auto rounded-md",
-                    "shadow-sm"
-                  )}
-                >
-                  <div className="flex justify-between w-full items-center gap-4">
-                    <motion.p
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      layout
-                      className="text-base text-neutral-700 dark:text-neutral-300 truncate max-w-xs"
-                    >
-                      {file.name}
-                    </motion.p>
-                    <motion.p
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      layout
-                      className="rounded-lg px-2 py-1 w-fit flex-shrink-0 text-sm text-neutral-600 dark:bg-neutral-800 dark:text-white shadow-input"
-                    >
-                      {(file.size / (1024 * 1024)).toFixed(2)} MB
-                    </motion.p>
-                  </div>
-
-                  <div className="flex text-sm md:flex-row flex-col items-start md:items-center w-full mt-2 justify-between text-neutral-600 dark:text-neutral-400">
-                    <motion.p
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      layout
-                      className="px-1 py-0.5 rounded-md bg-gray-100 dark:bg-neutral-800 "
-                    >
-                      {file.type}
-                    </motion.p>
-
-                    <motion.p
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      layout
-                    >
-                      modified{" "}
-                      {new Date(file.lastModified).toLocaleDateString()}
-                    </motion.p>
-                  </div>
-                </motion.div>
-              ))}
-            {!files.length && (
-              <motion.div
-                layoutId="file-upload"
-                variants={mainVariant}
-                transition={{
-                  type: "spring",
-                  stiffness: 300,
-                  damping: 20,
-                }}
-                className={cn(
-                  "relative group-hover/file:shadow-2xl z-40 bg-white dark:bg-neutral-900 flex items-center justify-center h-32 mt-4 w-full max-w-[8rem] mx-auto rounded-md",
-                  "shadow-[0px_10px_50px_rgba(0,0,0,0.1)]"
-                )}
-              >
-                {isDragActive ? (
-                  <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="text-neutral-600 flex flex-col items-center"
-                  >
-                    Drop it
-                    <IconUpload className="h-4 w-4 text-neutral-600 dark:text-neutral-400" />
-                  </motion.p>
-                ) : (
-                  <IconUpload className="h-4 w-4 text-neutral-600 dark:text-neutral-300" />
-                )}
-              </motion.div>
-            )}
-
-            {!files.length && (
-              <motion.div
-                variants={secondaryVariant}
-                className="absolute opacity-0 border border-dashed border-sky-400 inset-0 z-30 bg-transparent flex items-center justify-center h-32 mt-4 w-full max-w-[8rem] mx-auto rounded-md"
-              ></motion.div>
-            )}
-          </div>
+      </div>
+      {error && <p className="text-sm text-destructive mt-1">{error}</p>}
+      {files.length > 0 && (
+        <div className="mt-2">
+          {files.map((file, index) => (
+            <div key={index} className="text-sm text-muted-foreground">
+              {file.name}
+            </div>
+          ))}
         </div>
-      </motion.div>
+      )}
     </div>
   );
 };

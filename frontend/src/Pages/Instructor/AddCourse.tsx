@@ -34,6 +34,13 @@ const AddCourse = () => {
         Level: "",
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [uploadProgress, setUploadProgress] = useState<Record<number, number>>({});
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [isUploading, setIsUploading] = useState(false);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [error, setError] = useState<string | null>(null);
+
     const addSection = () => {
         setSections((prev) => [
             ...prev,
@@ -60,6 +67,20 @@ const AddCourse = () => {
     const handleFileChange = async (id: number, file: File | null) => {
         if (file) {
             try {
+                setIsUploading(true);
+                setError(null);
+                
+                // Validate file type
+                if (!file.type.startsWith('video/')) {
+                    throw new Error('Please upload a valid video file');
+                }
+
+                // Validate file size (e.g., max 100MB)
+                const maxSize = 100 * 1024 * 1024; // 100MB in bytes
+                if (file.size > maxSize) {
+                    throw new Error('File size should be less than 100MB');
+                }
+
                 const storage = getStorage(app);
                 const storageRef = ref(storage, `CourseVideos/${Date.now()}_${file.name}`);
                 const uploadTask = uploadBytesResumable(storageRef, file);
@@ -68,21 +89,34 @@ const AddCourse = () => {
                     "state_changed",
                     (snapshot) => {
                         const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                        setUploadProgress(prev => ({
+                            ...prev,
+                            [id]: Math.round(progress)
+                        }));
                         console.log(`Upload is ${progress}% done`);
                     },
                     (error) => {
                         console.error("Error uploading video: ", error);
-                        return;
+                        setError(`Error uploading video: ${error.message}`);
+                        setIsUploading(false);
                     },
                     async () => {
-                        const videoUrl: string = await getDownloadURL(uploadTask.snapshot.ref);
-                        console.log("Video uploaded and available at: ", videoUrl);
-                        handleInputChange(id, "videoUrl", videoUrl);
+                        try {
+                            const videoUrl: string = await getDownloadURL(uploadTask.snapshot.ref);
+                            console.log("Video uploaded and available at: ", videoUrl);
+                            handleInputChange(id, "videoUrl", videoUrl);
+                            setIsUploading(false);
+                        } catch (error) {
+                            console.error("Error getting download URL: ", error);
+                            setError("Error getting video URL after upload");
+                            setIsUploading(false);
+                        }
                     }
                 );
             } catch (error) {
                 console.error("Error during file upload: ", error);
-                return;
+                setError(error instanceof Error ? error.message : "Error uploading file");
+                setIsUploading(false);
             }
         }
     };
@@ -90,6 +124,20 @@ const AddCourse = () => {
     const handleThumbnailChange = async (file: File | null) => {
         if (file) {
             try {
+                setIsUploading(true);
+                setError(null);
+
+                // Validate file type
+                if (!file.type.startsWith('image/')) {
+                    throw new Error('Please upload a valid image file');
+                }
+
+                // Validate file size (e.g., max 5MB)
+                const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+                if (file.size > maxSize) {
+                    throw new Error('File size should be less than 5MB');
+                }
+
                 const storage = getStorage(app);
                 const storageRef = ref(storage, `CourseThumbnails/${Date.now()}_${file.name}`);
                 const uploadTask = uploadBytesResumable(storageRef, file);
@@ -102,20 +150,29 @@ const AddCourse = () => {
                     },
                     (error) => {
                         console.error("Error uploading thumbnail: ", error);
-                        return;
+                        setError(`Error uploading thumbnail: ${error.message}`);
+                        setIsUploading(false);
                     },
                     async () => {
-                        const thumbnailUrl: string = await getDownloadURL(uploadTask.snapshot.ref);
-                        console.log("Thumbnail uploaded and available at: ", thumbnailUrl);
-                        setFormData((prevData) => ({
-                            ...prevData,
-                            thumbnail: thumbnailUrl,
-                        }));
+                        try {
+                            const thumbnailUrl: string = await getDownloadURL(uploadTask.snapshot.ref);
+                            console.log("Thumbnail uploaded and available at: ", thumbnailUrl);
+                            setFormData((prevData) => ({
+                                ...prevData,
+                                thumbnail: thumbnailUrl,
+                            }));
+                            setIsUploading(false);
+                        } catch (error) {
+                            console.error("Error getting download URL: ", error);
+                            setError("Error getting thumbnail URL after upload");
+                            setIsUploading(false);
+                        }
                     }
                 );
             } catch (error) {
                 console.error("Error during thumbnail upload: ", error);
-                return;
+                setError(error instanceof Error ? error.message : "Error uploading thumbnail");
+                setIsUploading(false);
             }
         }
     };
@@ -187,118 +244,170 @@ const AddCourse = () => {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="w-full h-full p-3 flex gap-1 max-sm:block">
-            {/* Course Details */}
-            <div className="w-1/2 h-fit flex flex-col items-center max-sm:w-full">
-                <h1 className="text-lg font-bold text-center mb-2">Add Course</h1>
-                {courseSchemaFields.map((field, index) => (
-                    <div key={field.label + index} className="flex w-full flex-col px-5 py-2">
-                        {field.type === "text" || field.type === "number" ? (
-                            <Input
-                                onChange={handleInput}
-                                name={field.name}
-                                type={field.type}
-                                placeholder={field.label}
-                            />
-                        ) : null}
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-3">
+            <form onSubmit={handleSubmit} className="max-w-7xl mx-auto">
+                <div className="flex flex-col lg:flex-row gap-4">
+                    {/* Course Details */}
+                    <div className="w-full lg:w-1/2 bg-white rounded-lg shadow-md p-4">
+                        <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 rounded-lg mb-4">
+                            <h1 className="text-xl font-bold">Create New Course</h1>
+                            <p className="text-sm text-white/80">Fill in the details</p>
+                        </div>
+                        
+                        <div className="space-y-4 max-h-[calc(100vh-16rem)] overflow-y-auto pr-2">
+                            {courseSchemaFields.map((field, index) => (
+                                <div key={field.label + index}>
+                                    <label className="text-sm font-medium text-gray-700 mb-1 block">
+                                        {field.label}
+                                    </label>
+                                    
+                                    {field.type === "text" || field.type === "number" ? (
+                                        <Input
+                                            onChange={handleInput}
+                                            name={field.name}
+                                            type={field.type}
+                                            placeholder={field.label}
+                                            className="border-gray-200"
+                                        />
+                                    ) : null}
 
-                        {field.type === "textarea" ? (
-                            <Textarea
-                                onChange={handleInput}
-                                name={field.name}
-                                placeholder={field.label}
-                                rows={5}
-                            />
-                        ) : null}
+                                    {field.type === "textarea" ? (
+                                        <Textarea
+                                            onChange={handleInput}
+                                            name={field.name}
+                                            placeholder={field.label}
+                                            rows={4}
+                                            className="border-gray-200"
+                                        />
+                                    ) : null}
 
-                        {field.type === "file" && field.name === "thumbnail" ? (
-                            <Input
-                                type="file"
-                                name={field.name}
-                                placeholder={field.label}
-                                onChange={(e) => handleThumbnailChange(e.target.files?.[0] ?? null)}
-                            />
-                        ) : null}
+                                    {field.type === "file" && field.name === "thumbnail" ? (
+                                        <div className="space-y-2">
+                                            <Input
+                                                type="file"
+                                                name={field.name}
+                                                placeholder={field.label}
+                                                onChange={(e) => handleThumbnailChange(e.target.files?.[0] ?? null)}
+                                                className="border-gray-200"
+                                            />
+                                            {formData.thumbnail && (
+                                                <img 
+                                                    src={formData.thumbnail} 
+                                                    alt="Course thumbnail" 
+                                                    className="w-full h-32 object-cover rounded-md"
+                                                />
+                                            )}
+                                        </div>
+                                    ) : null}
 
-                        {field.type === "select" && field.options ? (
-                            <Select
-                                onValueChange={(value) =>
-                                    setFormData((data) => ({ ...data, [field.name]: value }))
-                                }
-                            >
-                                <SelectTrigger className="w-[180px]">
-                                    <SelectValue placeholder={field.label} />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {field.options.map((option, idx) => (
-                                        <SelectItem key={option + idx} value={option}>
-                                            {option}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        ) : null}
+                                    {field.type === "select" && field.options ? (
+                                        <Select
+                                            onValueChange={(value) =>
+                                                setFormData((data) => ({ ...data, [field.name]: value }))
+                                            }
+                                        >
+                                            <SelectTrigger className="w-full border-gray-200">
+                                                <SelectValue placeholder={field.label} />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {field.options.map((option, idx) => (
+                                                    <SelectItem key={option + idx} value={option}>
+                                                        {option}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    ) : null}
+                                </div>
+                            ))}
+                        </div>
                     </div>
-                ))}
-                <Button type="submit" disabled={!isFormValid()} className="w-[94%] mb-5 mt-2">
-                    Submit Course
-                </Button>
-            </div>
 
-            {/* Video Modules */}
-            <div className="w-1/2 h-fit flex items-center flex-col px-10 max-sm:w-full">
-                <h1 className="font-bold text-lg text-center">Video Modules</h1>
-                {sections.map((section) => (
-                    <div
-                        key={section.id}
-                        className="w-full h-fit px-5 rounded-lg py-4 flex flex-col gap-3 border relative mt-4"
-                    >
-                        <Input
-                            placeholder="Title"
-                            value={section.title}
-                            onChange={(e) =>
-                                handleInputChange(section.id, "title", e.target.value)
-                            }
-                        />
+                    {/* Video Modules */}
+                    <div className="w-full lg:w-1/2 bg-white rounded-lg shadow-md p-4">
+                        <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-4 rounded-lg mb-4">
+                            <h1 className="text-xl font-bold">Course Content</h1>
+                            <p className="text-sm text-white/80">Add sections and videos</p>
+                        </div>
+                        
+                        <div className="space-y-4 max-h-[calc(100vh-16rem)] overflow-y-auto pr-2">
+                            {sections.map((section) => (
+                                <div
+                                    key={section.id}
+                                    className="border rounded-lg p-4"
+                                >
+                                    <div className="flex items-center justify-between mb-3">
+                                        <h3 className="font-medium">Section {section.id}</h3>
+                                        <Button
+                                            variant="destructive"
+                                            size="sm"
+                                            className="h-7 w-7 rounded-full p-0"
+                                            onClick={() => deleteSection(section.id)}
+                                        >
+                                            ×
+                                        </Button>
+                                    </div>
+                                    
+                                    <Input
+                                        placeholder="Enter section title"
+                                        value={section.title}
+                                        onChange={(e) => handleInputChange(section.id, "title", e.target.value)}
+                                        className="mb-3"
+                                    />
 
-                        {section.videoUrl ? (
-                            <div className="w-full h-[200px]">
-                                <Videoplayer height="100%" width="100%" videoUrl={section.videoUrl} />
-                            </div>
-                        ) : (
-                            <Input
-                                type="file"
-                                placeholder="Upload Video"
-                                onChange={(e) =>
-                                    handleFileChange(section.id, e.target.files?.[0] ?? null)
-                                }
-                            />
-                        )}
-                        <div className="flex gap-3 items-center pb-2">
-                            <Checkbox
-                                className="ml-2"
-                                checked={section.freePreview}
-                                onCheckedChange={(checked) =>
-                                    handleInputChange(section.id, "freePreview", Boolean(checked))
-                                }
-                            />
-                            <p>Free Preview</p>
-                            <Button
-                                variant="destructive"
-                                size="icon"
-                                className="absolute right-5 rounded-full"
-                                onClick={() => deleteSection(section.id)}
+                                    {section.videoUrl ? (
+                                        <div className="rounded-md overflow-hidden mb-3">
+                                            <Videoplayer height="150px" width="100%" videoUrl={section.videoUrl} />
+                                        </div>
+                                    ) : (
+                                        <Input
+                                            type="file"
+                                            placeholder="Upload Video"
+                                            onChange={(e) => handleFileChange(section.id, e.target.files?.[0] ?? null)}
+                                            className="mb-3"
+                                        />
+                                    )}
+                                    
+                                    <div className="flex items-center gap-2">
+                                        <Checkbox
+                                            checked={section.freePreview}
+                                            onCheckedChange={(checked) =>
+                                                handleInputChange(section.id, "freePreview", Boolean(checked))
+                                            }
+                                        />
+                                        <label className="text-sm text-gray-600">
+                                            Free preview
+                                        </label>
+                                    </div>
+                                </div>
+                            ))}
+                            
+                            <Button 
+                                className="w-full bg-blue-600 hover:bg-blue-700"
+                                type="button" 
+                                onClick={addSection}
                             >
-                                X
+                                Add Section
                             </Button>
                         </div>
                     </div>
-                ))}
-                <Button className="w-[95%] mt-3 max-sm:mb-14" type="button" onClick={addSection}>
-                    Add Section
-                </Button>
-            </div>
-        </form>
+                </div>
+                
+                <div className="mt-4">
+                    <Button 
+                        type="submit" 
+                        disabled={!isFormValid()} 
+                        className={`w-full py-2 ${
+                            isFormValid() 
+                                ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700' 
+                                : 'opacity-50 cursor-not-allowed'
+                        }`}
+                    >
+                        {isFormValid() ? 'Create Course' : 'Please fill all required fields'}
+                    </Button>
+                </div>
+            </form>
+        </div>
     );
 };
 

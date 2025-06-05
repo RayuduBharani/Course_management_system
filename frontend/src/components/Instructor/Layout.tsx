@@ -57,7 +57,7 @@ export function InstructorLayout() {
     return (
         <div
             className={cn(
-                "flex h-screen w-screen max-w-full flex-col md:flex-row overflow-hidden"
+                "flex h-screen w-screen max-w-full flex-col md:flex-row overflow-hidden no-scrollbar"
             )}
         >
             <Sidebar open={open} setOpen={setOpen}>

@@ -48,16 +48,32 @@ const AddCourse = async (req, res) => {
 const GetInstructorCourses = async (req, res) => {
     await db()
     try {
+        console.log("Getting instructor courses...")
         const token = req.cookies[process.env.JWT_KEY]
-        const decode = jwt.verify(token, process.env.JWT_KEY)
-        const FindInstructor = await InstuctureModel.find({ userId: decode.userId })
-        const InstructorCourses = await courseModel.find({ instructor: FindInstructor[0]._id, isPublished: true }).populate("instructor")
-        if (InstructorCourses) {
-            res.send(InstructorCourses)
+        if (!token) {
+            console.log("No token found in cookies")
+            return res.status(401).json({ success: false, message: "No authentication token" })
         }
+        console.log("Token found:", token.substring(0, 10) + "...")
+        
+        const decode = jwt.verify(token, process.env.JWT_KEY)
+        console.log("Decoded user ID:", decode.userId)
+        
+        const FindInstructor = await InstuctureModel.find({ userId: decode.userId })
+        if (!FindInstructor || FindInstructor.length === 0) {
+            console.log("No instructor found for userId:", decode.userId)
+            return res.status(404).json({ success: false, message: "Instructor not found" })
+        }
+        console.log("Found instructor:", FindInstructor[0]._id)
+        
+        const InstructorCourses = await courseModel.find({ instructor: FindInstructor[0]._id, isPublished: true }).populate("instructor")
+        console.log("Found courses:", InstructorCourses.length)
+        
+        res.json({ success: true, courses: InstructorCourses })
     }
     catch (err) {
-        res.send({ success: false, message: err.message })
+        console.error("Error in GetInstructorCourses:", err)
+        res.status(500).json({ success: false, message: err.message })
     }
 }
 

@@ -31,9 +31,15 @@ export default function StudentAllCourses() {
 
   // Calculate course statistics
   const stats = useMemo(() => {
+    if (!courses?.length) return [];
+
     const totalStudents = courses.reduce((acc, course) => acc + (course.students?.length || 0), 0);
     const avgRating = 4.8; // This should come from actual ratings
-    const totalInstructors = new Set(courses.map(course => course.instructor._id)).size;
+    const totalInstructors = new Set(
+      courses
+        .filter(course => course.instructor)
+        .map(course => course.instructor._id)
+    ).size;
     
     return [
       {
@@ -63,10 +69,14 @@ export default function StudentAllCourses() {
     ];
   }, [courses]);
 
-  const filteredCourses = courses.filter(course =>
-    course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    course.instructor.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredCourses = useMemo(() => {
+    if (!courses) return [];
+    
+    return courses.filter(course =>
+      course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (course.instructor?.name || "").toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [courses, searchTerm]);
 
   const handleCourseClick = (courseId: string) => {
     navigate(`${courseId}`);
@@ -76,6 +86,27 @@ export default function StudentAllCourses() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (!courses?.length) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4 md:p-6">
+        <div className="max-w-7xl mx-auto">
+          <Card className="overflow-hidden border-0 shadow-xl bg-gradient-to-r from-blue-600 to-purple-600">
+            <CardContent className="p-8 flex items-center gap-6">
+              <div className="text-white">
+                <h1 className="text-2xl md:text-3xl font-bold mb-2">
+                  Welcome to <span className="text-yellow-300">GCC Academy</span>
+                </h1>
+                <p className="text-white/90 text-lg">
+                  No courses available at the moment. Please check back later.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
@@ -124,7 +155,9 @@ export default function StudentAllCourses() {
               <Filter className="h-4 w-4" />
             </Button>
           </div>
-        </div>        {/* Course Stats */}
+        </div>
+
+        {/* Course Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {stats.map((stat, index) => (
             <Card key={index} className="border-0 shadow-md p-4 flex items-center gap-4">
@@ -162,7 +195,7 @@ export default function StudentAllCourses() {
                     course.level === 'Intermediate' ? 'bg-yellow-500' : 'bg-red-500'
                   }`}
                 >
-                  {course.level}
+                  {course.level || 'All Levels'}
                 </Badge>
               </div>
               
@@ -171,7 +204,9 @@ export default function StudentAllCourses() {
                   {course.title}
                 </h3>
                 
-                <p className="text-gray-600 text-sm">by {course.instructor.name}</p>
+                <p className="text-gray-600 text-sm">
+                  by {course.instructor?.name || 'Unknown Instructor'}
+                </p>
                 
                 <div className="flex items-center gap-4 text-sm text-gray-500">
                   <div className="flex items-center gap-1">
@@ -180,11 +215,11 @@ export default function StudentAllCourses() {
                   </div>
                   <div className="flex items-center gap-1">
                     <Users className="h-4 w-4" />
-                    <span>{course.students.length}</span>
+                    <span>{course.students?.length || 0}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <Clock className="h-4 w-4" />
-                    <span>{course.files.length} lessons</span>
+                    <span>{course.files?.length || 0} lessons</span>
                   </div>
                 </div>
 

@@ -11,10 +11,11 @@ import { useDispatch } from "react-redux";
 import { AppDispatch } from "../store/store";
 import { UpdateInstructorProfileInfo } from "../store/slices/Instructor/profile";
 import { toast } from "@/hooks/use-toast";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function InstructorProfileUpdate() {
   const navigate = useNavigate();
-  const dispatch = useDispatch<AppDispatch>()
+  const dispatch = useDispatch<AppDispatch>();
   const [formData, setFormData] = useState<{
     linkedIn?: string;
     gitHub?: string;
@@ -37,6 +38,7 @@ export default function InstructorProfileUpdate() {
 
   const [profileImg, setProfileImg] = useState<File | null>(null);
   const [progress, setProgress] = useState<number>(0);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -61,165 +63,222 @@ export default function InstructorProfileUpdate() {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
-    if (profileImg) {
-      const storage = getStorage(app);
-      const storageRef = ref(storage, `Profiles/${Date.now()}_${profileImg.name}`);
-      const uploadTask = uploadBytesResumable(storageRef, profileImg);
+    try {
+      if (profileImg) {
+        const storage = getStorage(app);
+        const storageRef = ref(storage, `Profiles/${Date.now()}_${profileImg.name}`);
+        const uploadTask = uploadBytesResumable(storageRef, profileImg);
 
-      uploadTask.on(
-        "state_changed",
-        (snapshot) => {
-          const prog = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-          setProgress(prog);
-        },
-        (err) => {
-          console.error("Upload failed:", err);
-        },
-        async () => {
-          const imgUrl = await getDownloadURL(uploadTask.snapshot.ref);
-          setFormData((prevData) => ({
-            ...prevData,
-            profileImg: imgUrl
-          }));
-          submitProfileData({ ...formData, profileImg: imgUrl });
-        }
-      );
-    } else {
-      submitProfileData(formData);
+        uploadTask.on(
+          "state_changed",
+          (snapshot) => {
+            const prog = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+            setProgress(prog);
+          },
+          (error) => {
+            console.error("Upload failed:", error);
+            toast({
+              title: "Error uploading image",
+              description: "Please try again",
+              variant: "destructive"
+            });
+            setIsSubmitting(false);
+          },
+          async () => {
+            try {
+              const imgUrl = await getDownloadURL(uploadTask.snapshot.ref);
+              await submitProfileData({ ...formData, profileImg: imgUrl });
+            } catch (error) {
+              console.error("Error getting download URL:", error);
+              toast({
+                title: "Error updating profile",
+                description: "Please try again",
+                variant: "destructive"
+              });
+              setIsSubmitting(false);
+            }
+          }
+        );
+      } else {
+        await submitProfileData(formData);
+      }
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      toast({
+        title: "Error updating profile",
+        description: "Please try again",
+        variant: "destructive"
+      });
+      setIsSubmitting(false);
     }
   };
 
-  const submitProfileData = (data: typeof formData) => {
-    console.log("first")
-    dispatch(UpdateInstructorProfileInfo(data as FORMDATA))
-    .then((data)=>{
-        if(data){
-            navigate("/instructor/profile")
-        }
-        else {
-            toast({
-                title : "Something went wrong ! please try again" ,
-                variant : "destructive"
-            })
-        }
-    })
-  }
+  const submitProfileData = async (data: typeof formData) => {
+    try {
+      const result = await dispatch(UpdateInstructorProfileInfo(data as FORMDATA));
+      if (result) {
+        toast({
+          title: "Profile updated successfully",
+          variant: "default"
+        });
+        navigate("/instructor/profile");
+      } else {
+        throw new Error("Update failed");
+      }    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Please try again later";
+      toast({
+        title: "Failed to update profile",
+        description: errorMessage,
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
-    <div className="w-full h-full p-10 flex flex-col items-start">
-      <Button onClick={() => navigate(-1)} variant="link" className="flex gap-2 ml-8">
-        <i className="fa-solid fa-arrow-left"></i> Back
-      </Button>
-
-      <form
-        className="w-full h-full px-10 py-5 flex flex-col items-center gap-3"
-        onSubmit={handleSubmit}
-      >
-        <FileUpload onChange={handleFileUpload} />
-        <div className="w-full flex gap-5 mt-6">
-          <div className="gap-3 w-full">
-            <Label htmlFor="linkedIn">LinkedIn Profile</Label>
-            <Input
-              name="linkedIn"
-              id="linkedIn"
-              className="bg-background"
-              value={formData.linkedIn}
-              onChange={handleInputChange}
-            />
-          </div>
-
-          <div className="gap-3 w-full">
-            <Label htmlFor="gitHub">GitHub Profile</Label>
-            <Input
-              name="gitHub"
-              id="gitHub"
-              className="bg-background"
-              value={formData.gitHub}
-              onChange={handleInputChange}
-            />
-          </div>
-        </div>
-
-        <div className="gap-5 w-full flex justify-between">
-          <div className="w-[30%]">
-            <Label htmlFor="rollNumber">Roll Number</Label>
-            <Input
-              name="rollNumber"
-              minLength={10}
-              maxLength={10}
-              id="rollNumber"
-              className="bg-background"
-              value={formData.rollNumber}
-              onChange={handleInputChange}
-            />
-          </div>
-
-          <div className="w-[30%]">
-            <Label htmlFor="gender">Gender</Label>
-            <Select
-              name="gender"
-              onValueChange={(value) => handleSelectChange("gender", value)}
-            >
-              <SelectTrigger id="gender" className="w-full p-5 bg-background">
-                <SelectValue placeholder="Select" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Male">Male</SelectItem>
-                <SelectItem value="Female">Female</SelectItem>
-                <SelectItem value="Transgender">Transgender</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="w-[30%]">
-            <Label htmlFor="college">College</Label>
-            <Input
-              name="college"
-              id="college"
-              className="bg-background"
-              value={formData.college}
-              onChange={handleInputChange}
-            />
-          </div>
-        </div>
-
-        <div className="w-[100%] flex gap-5">
-          <div className="w-[50%]">
-            <Label htmlFor="branch">Branch</Label>
-            <Select
-              name="branch"
-              onValueChange={(value) => handleSelectChange("branch", value)}
-            >
-              <SelectTrigger id="branch" className="w-full p-5 bg-background">
-                <SelectValue placeholder="Select" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="CSD">CSD</SelectItem>
-                <SelectItem value="AID">AID</SelectItem>
-                <SelectItem value="CAI">CAI</SelectItem>
-                <SelectItem value="Cyber">Cyber</SelectItem>
-                <SelectItem value="CSM">CSM</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="w-[50%]">
-            <Label htmlFor="UPI">UPI id</Label>
-            <Input
-              id="UPI"
-              name="UPI"
-              className="bg-background"
-              value={formData.UPI}
-              onChange={handleInputChange}
-            />
-          </div>
-        </div>
-
-        <Button type="submit" className="w-full p-5 mt-1">
-          {progress > 0 && progress < 100 ? `Uploading: ${progress}%` : "Update your profile"}
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4 lg:p-6">
+      <div className="max-w-4xl mx-auto">
+        <Button 
+          onClick={() => navigate(-1)} 
+          variant="outline" 
+          className="mb-6 flex items-center gap-2 bg-white hover:bg-primary hover:text-white transition-colors duration-200"
+        >
+          <i className="fa-solid fa-arrow-left text-sm"></i>
+          <span className="font-medium">Back</span>
         </Button>
-      </form>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold text-center">Update Your Profile</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="flex justify-center">
+                <FileUpload onChange={handleFileUpload} />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="linkedIn" className="text-sm font-medium">LinkedIn Profile</Label>
+                  <Input
+                    name="linkedIn"
+                    id="linkedIn"
+                    placeholder="https://linkedin.com/in/..."
+                    className="bg-white"
+                    value={formData.linkedIn}
+                    onChange={handleInputChange}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="gitHub" className="text-sm font-medium">GitHub Profile</Label>
+                  <Input
+                    name="gitHub"
+                    id="gitHub"
+                    placeholder="https://github.com/..."
+                    className="bg-white"
+                    value={formData.gitHub}
+                    onChange={handleInputChange}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="rollNumber" className="text-sm font-medium">Roll Number</Label>
+                  <Input
+                    name="rollNumber"
+                    id="rollNumber"
+                    minLength={10}
+                    maxLength={10}
+                    placeholder="Enter your roll number"
+                    className="bg-white"
+                    value={formData.rollNumber}
+                    onChange={handleInputChange}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="gender" className="text-sm font-medium">Gender</Label>
+                  <Select
+                    name="gender"
+                    onValueChange={(value) => handleSelectChange("gender", value)}
+                  >
+                    <SelectTrigger id="gender" className="bg-white">
+                      <SelectValue placeholder="Select gender" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Male">Male</SelectItem>
+                      <SelectItem value="Female">Female</SelectItem>
+                      <SelectItem value="Transgender">Transgender</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="college" className="text-sm font-medium">College</Label>
+                  <Input
+                    name="college"
+                    id="college"
+                    placeholder="Enter your college name"
+                    className="bg-white"
+                    value={formData.college}
+                    onChange={handleInputChange}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="branch" className="text-sm font-medium">Branch</Label>
+                  <Select
+                    name="branch"
+                    onValueChange={(value) => handleSelectChange("branch", value)}
+                  >
+                    <SelectTrigger id="branch" className="bg-white">
+                      <SelectValue placeholder="Select branch" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="CSD">CSD</SelectItem>
+                      <SelectItem value="AID">AID</SelectItem>
+                      <SelectItem value="CAI">CAI</SelectItem>
+                      <SelectItem value="Cyber">Cyber</SelectItem>
+                      <SelectItem value="CSM">CSM</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2 md:col-span-2">
+                  <Label htmlFor="UPI" className="text-sm font-medium">UPI ID</Label>
+                  <Input
+                    id="UPI"
+                    name="UPI"
+                    placeholder="Enter your UPI ID"
+                    className="bg-white"
+                    value={formData.UPI}
+                    onChange={handleInputChange}
+                  />
+                </div>
+              </div>
+
+              <Button 
+                type="submit" 
+                className="w-full p-6 mt-6"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  progress > 0 && progress < 100 ? (
+                    `Uploading: ${progress}%`
+                  ) : (
+                    "Updating profile..."
+                  )
+                ) : (
+                  "Update Profile"
+                )}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

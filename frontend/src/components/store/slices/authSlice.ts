@@ -79,7 +79,7 @@ export const FetchInstructor = createAsyncThunk(
 
 export const FetchLead = createAsyncThunk(
     "/check/verify-Lead",
-    async (formData: LeadFormData) => {
+    async (formData: ILeadFormData) => {
         const response = await fetch("http://localhost:8000/api/check-verify/lead", {
             method: "POST",
             headers: {
@@ -95,7 +95,7 @@ export const FetchLead = createAsyncThunk(
 
 export const FetchStudent = createAsyncThunk(
     "/check/verify-student",
-    async (formData: StudentFormData) => {
+    async (formData: IStudentFormData) => {
         console.log(formData)
         const response = await fetch("http://localhost:8000/api/check-verify/student", {
             method: "POST",
@@ -199,13 +199,19 @@ export const authSlice = createSlice({
                 state.IsLoading = true
             })
             .addCase(FetchInstructor.fulfilled, (state, action) => {
-                // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-                state.IsLoading = false,
-                    state.IsAuthenticated = action.payload.success,
-                    state.user.role = action.payload.success ? action.payload.role : "Instructor"
+                if (action.payload.success) {
+                    state.IsLoading = false;
+                    state.IsAuthenticated = true;
+                    state.user.role = action.payload.role;
+                    state.user = { ...state.user, ...action.payload.data };
+                } else {
+                    state.IsLoading = false;
+                    state.user.role = "Empty";
+                }
             })
             .addCase(FetchInstructor.rejected, (state) => {
-                state.IsLoading = false
+                state.IsLoading = false;
+                state.user.role = "Empty";
             })
 
 
@@ -213,26 +219,38 @@ export const authSlice = createSlice({
                 state.IsLoading = true
             })
             .addCase(FetchLead.fulfilled, (state, action) => {
-                // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-                state.IsLoading = false,
-                    state.IsAuthenticated = action.payload.success,
-                    state.user.role = action.payload.success ? action.payload.role : "Lead"
+                if (action.payload.success) {
+                    state.IsLoading = false;
+                    state.IsAuthenticated = true;
+                    state.user.role = action.payload.role;
+                    state.user = { ...state.user, ...action.payload.data };
+                } else {
+                    state.IsLoading = false;
+                    state.user.role = "Empty";
+                }
             })
             .addCase(FetchLead.rejected, (state) => {
-                state.IsLoading = false
+                state.IsLoading = false;
+                state.user.role = "Empty";
             })
 
             .addCase(FetchStudent.pending, (state) => {
                 state.IsLoading = true
             })
             .addCase(FetchStudent.fulfilled, (state, action) => {
-                // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-                state.IsLoading = false,
-                    state.IsAuthenticated = action.payload.success,
-                    state.user.role = action.payload.success ? action.payload.role : "Student"
+                if (action.payload.success) {
+                    state.IsLoading = false;
+                    state.IsAuthenticated = true;
+                    state.user.role = action.payload.role;
+                    state.user = { ...state.user, ...action.payload.data };
+                } else {
+                    state.IsLoading = false;
+                    state.user.role = "Empty";
+                }
             })
             .addCase(FetchStudent.rejected, (state) => {
-                state.IsLoading = false
+                state.IsLoading = false;
+                state.user.role = "Empty";
             })
 
 

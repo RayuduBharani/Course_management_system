@@ -2,18 +2,22 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 const initialState : FindInstructorCourses = {
     isLoading: true,
-    courses: []
+    courses: [],
+    error: null
 }
 
 export const FetchInstructorCourses = createAsyncThunk(
     "instructor/courses",
     async () => {
-        const response = await fetch("http://localhost:8000/instructor/course/get" , {
-            method : "GET" ,
-            credentials : "include"
+        const response = await fetch("http://localhost:8000/instructor/course/get", {
+            method: "GET",
+            credentials: "include"
         })
         const data = await response.json()
-        return data.reverse()
+        if (!data.success && data.message) {
+            throw new Error(data.message)
+        }
+        return data.courses || []
     }
 )
 
@@ -22,18 +26,22 @@ const InstuctorSlice = createSlice({
     initialState,
     reducers: {},
     extraReducers(builder) {
-        builder.addCase(FetchInstructorCourses.pending , (state)=>{
-            state.isLoading = true
-        })
-        .addCase(FetchInstructorCourses.fulfilled , (state , action)=>{
-            state.isLoading = false ,
-            state.courses = action.payload
-        })
-        .addCase(FetchInstructorCourses.rejected , (state)=>{
-            state.isLoading = false
-        })
+        builder
+            .addCase(FetchInstructorCourses.pending, (state) => {
+                state.isLoading = true
+                state.error = null
+            })
+            .addCase(FetchInstructorCourses.fulfilled, (state, action) => {
+                state.isLoading = false
+                state.courses = action.payload
+                state.error = null
+            })
+            .addCase(FetchInstructorCourses.rejected, (state, action) => {
+                state.isLoading = false
+                state.courses = []
+                state.error = action.error.message || "Failed to fetch courses"
+            })
     }
 })
 
-export const {} = InstuctorSlice.actions
 export default InstuctorSlice.reducer

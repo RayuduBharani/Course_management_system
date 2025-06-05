@@ -12,6 +12,7 @@ export default function Signup() {
     const [btnLoading , setBtnLoading] = useState(false)
     const navigate = useNavigate()
 
+    
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setBtnLoading(true)

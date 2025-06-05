@@ -1,18 +1,17 @@
 interface Iuser {
-    userId: string
-    role: "Admin" | "Student" | "Lead" | "Instructor" | "Empty"
-    email: string,
-    image: string,
-    name: string
+    userId: string;
+    role: "Admin" | "Student" | "Lead" | "Instructor" | "Empty";
+    email: string;
+    image: string;
+    name: string;
+    team?: string;
 }
-
-
 
 interface IAuthenticatedProps {
     IsAuthenticated: boolean;
     user: Iuser;
     children?: React.ReactNode;
-    IsLoading?: boolean
+    IsLoading?: boolean;
 }
 
 interface ICookieData {
@@ -61,18 +60,20 @@ interface instructorFormData {
     gender : string
 }
 
-interface LeadFormData {
-    rollNumber: string,
-    branch: string,
-    teamNo: string,
-    profileImg: string
+interface IStudentFormData {
+    rollNumber: string;
+    branch: string;
+    teamNum: string;
+    gender: string;
+    profileImg: string;
 }
 
-interface StudentFormData {
-    rollNumber: string,
-    branch: string,
-    teamNum: string,
-    profileImg: string
+interface ILeadFormData {
+    rollNumber: string;
+    branch: string;
+    teamNo: string;
+    gender: string;
+    profileImg: string;
 }
 
 interface File {
@@ -83,7 +84,7 @@ interface File {
 }
 
 interface ICourse extends Document {
-    _id: any;
+    _id: string ;
     instructor: {
         branch: string;
         courseId: string[];
@@ -293,9 +294,8 @@ interface AdminCourse {
 
 interface FindInstructorCourses {
     isLoading: boolean,
-    courses: [
-        AdminCourse
-    ] | []
+    courses: AdminCourse[] | [],
+    error: string | null
 }
 
 interface InstructorProfileInitialstate {

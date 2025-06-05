@@ -9,27 +9,76 @@ require('dotenv').config()
 const signup = async (req, res) => {
     await db()
     const UserInfo = req.body
+    
+    // Validate required fields
+    if (!UserInfo.email || !UserInfo.password || !UserInfo.name) {
+        return res.status(400).json({ 
+            success: false, 
+            message: "Please provide all required fields", 
+            error: "auth/missing-fields" 
+        });
+    }
+
     try {
         const ExistedUser = await userModel.findOne({ email: UserInfo.email })
         if (ExistedUser) {
-            res.status(409).send({ success: false, message: "User Already Exists" })
+            return res.status(409).json({ 
+                success: false, 
+                message: "An account with this email already exists", 
+                error: "auth/email-already-exists" 
+            });
         }
+
+        // Email format validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(UserInfo.email)) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "Please provide a valid email address", 
+                error: "auth/invalid-email" 
+            });
+        }
+
+        // Password strength validation
+        if (UserInfo.password.length < 6) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "Password must be at least 6 characters long", 
+                error: "auth/weak-password" 
+            });
+        }
+
         let salt = bcrypt.genSaltSync(10);
         let hash = bcrypt.hashSync(UserInfo.password, salt);
+        
         const NewUserInfo = new userModel({
             name: UserInfo.name,
-            email: UserInfo.email,
+            email: UserInfo.email.toLowerCase(), // Store email in lowercase
             password: hash,
-            image: UserInfo.image,
+            image: UserInfo.image || "", // Default empty string if no image
             role: "Empty"
         })
+        
         const SignUpData = await NewUserInfo.save()
         if (SignUpData) {
-            res.status(201).send({ success: true, message: " You are Registerd" })
+            res.status(201).json({ 
+                success: true, 
+                message: "Account created successfully",
+                user: {
+                    name: SignUpData.name,
+                    email: SignUpData.email,
+                    role: SignUpData.role
+                }
+            });
         }
     }
     catch (err) {
-        res.status(500).send({ success: false, message: err.message })
+        console.error("Signup Error:", err);
+        res.status(500).json({ 
+            success: false, 
+            message: "An error occurred during registration",
+            error: "auth/registration-failed"
+        });
     }
 }
 
@@ -52,20 +101,36 @@ const signin = async (req, res) => {
                 }, process.env.JWT_KEY);
 
                 // Ensure only one response is sent
-                if (!res.headersSent) {
-                    res.cookie(process.env.JWT_KEY, token, { httpOnly: true, secure: false, expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) })
-                        .json({ success: true, token: token, role: SignInData.role, message: "Login Success", user: SignInData });
-                }
-            } else {
+                if (!res.headersSent) {                    res.cookie(process.env.JWT_KEY, token, { 
+                        httpOnly: true, 
+                        secure: process.env.NODE_ENV === 'production',
+                        sameSite: 'strict',
+                        path: '/',
+                        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) 
+                    }).json({ 
+                        success: true, 
+                        role: SignInData.role, 
+                        message: "Login Success", 
+                        user: SignInData 
+                    });
+                }            } else {
                 // Ensure only one response is sent
                 if (!res.headersSent) {
-                    res.status(400).send({ success: false, message: "Password Incorrect" });
+                    res.status(401).json({ 
+                        success: false, 
+                        message: "Invalid credentials",
+                        error: "auth/invalid-password"
+                    });
                 }
             }
         } else {
             // Ensure only one response is sent
             if (!res.headersSent) {
-                res.status(404).send({ success: false, message: "User not found" });
+                res.status(404).json({ 
+                    success: false, 
+                    message: "Account not found. Please register first.", 
+                    error: "auth/user-not-found"
+                });
             }
         }
     } catch (err) {
@@ -88,22 +153,48 @@ const logout = async (req, res) => {
 }
 
 const VerifyToken = async (req, res, next) => {
-    const cookiename = process.env.JWT_KEY
-    const token = req.cookies[cookiename]
-    if (!token)
+    const cookiename = process.env.JWT_KEY;
+    const token = req.cookies[cookiename];
+    
+    if (!token) {
         return res.status(401).json({
             success: false,
-            message: "Unauthorised user!",
+            message: "Authentication required. Please log in.",
+            error: "auth/no-token"
         });
+    }
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_KEY);
+        if (!decoded) {
+            throw new Error("Invalid token");
+        }
         req.user = decoded;
         next();
     } catch (error) {
+        console.error("Token Verification Error:", error);
+        
+        // Handle different types of JWT errors
+        if (error.name === "TokenExpiredError") {
+            return res.status(401).json({
+                success: false,
+                message: "Your session has expired. Please log in again.",
+                error: "auth/token-expired"
+            });
+        }
+        
+        if (error.name === "JsonWebTokenError") {
+            return res.status(401).json({
+                success: false,
+                message: "Invalid authentication token. Please log in again.",
+                error: "auth/invalid-token"
+            });
+        }
+
         res.status(401).json({
             success: false,
-            message: "Unauthorised user!",
+            message: "Authentication failed. Please log in again.",
+            error: "auth/verification-failed"
         });
     }
 }
@@ -130,8 +221,7 @@ const Google = async (req, res) => {
             });
 
             await user.save();
-        }
-        const token = jwt.sign({
+        }        const token = jwt.sign({
             name: user.name,
             email: user.email,
             image: user.image,
@@ -142,19 +232,25 @@ const Google = async (req, res) => {
         if (decoded) {
             res.cookie(process.env.JWT_KEY, token, { 
                 httpOnly: true, 
-                secure: false, 
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict',
+                path: '/',
                 expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) 
             }).json({ 
                 success: true, 
-                token, 
                 role: user.role, 
-                message: "Login Success", 
+                message: "Successfully logged in with Google",
                 user 
             })
         }
 
-    } catch (err) {
-        res.status(500).json({ success: false, message: "An error occurred, please try again!" });
+    }    catch (err) {
+        console.error("Google Auth Error:", err);
+        res.status(500).json({ 
+            success: false, 
+            message: "An error occurred during Google authentication",
+            error: "auth/google-signin-failed"
+        });
     }
 }
 
@@ -165,19 +261,30 @@ const GitHub = async (req, res) => {
     await db()
     const UserInfo = req.body
     try {
-        const ExistedUser = await userModel.findOne({ email: UserInfo })
+        const ExistedUser = await userModel.findOne({ email: UserInfo.email })
         if (ExistedUser) {
-            let token = jwt.sign({
+            const token = jwt.sign({
                 name: ExistedUser.name,
                 email: ExistedUser.email,
                 image: ExistedUser.image,
                 role: ExistedUser.role,
                 userId: ExistedUser._id
-            }, process.env.JWT_KEY)
+            }, process.env.JWT_KEY, { expiresIn: '7d' })
 
-            let decoded = jwt.verify(token, process.env.JWT_KEY);
+            const decoded = jwt.verify(token, process.env.JWT_KEY);
             if (decoded) {
-                res.cookie({ token: token, role: ExistedUser.role, message: "Login Success" })
+                res.cookie(process.env.JWT_KEY, token, { 
+                    httpOnly: true, 
+                    secure: process.env.NODE_ENV === 'production',
+                    sameSite: 'strict',
+                    path: '/',
+                    expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) 
+                }).json({ 
+                    success: true, 
+                    role: ExistedUser.role, 
+                    message: "Successfully logged in with GitHub",
+                    user: ExistedUser
+                });
             }
         }
         else {
@@ -207,9 +314,13 @@ const GitHub = async (req, res) => {
                 }
             }
         }
-    }
-    catch (err) {
-        res.send({ success: false, message: "Some err happened please try again !" })
+    }    catch (err) {
+        console.error("GitHub Auth Error:", err);
+        res.status(500).json({ 
+            success: false, 
+            message: "An error occurred during GitHub authentication",
+            error: "auth/github-signin-failed"
+        });
     }
 }
 
