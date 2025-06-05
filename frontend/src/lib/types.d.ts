@@ -76,15 +76,8 @@ interface ILeadFormData {
     profileImg: string;
 }
 
-interface File {
-    freePreview: boolean;
-    public_id: string;
-    videoUrl: string;
-    title: string
-}
-
-interface ICourse extends Document {
-    _id: string ;
+interface ICourse {
+    _id: string;
     instructor: {
         branch: string;
         courseId: string[];
@@ -117,11 +110,16 @@ interface ICourse extends Document {
     }[];
     requirements: string;
     keyPoints: string;
-    files: File[];
+    files: {
+        freePreview: boolean;
+        public_id: string;
+        videoUrl: string;
+        title: string;
+    }[];
     createdAt?: Date;
     updatedAt?: Date;
-    price: string,
-    objectives: string
+    price: string;
+    objectives: string;
 }
 
 interface ViewCourseinitialState {

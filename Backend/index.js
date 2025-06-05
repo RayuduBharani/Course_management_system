@@ -19,6 +19,8 @@ const AdminCourseAccessRouter = require("./routes/admin/courseAccess-route")
 const InstrctorProfile = require("./routes/Instructor/profile")
 const InstrctorEarnings = require("./routes/Instructor/earnings")
 const Instrctordetailes = require("./routes/admin/instructor-route")
+const InstructorWithdrawal = require("./routes/Instructor/withdrawal-route")
+const AdminWithdrawalRouter = require("./routes/admin/withdrawal-route")
 
 const app = express();
 app.use(express.json())
@@ -43,17 +45,21 @@ app.use('/api/check-verify', RoleRouter)
 app.use('/instructor/course', CourseRouter)
 app.use("/instructor/profile" , InstrctorProfile)
 app.use("/instructor/earning" , InstrctorEarnings)
+app.use("/instructor/withdrawal", InstructorWithdrawal)
+
+// admin
+app.use("/admin", AdminWithdrawalRouter)
+
 // All Courses
 app.use("/courses", AllCourseRouter)
 
 // orderCourses 
-
-app.use('/lead/order', LeadOrderRouter)
+app.use('/order', LeadOrderRouter)  // Changed from /lead/order to /order for consistency
 
 // lead 
 app.use("/lead/mycourse", LeadCoursesRouter)
 app.use("/lead/profile", ProfileRouter)
-app.use("/lead/progress-page", viewcourseRouter);
+app.use("/lead/progress-page", viewcourseRouter)
 app.use("/lead/team", TeamMembers)
 
 // student 

@@ -19,11 +19,15 @@ export function AdminLayout() {
             label: "Instructors",
             href: "courseProviders",
             icon: <i className="fa-solid fa-users mt-1"></i>,
-        },
-        {
+        },        {
             label: "Orders",
             href: "orders",
             icon: <i className="fa-solid fa-cart-shopping mt-1 mr-1"></i>,
+        },
+        {
+            label: "Withdrawals",
+            href: "withdrawals",
+            icon: <i className="fa-solid fa-money-bill-transfer mt-1"></i>,
         }
     ];
     const [open, setOpen] = useState(false);
@@ -46,7 +50,8 @@ export function AdminLayout() {
                         {open ? <Logo /> :
                             <img
                                 className="rounded-full w-7 h-7"
-                                src="https://media.licdn.com/dms/image/v2/D560BAQEdNp5niau0Rw/company-logo_200_200/company-logo_200_200/0/1683745552013?e=1735171200&v=beta&t=5ykcq9A8xtYhhFFdbeRTpzs8JjbqEQL_P5dkkE70rOs"
+                                src="/logo.png"
+                                alt="Logo"
                             />}
                         <div className="mt-24 flex flex-col gap-3">
                             {links.map((link, idx) => (
@@ -78,7 +83,8 @@ export const Logo = () => {
         <Link to="#" className="flex gap-2">
             <img
                 className="rounded-full w-7 h-7"
-                src="https://media.licdn.com/dms/image/v2/D560BAQEdNp5niau0Rw/company-logo_200_200/company-logo_200_200/0/1683745552013?e=1735171200&v=beta&t=5ykcq9A8xtYhhFFdbeRTpzs8JjbqEQL_P5dkkE70rOs"
+                src="/logo.png"
+                alt="Logo"
             />
             <motion.span
                 initial={{ opacity: 0 }}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import Loader from "../Loading"
 import { Button } from "../ui/button"
@@ -13,32 +13,57 @@ import { useSelector } from "react-redux"
 import { RootState } from "../store/store"
 import { toast } from "@/hooks/use-toast"
 
+interface VideoContent {
+    title: string;
+    videoUrl: string;
+    freePreview: boolean;
+}
+
 export default function StudentCourseDetailesView() {
     const { id } = useParams()
     const navigate = useNavigate()
     const [courseInfo, setCourseInfo] = useState<ICourse>()
     const [approvalUrl, setApprovalUrl] = useState("")
     const [isProcessing, setIsProcessing] = useState(false)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const [selectedVideo, setSelectedVideo] = useState<any>(null)
+    const [selectedVideo, setSelectedVideo] = useState<VideoContent | null>(null)
+    const { user } = useSelector((state: RootState) => state.auth as { user: { userId: string; email: string } })
 
-    const FetchCourseInfo = async () => {
-        const response = await fetch(`http://localhost:8000/courses/get/${id}`)
-        const data = await response.json()
-        setCourseInfo(data)
-    }
+    const FetchCourseInfo = useCallback(async () => {
+        try {
+            const response = await fetch(`http://localhost:8000/courses/get/${id}`)
+            const data = await response.json()
+            setCourseInfo(data)
+        } catch (error) {
+            console.error('Failed to fetch course info:', error)
+            toast({
+                title: "Failed to load course information",
+                description: "Please try again later",
+                variant: "destructive"
+            })
+        }
+    }, [id])
 
     useEffect(() => {
         FetchCourseInfo()
-    }, [id])
+    }, [FetchCourseInfo])
 
-    const { user } = useSelector((state: RootState) => state.auth)
-
-    if (approvalUrl != "") {
+    if (approvalUrl !== "") {
         window.location.href = approvalUrl
     }
 
+    const handleVideoClick = (video: VideoContent) => {
+        if (video.freePreview) {
+            setSelectedVideo(video)
+        }
+    }
+
+    const closeVideoDialog = () => {
+        setSelectedVideo(null)
+    }
+
     const handleCreatePayment = async () => {
+        if (!courseInfo || !user) return;
+        
         setIsProcessing(true)
         const paymentPayload = {
             userId: user.userId,
@@ -48,13 +73,14 @@ export default function StudentCourseDetailesView() {
             orderDate: Date.now(),
             paymentId: "",
             payerId: "",
-            instructorId: courseInfo?.instructor._id,
-            courseId: courseInfo?._id,
-            coursePrice: courseInfo?.price,
-            courseTitle: courseInfo?.title
+            instructorId: courseInfo.instructor._id,
+            courseId: courseInfo._id,
+            coursePrice: courseInfo.price,
+            courseTitle: courseInfo.title
         }
+        
         try {
-            const response = await fetch("http://localhost:8000/lead/order/create/stu", {
+            const response = await fetch("http://localhost:8000/order/create/stu", {
                 method: "POST",
                 headers: {
                     "Content-type": "application/json"
@@ -66,32 +92,26 @@ export default function StudentCourseDetailesView() {
             if (data.success) {
                 sessionStorage.setItem("currentOrderId", data.orderId)
                 setApprovalUrl(data.approvalUrl)
-                setIsProcessing(false)
             } else {
                 toast({
-                    title: "Payment method failed please try again",
+                    title: "Payment failed to initialize",
+                    description: data.message || "Please try again",
                     variant: "destructive"
                 })
-                setIsProcessing(false)
             }
         } catch (err) {
-            console.log(err)
+            console.error('Payment creation failed:', err)
+            toast({
+                title: "Payment failed",
+                description: "Unable to initialize payment. Please try again.",
+                variant: "destructive"
+            })
+        } finally {
             setIsProcessing(false)
         }
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const handleVideoClick = (video: any) => {
-        if (video.freePreview) {
-            setSelectedVideo(video)
-        }
-    }
-
-    const closeVideoDialog = () => {
-        setSelectedVideo(null)
-    }
-
-    if (courseInfo == undefined) {
+    if (!courseInfo) {
         return (
             <div className="min-h-screen bg-gray-50/50 flex items-center justify-center">
                 <Loader />
@@ -341,7 +361,7 @@ export default function StudentCourseDetailesView() {
                         <Videoplayer
                             width="100%"
                             height="100%"
-                            videoUrl={selectedVideo?.videoUrl}
+                            videoUrl={selectedVideo?.videoUrl || ""}
                         />
                     </div>
                     <div className="flex justify-center mt-6">

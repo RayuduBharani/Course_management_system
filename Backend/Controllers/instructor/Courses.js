@@ -3,6 +3,7 @@ const db = require('../../Utils/DB/db');
 const courseModel = require('../../Models/Instructor/Courses');
 const InstuctureModel = require('../../Models/RBAC/InstructorModel');
 const OrderModel = require('../../Models/Common/OrderModel');
+const WithdrawalRequest = require('../../Models/Instructor/WithdrawalRequest'); // Assuming the path to WithdrawalRequest model
 
 const AddCourse = async (req, res) => {
     await db()
@@ -83,9 +84,42 @@ const GetOrderDetailes = async (req,res) => {
         const token = req.cookies[process.env.JWT_KEY]
         const decode = jwt.verify(token, process.env.JWT_KEY)
         const findInstructor = await InstuctureModel.findOne({userId : decode.userId})
-        const findOrder = await OrderModel.find({instructorId : findInstructor._id})
-        if(findOrder){
-            res.send(findOrder)
+        
+        // Get all orders for this instructor
+        const findOrders = await OrderModel.find({instructorId : findInstructor._id})
+        
+        // Get all withdrawal requests for this instructor 
+        const withdrawalRequests = await WithdrawalRequest.find({
+            instructorId: findInstructor._id,
+            status: { $in: ['pending', 'approved'] }
+        })
+
+        // Calculate total approved/completed course payments
+        const completedPayments = findOrders
+            .filter(order => order.orderStatus === "Approval")
+            .reduce((total, order) => total + parseFloat(order.coursePrice), 0)
+
+        // Calculate total withdrawn/pending withdrawal amount
+        const withdrawnAmount = withdrawalRequests.reduce((total, req) => {
+            return total + req.amount
+        }, 0)
+
+        // Calculate available balance
+        const availableBalance = completedPayments - withdrawnAmount
+
+        if(findOrders){
+            res.send({
+                orders: findOrders,
+                availableBalance,
+                withdrawalRequests
+            })
+        } else {
+            res.send({
+                success: false,
+                message: "No orders found",
+                availableBalance: 0,
+                withdrawalRequests: []
+            })
         }
     } 
     catch (err) {

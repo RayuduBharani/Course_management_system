@@ -57,7 +57,8 @@ export function StudentLayout() {
                         {open ? <Logo /> : 
                             <img
                                 className="rounded-full w-7 h-7"
-                                src="https://media.licdn.com/dms/image/v2/D560BAQEdNp5niau0Rw/company-logo_200_200/company-logo_200_200/0/1683745552013?e=1735171200&v=beta&t=5ykcq9A8xtYhhFFdbeRTpzs8JjbqEQL_P5dkkE70rOs"
+                                src="/logo.png"
+                                alt="Logo"
                             />
                         }
                         <div className="mt-24 flex flex-col gap-3">
@@ -108,7 +109,8 @@ export const Logo = () => {
         <Link to="#" className="flex gap-2">
             <img
                 className="rounded-full w-7 h-7"
-                src="https://media.licdn.com/dms/image/v2/D560BAQEdNp5niau0Rw/company-logo_200_200/company-logo_200_200/0/1683745552013?e=1735171200&v=beta&t=5ykcq9A8xtYhhFFdbeRTpzs8JjbqEQL_P5dkkE70rOs"
+                src="/logo.png"
+                alt="Logo"
             />
             <motion.span
                 initial={{ opacity: 0 }}

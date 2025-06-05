@@ -23,12 +23,18 @@ export function InstructorLayout() {
             icon: (
                 <i className="fa-solid fa-book-open-reader mt-1"></i>
             ),
-        },
-        {
-            label: "Earning",
+        },        {
+            label: "Earnings",
             href: "earnings",
             icon: (
                 <i className="fa-solid fa-wallet mt-1"></i>
+            ),
+        },
+        {
+            label: "Withdrawals",
+            href: "withdrawals",
+            icon: (
+                <i className="fa-solid fa-money-bill-transfer mt-1"></i>
             ),
         }
     ];
@@ -68,7 +74,7 @@ export function InstructorLayout() {
                         ) : (
                             <img
                                 className="rounded-full w-7 h-7"
-                                src="https://media.licdn.com/dms/image/v2/D560BAQEdNp5niau0Rw/company-logo_200_200/company-logo_200_200/0/1683745552013?e=1735171200&v=beta&t=5ykcq9A8xtYhhFFdbeRTpzs8JjbqEQL_P5dkkE70rOs"
+                                src="/logo.png"
                                 alt="Company Logo"
                             />
                         )}
@@ -120,7 +126,7 @@ export const Logo = () => {
         <Link to="auth/signin" className="flex gap-2">
             <img
                 className="rounded-full w-7 h-7"
-                src="https://media.licdn.com/dms/image/v2/D560BAQEdNp5niau0Rw/company-logo_200_200/company-logo_200_200/0/1683745552013?e=1735171200&v=beta&t=5ykcq9A8xtYhhFFdbeRTpzs8JjbqEQL_P5dkkE70rOs"
+                src="/logo.png"
                 alt="Company Logo"
             />
             <motion.span

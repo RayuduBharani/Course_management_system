@@ -19,8 +19,7 @@ export const store = configureStore({
         team : teamSlice,
         studentProfile : StudentProfileInfo,
         studentProgress:StudentProgressSlice,
-        adminProgress:AdminSlice ,
-        Instuctor : InstuctorSlice,
+        adminProgress:AdminSlice ,        Instructor : InstuctorSlice,
         InstructorProfile : InstructorProfile
     }
 })

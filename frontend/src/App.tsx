@@ -50,6 +50,8 @@ import InstructorProfileUpdate from './components/Instructor/ProfileUpdate'
 import EarningPage from './Pages/Instructor/EarningPage'
 import InstructorDetails from './components/Admin/instructorDetails'
 import Payment from './Pages/Admin/pay'
+import WithdrawalPage from './Pages/Instructor/WithdrawalPage'
+import WithdrawalsPage from './Pages/Admin/WithdrawalsPage'
 
 
 function App() {
@@ -96,8 +98,8 @@ function App() {
                     <Route path='pay/:id' element={<Payment />} />
                     <Route path='courseProviders' element={<AdminInstructors />} />
                     <Route path='courseProviders/:id' element={<InstructorDetails />} />
-                    <Route path='users' element={<AdminStudents />} />
-                    <Route path='orders' element={<Orders />} />
+                    <Route path='users' element={<AdminStudents />} />                    <Route path='orders' element={<Orders />} />
+                    <Route path='withdrawals' element={<WithdrawalsPage />} />
                     <Route path='leads' element={<AdminLeads />} />
                     <Route path='courses/:id' element={<AdminCourseDetailesView />} />
                     <Route path='courses/coureview/:id' element={<AdminCourseDetailesPage />} />
@@ -135,8 +137,9 @@ function App() {
                     <Route path='dashboard' element={<InstructorDashbord />} />
                     <Route path='courses' element={<InstructorAllCourses />} />
                     <Route path='profile' element={<InstructorProfile />} />
-                    <Route path='new' element={<AddCourse />} />
+                    <Route path='new' element={<AddCourse />} />                    
                     <Route path='earnings' element={<EarningPage />} />
+                    <Route path='withdrawals' element={<WithdrawalPage />} />
                     <Route path='courses/view/:id' element={<ViewCourse />} />
                     <Route path='courses/coureview/:id' element={<InstructorCourseEnrollDetailesPage />} />
                     <Route path='profile/update' element={<InstructorProfileUpdate />} />

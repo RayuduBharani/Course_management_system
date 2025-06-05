@@ -18,12 +18,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/components/store/store";
 import { FetchInstructorCourses } from "@/components/store/slices/Instructor/courses";
 import Loader from "@/components/Loading";
+import type { AdminCourse } from "@/lib/admin-types";
 
 export default function InstructorAllCourses() {
     const [searchTerm, setSearchTerm] = useState("");
     const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>();
-    const { courses, isLoading, error } = useSelector((state: RootState) => state.Instuctor);
+    const { courses, isLoading, error } = useSelector((state: RootState) => state.Instructor);
     
     useEffect(() => {
         dispatch(FetchInstructorCourses())
@@ -31,9 +32,9 @@ export default function InstructorAllCourses() {
 
     // Calculate instructor stats
     const stats = useMemo(() => {
-        const totalStudents = courses.reduce((acc, course) => acc + (course.students?.length || 0), 0);
+        const totalStudents = courses.reduce((acc: number, course: AdminCourse) => acc + (course.students?.length || 0), 0);
         const avgRating = 4.8; // This should come from actual ratings
-        const totalLessons = courses.reduce((acc, course) => acc + (course.files?.length || 0), 0);
+        const totalLessons = courses.reduce((acc: number, course: AdminCourse) => acc + (course.files?.length || 0), 0);
         
         return [
             {
@@ -44,7 +45,7 @@ export default function InstructorAllCourses() {
             },
             {
                 icon: <Users className="h-4 w-4" />,
-                value: new Intl.NumberFormat("en-US", { notation: "compact" }).format(totalStudents) + "+",
+                value: totalStudents.toString() + "+",
                 label: "Total Students",
                 color: "text-green-600"
             },
@@ -56,14 +57,14 @@ export default function InstructorAllCourses() {
             },
             {
                 icon: <PlayCircle className="h-4 w-4" />,
-                value: totalLessons + "+",
+                value: totalLessons.toString() + "+",
                 label: "Total Lessons",
                 color: "text-orange-600"
             }
         ];
     }, [courses]);
 
-    const filteredCourses = courses.filter(course =>
+    const filteredCourses = courses.filter((course: AdminCourse) =>
         course.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
 

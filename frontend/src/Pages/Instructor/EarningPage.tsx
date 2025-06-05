@@ -19,8 +19,12 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useEffect, useState, useMemo } from "react";
-import { DollarSign, Users, TrendingUp, Search, LineChart } from "lucide-react";
+import { useEffect, useState, useMemo, useCallback } from "react";
+import { DollarSign, Users, TrendingUp, Search, ArrowRight, Wallet, AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Loader2 } from "lucide-react";
 
 interface EarningItem {
     courseTitle: string;
@@ -47,37 +51,55 @@ export default function EarningPage() {
     const [searchTerm, setSearchTerm] = useState("");
     const [sortBy, setSortBy] = useState("date");
     const [filteredData, setFilteredData] = useState<EarningItem[]>([]);
+    const [error, setError] = useState<string | null>(null);
+    const [availableBalance, setAvailableBalance] = useState(0);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [withdrawalRequests, setWithdrawalRequests] = useState([]);
 
-    const calculateStats = (data: EarningItem[]): EarningStats => {
+    const calculateStats = useCallback((data: EarningItem[]): EarningStats => {
+        // Handle invalid input
+        if (!Array.isArray(data)) {
+            return {
+                totalAmount: 0,
+                successfulOrders: 0,
+                pendingAmount: 0,
+                averageOrderValue: 0,
+                monthlyGrowth: 0
+            };
+        }        // Filter successful payments, ensuring all required fields exist
         const successfulPayments = data.filter(item => 
-            item.paymentStatus === "success" && item.orderStatus === "completed"
+            item && 
+            item.orderStatus === "Approval" &&  // Only check orderStatus since Approval means success
+            item.coursePrice &&
+            typeof item.coursePrice.$numberDecimal === 'string'
         );
 
+        // Calculate total amount from successful payments
         const totalSuccessfulAmount = successfulPayments.reduce((sum, item) => 
             sum + parseFloat(item.coursePrice.$numberDecimal || "0"), 0
+        );        // Calculate pending amount (only count orders with Pending status)
+        const pendingAmount = data.reduce((sum, item) => {
+            if (item && item.coursePrice && item.orderStatus === "Pending") {
+                return sum + parseFloat(item.coursePrice.$numberDecimal || "0");
+            }
+            return sum;
+        }, 0);
+
+        // Calculate monthly statistics
+        const now = new Date();
+        const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+        const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+
+        const currentMonthPayments = successfulPayments.filter(item => 
+            new Date(item.createdAt) >= currentMonthStart
+        );
+        
+        const lastMonthPayments = successfulPayments.filter(item => 
+            new Date(item.createdAt) >= lastMonthStart && 
+            new Date(item.createdAt) < currentMonthStart
         );
 
-        const pendingPayments = data.filter(item => 
-            item.paymentStatus !== "success" || item.orderStatus !== "completed"
-        );
-
-        const pendingAmount = pendingPayments.reduce((sum, item) => 
-            sum + parseFloat(item.coursePrice.$numberDecimal || "0"), 0
-        );
-
-        // Calculate monthly growth
-        const currentMonth = new Date().getMonth();
-        const currentYearPayments = successfulPayments.filter(item => {
-            const paymentDate = new Date(item.createdAt);
-            return paymentDate.getMonth() === currentMonth;
-        });
-
-        const lastMonthPayments = successfulPayments.filter(item => {
-            const paymentDate = new Date(item.createdAt);
-            return paymentDate.getMonth() === (currentMonth - 1);
-        });
-
-        const currentMonthTotal = currentYearPayments.reduce((sum, item) => 
+        const currentMonthTotal = currentMonthPayments.reduce((sum, item) => 
             sum + parseFloat(item.coursePrice.$numberDecimal || "0"), 0
         );
 
@@ -85,7 +107,9 @@ export default function EarningPage() {
             sum + parseFloat(item.coursePrice.$numberDecimal || "0"), 0
         );
 
-        const monthlyGrowth = lastMonthTotal === 0 ? 100 : 
+        // Calculate monthly growth percentage
+        const monthlyGrowth = lastMonthTotal === 0 ? 
+            (currentMonthTotal > 0 ? 100 : 0) : 
             ((currentMonthTotal - lastMonthTotal) / lastMonthTotal) * 100;
 
         return {
@@ -96,21 +120,34 @@ export default function EarningPage() {
                 totalSuccessfulAmount / successfulPayments.length : 0,
             monthlyGrowth: monthlyGrowth
         };
-    };
+    }, []);
 
-    const stats = useMemo(() => calculateStats(earningData), [earningData]);
+    const stats = useMemo(() => calculateStats(earningData), [calculateStats, earningData]);
 
     const fetchInstructorEarnings = async () => {
         try {
             setIsLoading(true);
+            setError(null);
             const response = await fetch("http://localhost:8000/instructor/earning/orders", {
                 credentials: "include",
             });
-            const data: EarningItem[] = await response.json();
-            setEarningData(data);
-            setFilteredData(data);
+            const result = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(result.message || 'Failed to fetch earnings');
+            }
+
+            // The backend always sends orders, even if empty
+            const orders = result.orders || [];
+            setEarningData(orders);
+            setFilteredData(orders);
+            setAvailableBalance(result.availableBalance || 0);
+            setWithdrawalRequests(result.withdrawalRequests || []);
         } catch (error) {
             console.error("Error fetching earnings:", error);
+            setError(error instanceof Error ? error.message : 'Failed to fetch earnings');
+            setEarningData([]);
+            setFilteredData([]);
         } finally {
             setIsLoading(false);
         }
@@ -136,22 +173,20 @@ export default function EarningPage() {
                 case "status":
                     return a.orderStatus.localeCompare(b.orderStatus);
                 case "date":
-                    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
                 default:
-                    return 0;
+                    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
             }
         });
         setFilteredData(sorted);
-    }, [sortBy, filteredData]);
-
-    const getStatusColor = (status: string, paymentStatus: string) => {
-        if (paymentStatus !== "success") return "destructive";
-        return status === "completed" ? "default" : "secondary";
+    }, [sortBy, filteredData]);    const getStatusColor = (orderStatus: string) => {
+        if (orderStatus === "Approval") return "default";
+        if (orderStatus === "Pending") return "secondary";
+        return "destructive";
     };
 
     return (
         <div className="w-full h-full p-4 md:p-10 space-y-6">
-            <div className="grid gap-4 md:grid-cols-4">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
@@ -164,6 +199,7 @@ export default function EarningPage() {
                         </p>
                     </CardContent>
                 </Card>
+                
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Successful Orders</CardTitle>
@@ -176,9 +212,23 @@ export default function EarningPage() {
                         </p>
                     </CardContent>
                 </Card>
+                
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Average Order</CardTitle>
+                        <CardTitle className="text-sm font-medium">Available Balance</CardTitle>
+                        <Wallet className="h-4 w-4 text-muted-foreground"/>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold">₹ {availableBalance.toFixed(2)}</div>
+                        <p className="text-xs text-muted-foreground">
+                            Ready for withdrawal
+                        </p>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Average Order Value</CardTitle>
                         <TrendingUp className="h-4 w-4 text-muted-foreground"/>
                     </CardHeader>
                     <CardContent>
@@ -188,18 +238,14 @@ export default function EarningPage() {
                         </p>
                     </CardContent>
                 </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Pending Amount</CardTitle>
-                        <LineChart className="h-4 w-4 text-muted-foreground"/>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">₹ {stats.pendingAmount.toFixed(2)}</div>
-                        <p className="text-xs text-muted-foreground">
-                            From incomplete orders
-                        </p>
-                    </CardContent>
-                </Card>
+            </div>
+
+            <div className="flex justify-end mb-4">
+                <Button asChild>
+                    <Link to="/instructor/withdrawals">
+                        Request Withdrawal <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
+                </Button>
             </div>
 
             <Separator />
@@ -226,54 +272,67 @@ export default function EarningPage() {
                 </Select>
             </div>
 
-            <div className="rounded-md border">
-                <Table>
-                    <TableCaption>Earnings Details</TableCaption>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead className="w-[100px]">No</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead>Course Name</TableHead>
-                            <TableHead>User Email</TableHead>
-                            <TableHead className="text-right">Amount</TableHead>
-                            <TableHead>Payment Status</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {isLoading ? (
-                            Array(5).fill(0).map((_, i) => (
-                                <TableRow key={i}>
-                                    <TableCell><Skeleton className="h-4 w-8" /></TableCell>
-                                    <TableCell><Skeleton className="h-4 w-20" /></TableCell>
-                                    <TableCell><Skeleton className="h-4 w-40" /></TableCell>
-                                    <TableCell><Skeleton className="h-4 w-32" /></TableCell>
-                                    <TableCell><Skeleton className="h-4 w-16" /></TableCell>
-                                    <TableCell><Skeleton className="h-4 w-20" /></TableCell>
-                                </TableRow>
-                            ))
-                        ) : (
-                            filteredData.map((data: EarningItem, index) => (
-                                <TableRow key={index} className={data.paymentStatus !== "success" ? "opacity-60" : ""}>
-                                    <TableCell className="font-medium">{index + 1}</TableCell>
-                                    <TableCell>
-                                        <Badge variant={getStatusColor(data.orderStatus, data.paymentStatus)}>
-                                            {data.orderStatus}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell className="font-medium">{data.courseTitle}</TableCell>
-                                    <TableCell>{data.userEmail}</TableCell>
-                                    <TableCell className="text-right">₹ {data.coursePrice.$numberDecimal}</TableCell>
-                                    <TableCell>
-                                        <Badge variant={data.paymentStatus === "success" ? "default" : "destructive"}>
-                                            {data.paymentStatus}
-                                        </Badge>
-                                    </TableCell>
-                                </TableRow>
-                            ))
-                        )}
-                    </TableBody>
-                </Table>
-            </div>
+            {error && (
+                <Alert variant="destructive" className="mb-4">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertTitle>Error</AlertTitle>
+                    <AlertDescription>{error}</AlertDescription>
+                </Alert>
+            )}
+
+            {isLoading ? (
+                <div className="flex justify-center items-center h-[200px]">
+                    <Loader2 className="h-6 w-6 animate-spin" />
+                </div>
+            ) : (
+                <div className="rounded-md border">
+                    <Table>
+                        <TableCaption>Earnings Details</TableCaption>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead className="w-[100px]">No</TableHead>
+                                <TableHead>Status</TableHead>
+                                <TableHead>Course Name</TableHead>
+                                <TableHead>User Email</TableHead>
+                                <TableHead className="text-right">Amount</TableHead>
+                                <TableHead>Payment Status</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {isLoading ? (
+                                Array(5).fill(0).map((_, i) => (
+                                    <TableRow key={i}>
+                                        <TableCell><Skeleton className="h-4 w-8" /></TableCell>
+                                        <TableCell><Skeleton className="h-4 w-20" /></TableCell>
+                                        <TableCell><Skeleton className="h-4 w-40" /></TableCell>
+                                        <TableCell><Skeleton className="h-4 w-32" /></TableCell>
+                                        <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+                                        <TableCell><Skeleton className="h-4 w-20" /></TableCell>
+                                    </TableRow>
+                                ))
+                            ) : (
+                                filteredData.map((data: EarningItem, index) => (                                    <TableRow key={index} className={data.orderStatus !== "Approval" ? "opacity-60" : ""}>
+                                        <TableCell className="font-medium">{index + 1}</TableCell>
+                                        <TableCell>
+                                            <Badge variant={getStatusColor(data.orderStatus)}>
+                                                {data.orderStatus}
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell className="font-medium">{data.courseTitle}</TableCell>
+                                        <TableCell>{data.userEmail}</TableCell>
+                                        <TableCell className="text-right">₹ {data.coursePrice.$numberDecimal}</TableCell>
+                                        <TableCell>
+                                            <Badge variant={data.orderStatus === "Approval" ? "default" : "secondary"}>
+                                                {data.orderStatus === "Approval" ? "Success" : "Pending"}
+                                            </Badge>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            )}
+                        </TableBody>
+                    </Table>
+                </div>
+            )}
         </div>
     );
 }

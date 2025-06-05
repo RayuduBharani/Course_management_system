@@ -1,5 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
+import type { FindInstructorCourses } from "@/lib/admin-types";
+
 const initialState : FindInstructorCourses = {
     isLoading: true,
     courses: [],
