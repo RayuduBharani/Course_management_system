@@ -29,7 +29,6 @@ export default function InstructorDashboard() {
     error: state.Instructor.error as string | null
   }));
 
-  // Memoize the courses transformation
   const courses = useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return rawCourses.map((adminCourse: any) => ({
@@ -38,7 +37,6 @@ export default function InstructorDashboard() {
     })) as Course[];
   }, [rawCourses]);
 
-  // Memoize stats calculation
   const stats = useMemo(() => {
     if (!Array.isArray(courses)) {
       return {
@@ -104,89 +102,89 @@ export default function InstructorDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 p-6">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-slate-50 p-4 md:p-6">
+      <div className="max-w-5xl mx-auto">
         {/* Hero Section */}
-        <div className="text-center mb-16 pt-12">
-          <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-4 py-2 rounded-full text-sm font-medium mb-6">
+        <div className="text-center mb-10 pt-8">
+          <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-600 px-3 py-1.5 rounded-full text-sm font-medium mb-4">
             <Award className="w-4 h-4" />
             Instructor Portal
           </div>
           
-          <h1 className="text-5xl font-bold text-slate-900 mb-6 leading-tight">
+          <h1 className="text-2xl font-bold text-slate-900 mb-4">
             Shape the Future of
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600"> Learning</span>
+            <span className="text-blue-600"> Learning</span>
           </h1>
           
-          <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed mb-8">
+          <p className="text-base text-slate-600 max-w-xl mx-auto mb-6">
             Empower students worldwide with your expertise. Create impactful courses, 
             track progress, and build a community of learners.
           </p>
           
-          <div className="flex gap-4 justify-center flex-wrap">
-            <Button 
-              size="lg"
-              onClick={() => navigate('/instructor/new')}
-            >
-              <BookOpen className="w-5 h-5 mr-2" />
-              Create Course
-            </Button>
-          </div>
+          <Button 
+            onClick={() => navigate('/instructor/new')}
+            className="inline-flex items-center"
+          >
+            <BookOpen className="w-4 h-4 mr-2" />
+            Create Course
+          </Button>
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-blue-100 rounded-xl">
-                <BookOpen className="w-6 h-6 text-blue-600" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+          <div className="bg-white rounded-lg p-4 shadow-sm border border-slate-100">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2 bg-blue-50 rounded-md">
+                <BookOpen className="w-5 h-5 text-blue-600" />
               </div>
-              <span className="text-2xl font-bold text-slate-900">{stats.activeCourses}</span>
+              <span className="text-xl font-bold text-slate-900">{stats.activeCourses}</span>
             </div>
-            <h3 className="font-semibold text-slate-900 mb-1">Active Courses</h3>
+            <h3 className="font-medium text-slate-900 mb-0.5">Active Courses</h3>
             <p className="text-sm text-slate-500">Currently published</p>
           </div>
 
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-green-100 rounded-xl">
-                <Users className="w-6 h-6 text-green-600" />
+          <div className="bg-white rounded-lg p-4 shadow-sm border border-slate-100">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2 bg-green-50 rounded-md">
+                <Users className="w-5 h-5 text-green-600" />
               </div>
-              <span className="text-2xl font-bold text-slate-900">
+              <span className="text-xl font-bold text-slate-900">
                 {new Intl.NumberFormat("en-US", { notation: "compact" }).format(stats.totalStudents)}
               </span>
             </div>
-            <h3 className="font-semibold text-slate-900 mb-1">Total Students</h3>
+            <h3 className="font-medium text-slate-900 mb-0.5">Total Students</h3>
             <p className="text-sm text-slate-500">Across all courses</p>
           </div>
 
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-orange-100 rounded-xl">
-                <Award className="w-6 h-6 text-orange-600" />
+          <div className="bg-white rounded-lg p-4 shadow-sm border border-slate-100">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2 bg-orange-50 rounded-md">
+                <Award className="w-5 h-5 text-orange-600" />
               </div>
-              <span className="text-2xl font-bold text-slate-900">{stats.completionRate}%</span>
+              <span className="text-xl font-bold text-slate-900">{stats.completionRate}%</span>
             </div>
-            <h3 className="font-semibold text-slate-900 mb-1">Completion Rate</h3>
+            <h3 className="font-medium text-slate-900 mb-0.5">Completion Rate</h3>
             <p className="text-sm text-slate-500">Student success</p>
           </div>
         </div>
 
         {/* Quick Actions */}
-        <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200">
-          <h2 className="text-2xl font-bold text-slate-900 mb-6">Quick Actions</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-white rounded-lg p-6 shadow-sm border border-slate-100">
+          <h2 className="text-lg font-semibold text-slate-900 mb-4">Quick Actions</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div 
               className="group cursor-pointer" 
               onClick={() => navigate('/instructor/new')}
             >
-              <div className="p-6 rounded-xl border-2 border-dashed border-slate-200 hover:border-blue-300 hover:bg-blue-50/50 transition-all">
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:bg-blue-200 transition-colors">
-                    <BookOpen className="w-6 h-6 text-blue-600" />
+              <div className="p-4 rounded-lg border border-slate-200 hover:border-blue-200 hover:bg-blue-50/30 transition-all">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-blue-50 rounded-md flex items-center justify-center group-hover:bg-blue-100 transition-colors">
+                    <BookOpen className="w-5 h-5 text-blue-600" />
                   </div>
-                  <h3 className="font-semibold text-slate-900 mb-2">Create New Course</h3>
-                  <p className="text-sm text-slate-500">Start building your next course</p>
+                  <div className="text-left">
+                    <h3 className="font-medium text-slate-900 mb-0.5">Create New Course</h3>
+                    <p className="text-sm text-slate-500">Start building your next course</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -195,13 +193,15 @@ export default function InstructorDashboard() {
               className="group cursor-pointer"
               onClick={() => navigate('/instructor/courses')}
             >
-              <div className="p-6 rounded-xl border-2 border-dashed border-slate-200 hover:border-green-300 hover:bg-green-50/50 transition-all">
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:bg-green-200 transition-colors">
-                    <Users className="w-6 h-6 text-green-600" />
+              <div className="p-4 rounded-lg border border-slate-200 hover:border-green-200 hover:bg-green-50/30 transition-all">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-green-50 rounded-md flex items-center justify-center group-hover:bg-green-100 transition-colors">
+                    <Users className="w-5 h-5 text-green-600" />
                   </div>
-                  <h3 className="font-semibold text-slate-900 mb-2">Manage Students</h3>
-                  <p className="text-sm text-slate-500">View and interact with learners</p>
+                  <div className="text-left">
+                    <h3 className="font-medium text-slate-900 mb-0.5">Manage Students</h3>
+                    <p className="text-sm text-slate-500">View and interact with learners</p>
+                  </div>
                 </div>
               </div>
             </div>

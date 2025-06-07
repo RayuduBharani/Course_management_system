@@ -2,8 +2,6 @@ import Videoplayer from "@/components/Common/VideoPlayer/Videoplayer";
 import Loader from "@/components/Loading";
 import { AppDispatch, RootState } from "@/components/store/store";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,15 +10,6 @@ import { hourglass } from "ldrs";
 import BookLoader from "@/components/Loading/BookLoader";
 import { FetchAdminCourseView } from "@/components/store/slices/admin/course-view";
 import { Badge } from "@/components/ui/badge";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface Student {
@@ -127,71 +116,6 @@ export default function InstructorCourseEnrollDetailesPage() {
             </div>
           </div>
         )}
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl font-bold flex items-center gap-3">
-              <i className="fa-solid fa-users text-primary"></i>
-              Enrolled Students
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <div className="space-y-4">
-                {[...Array(5)].map((_, i) => (
-                  <div key={i} className="flex items-center space-x-4">
-                    <Skeleton className="h-12 w-12 rounded-full" />
-                    <div className="space-y-2">
-                      <Skeleton className="h-4 w-[250px]" />
-                      <Skeleton className="h-4 w-[200px]" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : students.length === 0 ? (
-              <div className="text-center py-12">
-                <i className="fa-solid fa-user-graduate text-4xl text-gray-400 mb-4"></i>
-                <p className="text-gray-500">No students enrolled yet</p>
-              </div>
-            ) : (
-              <ScrollArea className="h-[600px] rounded-md">
-                <Table>
-                  <TableHeader className="sticky top-0 bg-white shadow-sm">
-                    <TableRow>
-                      <TableHead className="w-[50px]">Profile</TableHead>
-                      <TableHead>Name</TableHead>
-                      <TableHead className="hidden md:table-cell">Email</TableHead>
-                      <TableHead className="hidden lg:table-cell">College</TableHead>
-                      <TableHead>Roll Number</TableHead>
-                      <TableHead className="hidden md:table-cell">Enrolled On</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {students.map((student) => (
-                      <TableRow key={student.id}>
-                        <TableCell>
-                          <Avatar>
-                            <AvatarImage src={student.profileImg} />
-                            <AvatarFallback>
-                              {student.name.charAt(0).toUpperCase()}
-                            </AvatarFallback>
-                          </Avatar>
-                        </TableCell>
-                        <TableCell className="font-medium">{student.name}</TableCell>
-                        <TableCell className="hidden md:table-cell">{student.email}</TableCell>
-                        <TableCell className="hidden lg:table-cell">{student.college}</TableCell>
-                        <TableCell>{student.rollNumber}</TableCell>
-                        <TableCell className="hidden md:table-cell">
-                          {new Date(student.enrolledAt).toLocaleDateString()}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </ScrollArea>
-            )}
-          </CardContent>
-        </Card>
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-[calc(100vh-240px)]">

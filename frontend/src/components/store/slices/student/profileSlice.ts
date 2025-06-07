@@ -86,5 +86,5 @@ const StudentProfileSlice = createSlice({
     },
 })
 
-export const { } = StudentProfileSlice.actions
+export const {GettingProfileInfo } = StudentProfileSlice.actions
 export default StudentProfileSlice.reducer

@@ -74,7 +74,7 @@ export function StudentLayout() {
                                 <p className="text-sm -mt-1">Logout</p>
                             </div>
                         </div>
-                    </div>
+                    </div>                    
                     <div>
                         <SidebarLink
                             link={{
@@ -82,11 +82,15 @@ export function StudentLayout() {
                                 href: "profile",
                                 icon: (
                                     <img
-                                        src={profileInfo ? profileInfo.profileImg : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRNKfj6RsyRZqO4nnWkPFrYMmgrzDmyG31pFQ&s"}
-                                        className="h-7 w-7 flex-shrink-0 rounded-full"
-                                        width={50}
-                                        height={50}
-                                        alt="Avatar"
+                                        src={profileInfo?.profileImg || "/default-avatar.png"}
+                                        className="h-7 w-7 flex-shrink-0 rounded-full object-cover bg-muted"
+                                        width={28}
+                                        height={28}
+                                        alt="Profile"
+                                        onError={(e) => {
+                                            const target = e.target as HTMLImageElement;
+                                            target.src = "https://ui-avatars.com/api/?name=User&background=random";
+                                        }}
                                     />
                                 ),
                             }}

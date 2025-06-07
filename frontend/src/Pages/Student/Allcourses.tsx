@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -43,28 +43,24 @@ export default function StudentAllCourses() {
     
     return [
       {
-        icon: <Layers className="h-4 w-4" />,
+        icon: <Layers className="h-5 w-5 text-primary" />,
         value: courses.length + "+",
-        label: "Total Courses",
-        color: "text-blue-600"
+        label: "Total Courses"
       },
       {
-        icon: <Users className="h-4 w-4" />,
+        icon: <Users className="h-5 w-5 text-primary" />,
         value: new Intl.NumberFormat("en-US", { notation: "compact" }).format(totalStudents) + "+",
-        label: "Active Students",
-        color: "text-green-600"
+        label: "Active Students"
       },
       {
-        icon: <Star className="h-4 w-4" />,
+        icon: <Star className="h-5 w-5 text-primary" />,
         value: avgRating.toFixed(1),
-        label: "Avg Rating",
-        color: "text-purple-600"
+        label: "Avg Rating"
       },
       {
-        icon: <GraduationCap className="h-4 w-4" />,
+        icon: <GraduationCap className="h-5 w-5 text-primary" />,
         value: totalInstructors + "+",
-        label: "Instructors",
-        color: "text-orange-600"
+        label: "Instructors"
       }
     ];
   }, [courses]);
@@ -85,22 +81,27 @@ export default function StudentAllCourses() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   if (!courses?.length) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4 md:p-6">
-        <div className="max-w-7xl mx-auto">
-          <Card className="overflow-hidden border-0 shadow-xl bg-gradient-to-r from-blue-600 to-purple-600">
-            <CardContent className="p-8 flex items-center gap-6">
-              <div className="text-white">
-                <h1 className="text-2xl md:text-3xl font-bold mb-2">
-                  Welcome to <span className="text-yellow-300">GCC Academy</span>
+      <div className="min-h-screen bg-background p-4 md:p-6">
+        <div className="max-w-6xl mx-auto">
+          <Card className="overflow-hidden border-0 bg-primary text-primary-foreground">
+            <CardContent className="p-6 flex items-center gap-4">
+              <div className="flex-shrink-0">
+                <div className="w-12 h-12 bg-primary-foreground/10 rounded-lg flex items-center justify-center backdrop-blur-sm">
+                  <BookOpen className="h-6 w-6 text-primary-foreground" />
+                </div>
+              </div>
+              <div>
+                <h1 className="text-2xl font-semibold mb-1">
+                  Welcome to <span className="text-primary-foreground">GCC Academy</span>
                 </h1>
-                <p className="text-white/90 text-lg">
+                <p className="text-primary-foreground/80">
                   No courses available at the moment. Please check back later.
                 </p>
               </div>
@@ -112,22 +113,21 @@ export default function StudentAllCourses() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4 md:p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        
+    <div className="min-h-screen bg-background p-4 md:p-6">
+      <div className="max-w-6xl mx-auto space-y-8">
         {/* Welcome Banner */}
-        <Card className="overflow-hidden border-0 shadow-xl bg-gradient-to-r from-blue-600 to-purple-600">
-          <CardContent className="p-8 flex items-center gap-6">
+        <Card className="overflow-hidden border-0 bg-primary text-primary-foreground">
+          <CardContent className="p-6 flex items-center gap-4">
             <div className="flex-shrink-0">
-              <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
-                <BookOpen className="h-8 w-8 text-white" />
+              <div className="w-12 h-12 bg-primary-foreground/10 rounded-lg flex items-center justify-center backdrop-blur-sm">
+                <BookOpen className="h-6 w-6 text-primary-foreground" />
               </div>
             </div>
-            <div className="text-white">
-              <h1 className="text-2xl md:text-3xl font-bold mb-2">
-                Welcome to <span className="text-yellow-300">GCC Academy</span>
+            <div>
+              <h1 className="text-2xl font-semibold mb-1">
+                Welcome to <span className="text-primary-foreground/90">GCC Academy</span>
               </h1>
-              <p className="text-white/90 text-lg">
+              <p className="text-primary-foreground/80">
                 Explore, Learn and Build All Real Life Projects
               </p>
             </div>
@@ -137,109 +137,114 @@ export default function StudentAllCourses() {
         {/* Header & Search */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">All Courses</h2>
-            <p className="text-gray-600">Discover {courses.length}+ courses to advance your skills</p>
+            <h2 className="text-xl font-semibold">All Courses</h2>
+            <p className="text-muted-foreground">Discover {courses.length}+ courses to advance your skills</p>
           </div>
           
-          <div className="flex gap-3 w-full md:w-auto">
-            <div className="relative flex-1 md:w-80">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <div className="flex gap-2 w-full md:w-auto">
+            <div className="relative flex-1 md:w-64">
+              <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
-                placeholder="Search courses or instructors..."
+                placeholder="Search courses..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 border-0 shadow-md"
+                className="pl-8 bg-muted border-0"
               />
             </div>
-            <Button variant="outline" size="icon" className="shadow-md">
+            <Button variant="secondary" size="icon" className="bg-muted border-0">
               <Filter className="h-4 w-4" />
             </Button>
           </div>
         </div>
 
         {/* Course Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {stats.map((stat, index) => (
-            <Card key={index} className="border-0 shadow-md p-4 flex items-center gap-4">
-              <div className={`p-3 rounded-full ${stat.color} bg-opacity-10`}>
-                {stat.icon}
-              </div>
-              <div>
-                <p className="text-lg font-semibold text-gray-900">{stat.value}</p>
-                <p className="text-sm text-gray-500">{stat.label}</p>
-              </div>
-            </Card>
-          ))}
-        </div>
-
-        {/* Courses Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredCourses.map((course) => (
-            <Card 
-              key={course._id} 
-              className="group cursor-pointer border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 overflow-hidden"
-              onClick={() => handleCourseClick(course._id)}
-            >
-              <div className="relative">
-                <img 
-                  src={course.thumbnail} 
-                  alt={course.title}
-                  className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
-                  <PlayCircle className="h-12 w-12 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <Card key={index} className="border-0">
+              <CardContent className="p-4 flex items-center gap-3">
+                <div className="p-2.5 rounded-xl bg-primary/10">
+                  {stat.icon}
                 </div>
-                <Badge 
-                  className={`absolute top-3 right-3 ${
-                    course.level === 'Beginner' ? 'bg-green-500' :
-                    course.level === 'Intermediate' ? 'bg-yellow-500' : 'bg-red-500'
-                  }`}
-                >
-                  {course.level || 'All Levels'}
-                </Badge>
-              </div>
-              
-              <CardContent className="p-5 space-y-3">
-                <h3 className="font-bold text-lg leading-tight text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2">
-                  {course.title}
-                </h3>
-                
-                <p className="text-gray-600 text-sm">
-                  by {course.instructor?.name || 'Unknown Instructor'}
-                </p>
-                
-                <div className="flex items-center gap-4 text-sm text-gray-500">
-                  <div className="flex items-center gap-1">
-                    <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                    <span className="font-medium">4.8</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Users className="h-4 w-4" />
-                    <span>{course.students?.length || 0}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Clock className="h-4 w-4" />
-                    <span>{course.files?.length || 0} lessons</span>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between pt-2">
-                  <span className="text-2xl font-bold text-blue-600">₹{course.price}</span>
-                  <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
-                    Start Learning
-                  </Button>
+                <div>
+                  <p className="text-xl font-semibold">{stat.value}</p>
+                  <p className="text-sm text-muted-foreground">{stat.label}</p>
                 </div>
               </CardContent>
             </Card>
           ))}
         </div>
 
-        {filteredCourses.length === 0 && (
-          <div className="text-center py-12">
-            <div className="text-gray-400 text-lg mb-2">No courses found</div>
-            <p className="text-gray-500">Try adjusting your search terms</p>
-          </div>
-        )}
+        {/* Courses Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {filteredCourses.map((course) => (
+            <Card 
+              key={course._id} 
+              className="group cursor-pointer border-0 bg-card hover:bg-muted transition-colors duration-200"
+              onClick={() => handleCourseClick(course._id)}
+            >
+              <div className="relative">
+                <img 
+                  src={course.thumbnail} 
+                  alt={course.title}
+                  className="w-full aspect-video object-cover rounded-t-lg"
+                />
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-200 flex items-center justify-center">
+                  <PlayCircle className="h-10 w-10 text-primary-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                </div>
+                <Badge 
+                  variant="secondary"
+                  className="absolute top-3 right-3 bg-primary-foreground/90 text-primary hover:bg-primary-foreground/90"
+                >
+                  {course.level || 'All Levels'}
+                </Badge>
+              </div>
+              
+              <CardContent className="p-4 space-y-3">
+                <h3 className="font-medium text-base line-clamp-2 group-hover:text-primary transition-colors">
+                  {course.title}
+                </h3>
+                
+                <p className="text-sm text-muted-foreground">
+                  by {course.instructor?.name || 'Unknown Instructor'}
+                </p>
+                
+                <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-1.5">
+                    <Star className="h-4 w-4 text-primary fill-current" />
+                    <span>4.8</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <Users className="h-4 w-4" />
+                    <span>{course.students?.length || 0}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <Clock className="h-4 w-4" />
+                    <span>{course.files?.length || 0} lessons</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-2">
+                  <span className="text-lg font-semibold text-primary">₹{course.price}</span>
+                  <Button size="sm" variant="secondary" className="group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-200">
+                    Start Learning
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+
+          {filteredCourses.length === 0 && (
+            <div className="col-span-full flex justify-center items-center py-12">
+              <Card className="border-0 bg-muted p-6 text-center max-w-sm">
+                <h3 className="text-lg font-medium mb-2">No courses found</h3>
+                <p className="text-muted-foreground mb-4">Try adjusting your search terms</p>
+                <Button variant="secondary" className="w-full" onClick={() => setSearchTerm('')}>
+                  Clear Search
+                </Button>
+              </Card>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

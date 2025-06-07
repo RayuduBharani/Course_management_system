@@ -9,11 +9,10 @@ import {
     Clock, 
     Users, 
     Layers,
-    GraduationCap,
-    BookCheck,
-    Star
+    BookCheck
 } from "lucide-react";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 
 interface Course {
@@ -27,12 +26,26 @@ interface Course {
     students: Array<unknown>;
 }
 
+interface EnrolledCourseItem {
+    courseId: Course;
+    DateOfPurchase: string;
+    _id: string;
+    instructorId: string;
+    paid: number;
+}
+
 interface EnrolledCourse {
     _id: string;
-    course: [{
-        courseId: Course;
-        DateOfPurchase: string;
-    }];
+    course: EnrolledCourseItem[];
+    createdAt: string;
+    updatedAt: string;
+    studentId: {
+        _id: string;
+        userId: string;
+        name: string;
+        email: string;
+        rollNumber: string;
+    };
 }
 
 export default function StudentEnrolledCourses() {
@@ -43,11 +56,16 @@ export default function StudentEnrolledCourses() {
     const stats = useMemo(() => {
         if (!myCourseInfo) return [];
 
-        const totalCourses = myCourseInfo.length;
-        const totalLessons = myCourseInfo.reduce((acc, course) => 
-            acc + course.course[0].courseId.files.length, 0);
-        const completionRate = 75; // This should come from actual progress data
-        const avgRating = 4.8; // This should come from actual ratings
+        // Calculate total number of courses across all enrollments
+        const totalCourses = myCourseInfo.reduce((acc, enrollment) => 
+            acc + enrollment.course.length, 0);
+
+        // Calculate total lessons across all courses
+        const totalLessons = myCourseInfo.reduce((acc, enrollment) => {
+            const courseLessons = enrollment.course.reduce((courseAcc, course) => 
+                courseAcc + course.courseId.files.length, 0);
+            return acc + courseLessons;
+        }, 0);
 
         return [
             {
@@ -61,23 +79,11 @@ export default function StudentEnrolledCourses() {
                 value: new Intl.NumberFormat("en-US", { notation: "compact" }).format(totalLessons),
                 label: "Total Lessons",
                 color: "text-green-600"
-            },
-            {
-                icon: <Star className="h-4 w-4" />,
-                value: avgRating.toFixed(1),
-                label: "Avg Rating",
-                color: "text-purple-600"
-            },
-            {
-                icon: <GraduationCap className="h-4 w-4" />,
-                value: completionRate + "%",
-                label: "Completion Rate",
-                color: "text-orange-600"
             }
         ];
     }, [myCourseInfo]);
 
-    const FetchMyCourses = async () => {
+    const FetchMyCourses = useCallback(async () => {
         const url = search
             ? `http://localhost:8000/student/mycourse/search/${search}`
             : "http://localhost:8000/student/mycourse/all";
@@ -93,11 +99,11 @@ export default function StudentEnrolledCourses() {
             console.log(data.message);
             setMyCourseInfo([]);
         }
-    };
+    }, [search]);
 
     useEffect(() => {
         FetchMyCourses();
-    }, [search]);
+    }, [FetchMyCourses]);
 
     const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -105,21 +111,21 @@ export default function StudentEnrolledCourses() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4 md:p-6">
-            <div className="max-w-7xl mx-auto space-y-6">
+        <div className="min-h-screen bg-background p-4 md:p-6">
+            <div className="max-w-6xl mx-auto space-y-8">
                 {/* Welcome Banner */}
-                <Card className="overflow-hidden border-0 shadow-xl bg-gradient-to-r from-blue-600 to-purple-600">
-                    <CardContent className="p-8 flex items-center gap-6">
+                <Card className="overflow-hidden border-0 bg-primary text-primary-foreground">
+                    <CardContent className="p-6 flex items-center gap-4">
                         <div className="flex-shrink-0">
-                            <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
-                                <BookOpen className="h-8 w-8 text-white" />
+                            <div className="w-12 h-12 bg-primary-foreground/10 rounded-lg flex items-center justify-center backdrop-blur-sm">
+                                <BookOpen className="h-6 w-6 text-primary-foreground" />
                             </div>
                         </div>
-                        <div className="text-white">
-                            <h1 className="text-2xl md:text-3xl font-bold mb-2">
+                        <div>
+                            <h1 className="text-2xl font-semibold mb-1">
                                 My Learning Journey
                             </h1>
-                            <p className="text-white/90 text-lg">
+                            <p className="text-primary-foreground/80">
                                 Track your progress and continue learning
                             </p>
                         </div>
@@ -129,98 +135,100 @@ export default function StudentEnrolledCourses() {
                 {/* Search Section */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
-                        <h2 className="text-3xl font-bold text-gray-900 mb-2">Enrolled Courses</h2>
-                        <p className="text-gray-600">Continue your learning journey</p>
+                        <h2 className="text-xl font-semibold">Enrolled Courses</h2>
                     </div>
-                    <form onSubmit={handleSearch} className="flex gap-3 w-full md:w-auto">
-                        <div className="relative flex-1 md:w-80">
-                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                    <form onSubmit={handleSearch} className="flex gap-2 w-full md:w-auto">
+                        <div className="relative flex-1 md:w-64">
+                            <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                             <Input
                                 onChange={(e) => setSearch(e.target.value)}
                                 value={search}
                                 name="search"
-                                className="pl-10 border-0 shadow-md"
-                                placeholder="Search your courses..."
+                                className="pl-8 bg-muted"
+                                placeholder="Search courses..."
                             />
                         </div>
-                        <Button type="submit" className="shadow-md">Search</Button>
+                        <Button type="submit" variant="secondary">Search</Button>
                     </form>
                 </div>
 
                 {/* Statistics Section */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     {stats.map((stat, index) => (
-                        <Card key={index} className="border-0 shadow-md p-4 flex items-center gap-4">
-                            <div className={`p-3 rounded-full ${stat.color} bg-opacity-10`}>
-                                {stat.icon}
-                            </div>
-                            <div>
-                                <p className="text-lg font-semibold text-gray-900">{stat.value}</p>
-                                <p className="text-sm text-gray-500">{stat.label}</p>
-                            </div>
+                        <Card key={index} className="border-0">
+                            <CardContent className="p-4 flex items-center gap-3">
+                                <div className={`p-2.5 rounded-xl bg-primary/10`}>
+                                    {React.cloneElement(stat.icon, { className: "h-5 w-5 text-primary" })}
+                                </div>
+                                <div>
+                                    <p className="text-xl font-semibold">{stat.value}</p>
+                                    <p className="text-sm text-muted-foreground">{stat.label}</p>
+                                </div>
+                            </CardContent>
                         </Card>
                     ))}
                 </div>
 
                 {/* Course Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     {myCourseInfo && myCourseInfo.length === 0 ? (
-                        <div className="col-span-full flex justify-center items-center py-16">
-                            <Card className="border-0 shadow-md p-8 text-center max-w-md">
-                                <h3 className="text-2xl font-bold text-gray-900 mb-2">No courses found</h3>
-                                <p className="text-gray-600 mb-6">Start your learning journey today by enrolling in our courses.</p>
+                        <div className="col-span-full flex justify-center items-center py-12">
+                            <Card className="border-0 bg-muted p-6 text-center max-w-sm">
+                                <h3 className="text-lg font-medium mb-2">No courses found</h3>
+                                <p className="text-muted-foreground mb-4">Start your learning journey today.</p>
                                 <Link to="/student/courses">
-                                    <Button className="bg-blue-600 hover:bg-blue-700">
+                                    <Button variant="secondary" className="w-full">
                                         Browse Courses
                                     </Button>
                                 </Link>
-                            </Card>
+                            </Card> 
                         </div>
                     ) : (
-                        myCourseInfo && myCourseInfo.map((course, index) => (
+                        myCourseInfo && myCourseInfo.flatMap((enrolledCourses) => 
+                            enrolledCourses.course.map((courseItem) => (
                             <Card 
-                                key={index} 
-                                className="group cursor-pointer border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 overflow-hidden"
+                                key={courseItem._id} 
+                                className="group border-0 bg-card hover:bg-muted transition-colors duration-200"
                             >
                                 <div className="relative">
                                     <AspectRatio ratio={16 / 9}>
                                         <img 
-                                            src={course.course[0].courseId.thumbnail} 
-                                            alt={course.course[0].courseId.title} 
-                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                            src={courseItem.courseId.thumbnail} 
+                                            alt={courseItem.courseId.title} 
+                                            className="w-full h-full object-cover rounded-t-lg"
                                         />
                                     </AspectRatio>
-                                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
                                 </div>
                                 
-                                <CardContent className="p-5 space-y-3">
-                                    <h3 className="font-bold text-lg leading-tight text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2">
-                                        {course.course[0].courseId.title}
+                                <CardContent className="p-4 space-y-3">
+                                    <h3 className="font-medium text-base line-clamp-2">
+                                        {courseItem.courseId.title}
                                     </h3>
                                     
-                                    <p className="text-gray-600 text-sm">by {course.course[0].courseId.instructor.name}</p>
+                                    <p className="text-sm text-muted-foreground">by {courseItem.courseId.instructor.name}</p>
                                     
-                                    <div className="flex items-center gap-4 text-sm text-gray-500">
-                                        <div className="flex items-center gap-1">
+                                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                                        <div className="flex items-center gap-1.5">
                                             <Users className="h-4 w-4" />
-                                            <span>{course.course[0].courseId.students.length} Students</span>
+                                            <span>{courseItem.courseId.students.length}</span>
                                         </div>
-                                        <div className="flex items-center gap-1">
+                                        <div className="flex items-center gap-1.5">
                                             <Clock className="h-4 w-4" />
-                                            <span>{course.course[0].courseId.files.length} Lessons</span>
+                                            <span>{courseItem.courseId.files.length} Lessons</span>
                                         </div>
                                     </div>
                                     
-                                    <Link to={`view-page/${course._id}`} className="block">
-                                        <Button className="w-full bg-blue-600 hover:bg-blue-700">
-                                            <span>Continue Learning</span>
+                                    <Link to={`view-page/${enrolledCourses._id}`} className="block pt-2">
+                                        <Button variant="secondary" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-200">
+                                            Continue Learning
                                             <ArrowRight size={16} className="ml-2" />
                                         </Button>
                                     </Link>
                                 </CardContent>
                             </Card>
+                            ))
                         ))
-                    )}
+                    }
                 </div>
             </div>
         </div>

@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -152,165 +153,195 @@ export default function WithdrawalPage() {
         } finally {
             setIsLoading(false);
         }
-    };
-
-    const getStatusColor = (status: string) => {
-        switch (status) {
-            case 'approved':
-                return 'secondary';
-            case 'rejected':
-                return 'destructive';
-            default:
-                return 'default';
-        }
-    };
-
-    return (
-        <div className="container mx-auto py-6 space-y-6">
-            <div className="flex justify-between items-center">
-                <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Withdrawals</h1>
-                    <p className="text-muted-foreground">
-                        Manage your earnings and withdrawal requests
-                    </p>
+    };    return (
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4 lg:p-6">
+            <div className="max-w-7xl mx-auto space-y-6">
+                {/* Header */}
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h1 className="text-2xl font-bold tracking-tight">Withdrawals</h1>
+                        <p className="text-muted-foreground">Manage your earnings and withdrawal requests</p>
+                    </div>
+                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                        <DialogTrigger asChild>
+                            <Button className="bg-primary hover:bg-primary/90">
+                                <IndianRupee className="mr-2 h-4 w-4" />
+                                Request Withdrawal
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[425px]">
+                            <DialogHeader>
+                                <DialogTitle>Request Withdrawal</DialogTitle>
+                                <DialogDescription className="text-muted-foreground">
+                                    Available balance: ₹{totalEarnings.toFixed(2)}
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="space-y-4 py-4">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Amount</label>
+                                    <Input
+                                        type="number"
+                                        placeholder="Enter amount"
+                                        value={amount}
+                                        onChange={(e) => setAmount(e.target.value)}
+                                        className="col-span-3"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Remarks (optional)</label>
+                                    <Textarea
+                                        placeholder="Add any remarks..."
+                                        value={remarks}
+                                        onChange={(e) => setRemarks(e.target.value)}
+                                        className="col-span-3"
+                                    />
+                                </div>
+                            </div>
+                            <div className="flex justify-end gap-3">
+                                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                                    Cancel
+                                </Button>
+                                <Button 
+                                    onClick={handleSubmit} 
+                                    disabled={isLoading}
+                                    className="bg-primary hover:bg-primary/90"
+                                >
+                                    {isLoading ? (
+                                        <>
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            Submitting...
+                                        </>
+                                    ) : (
+                                        "Submit Request"
+                                    )}
+                                </Button>
+                            </div>
+                        </DialogContent>
+                    </Dialog>
                 </div>
-                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                    <DialogTrigger asChild>
-                        <Button>Request Withdrawal</Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>Request Withdrawal</DialogTitle>
-                            <DialogDescription>
-                                Available balance: ₹{totalEarnings.toFixed(2)}
-                            </DialogDescription>
-                        </DialogHeader>
-                        <div className="space-y-4 py-4">
-                            <div className="space-y-2">
-                                <label>Amount</label>
-                                <Input
-                                    type="number"
-                                    placeholder="Enter amount"
-                                    value={amount}
-                                    onChange={(e) => setAmount(e.target.value)}
-                                />
+
+                {/* Stats Grid */}
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                    <Card className="bg-primary/5 border-none">
+                        <CardContent className="p-6">
+                            <div className="flex items-center space-x-4">
+                                <div className="p-2 bg-primary/10 rounded-full">
+                                    <IndianRupee className="h-6 w-6 text-primary" />
+                                </div>
+                                <div>
+                                    <p className="text-sm font-medium text-muted-foreground">Available Balance</p>
+                                    <h3 className="text-2xl font-bold">₹{totalEarnings.toFixed(2)}</h3>
+                                </div>
                             </div>
-                            <div className="space-y-2">
-                                <label>Remarks (optional)</label>
-                                <Textarea
-                                    placeholder="Add any remarks..."
-                                    value={remarks}
-                                    onChange={(e) => setRemarks(e.target.value)}
-                                />
+                        </CardContent>
+                    </Card>
+
+                    <Card className="bg-yellow-50 border-none">
+                        <CardContent className="p-6">
+                            <div className="flex items-center space-x-4">
+                                <div className="p-2 bg-yellow-100 rounded-full">
+                                    <Clock className="h-6 w-6 text-yellow-600" />
+                                </div>
+                                <div>
+                                    <p className="text-sm font-medium text-muted-foreground">Pending Requests</p>
+                                    <h3 className="text-2xl font-bold">
+                                        {withdrawalHistory.filter(w => w.status === 'pending').length}
+                                    </h3>
+                                </div>
                             </div>
-                        </div>
-                        <div className="flex justify-end space-x-2">
-                            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-                                Cancel
-                            </Button>
-                            <Button onClick={handleSubmit} disabled={isLoading}>
-                                {isLoading ? "Submitting..." : "Submit Request"}
-                            </Button>
-                        </div>
-                    </DialogContent>
-                </Dialog>
-            </div>
+                        </CardContent>
+                    </Card>
 
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">
-                            Available Balance
-                        </CardTitle>
-                        <IndianRupee className="h-4 w-4 text-muted-foreground" />
+                    <Card className="bg-green-50 border-none">
+                        <CardContent className="p-6">
+                            <div className="flex items-center space-x-4">
+                                <div className="p-2 bg-green-100 rounded-full">
+                                    <CheckCircle className="h-6 w-6 text-green-600" />
+                                </div>
+                                <div>
+                                    <p className="text-sm font-medium text-muted-foreground">Approved Withdrawals</p>
+                                    <h3 className="text-2xl font-bold">
+                                        ₹{withdrawalHistory
+                                            .filter(w => w.status === 'approved')
+                                            .reduce((sum, w) => sum + w.amount, 0)
+                                            .toFixed(2)}
+                                    </h3>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card className="bg-red-50 border-none">
+                        <CardContent className="p-6">
+                            <div className="flex items-center space-x-4">
+                                <div className="p-2 bg-red-100 rounded-full">
+                                    <AlertCircle className="h-6 w-6 text-red-600" />
+                                </div>
+                                <div>
+                                    <p className="text-sm font-medium text-muted-foreground">Rejected Requests</p>
+                                    <h3 className="text-2xl font-bold">
+                                        {withdrawalHistory.filter(w => w.status === 'rejected').length}
+                                    </h3>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+
+                {/* Withdrawal History Table */}
+                <Card className="border-none">
+                    <CardHeader>
+                        <CardTitle>Withdrawal History</CardTitle>
+                        <CardDescription className="text-muted-foreground">
+                            View all your withdrawal requests and their status
+                        </CardDescription>
                     </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">₹{totalEarnings.toFixed(2)}</div>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">
-                            Pending Requests
-                        </CardTitle>
-                        <Clock className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">
-                            {withdrawalHistory.filter(w => w.status === 'pending').length}
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">
-                            Approved Withdrawals
-                        </CardTitle>
-                        <CheckCircle className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">
-                            ₹{withdrawalHistory
-                                .filter(w => w.status === 'approved')
-                                .reduce((sum, w) => sum + w.amount, 0)
-                                .toFixed(2)}
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">
-                            Rejected Requests
-                        </CardTitle>
-                        <AlertCircle className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">
-                            {withdrawalHistory.filter(w => w.status === 'rejected').length}
-                        </div>
-                    </CardContent>
-                </Card>
-            </div>
-
-            <Card>
-                <CardHeader>
-                    <CardTitle>Withdrawal History</CardTitle>
-                    <CardDescription>
-                        View all your withdrawal requests and their status
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Date</TableHead>
-                                <TableHead>Amount</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead>Remarks</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {withdrawalHistory.map((request) => (
-                                <TableRow key={request._id}>
-                                    <TableCell>
-                                        {new Date(request.createdAt).toLocaleDateString()}
-                                    </TableCell>
-                                    <TableCell>₹{request.amount.toFixed(2)}</TableCell>
-                                    <TableCell>
-                                        <Badge variant={getStatusColor(request.status)}>
-                                            {request.status}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell>{request.remarks || "-"}</TableCell>
+                    <CardContent className="p-0">
+                        <Table>
+                            <TableHeader className="bg-muted/50">
+                                <TableRow>
+                                    <TableHead>Date</TableHead>
+                                    <TableHead>Amount</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead>Remarks</TableHead>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </CardContent>
-            </Card>
+                            </TableHeader>
+                            <TableBody>
+                                {withdrawalHistory.map((request) => (
+                                    <TableRow key={request._id}>
+                                        <TableCell className="font-medium">
+                                            {new Date(request.createdAt).toLocaleDateString()}
+                                        </TableCell>
+                                        <TableCell>₹{request.amount.toFixed(2)}</TableCell>
+                                        <TableCell>                                            <Badge 
+                                                variant={
+                                                    request.status === 'approved' 
+                                                        ? "default" 
+                                                        : request.status === 'rejected'
+                                                        ? "destructive"
+                                                        : "secondary"
+                                                }
+                                                className={`${
+                                                    request.status === 'approved'
+                                                        ? "bg-green-100 text-green-800"
+                                                        : request.status === 'rejected'
+                                                        ? "bg-red-100 text-red-800"
+                                                        : "bg-yellow-100 text-yellow-800"
+                                                }`}
+                                            >
+                                                {request.status}
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell className="text-muted-foreground">
+                                            {request.remarks || "-"}
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </CardContent>
+                </Card>
+            </div>
         </div>
     );
 }
