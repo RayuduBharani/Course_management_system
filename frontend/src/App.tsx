@@ -56,7 +56,7 @@ import WithdrawalsPage from './Pages/Admin/WithdrawalsPage'
 
 function App() {
     const dispatch = useDispatch<AppDispatch>()
-    const { IsAuthenticated, user, IsLoading } = useSelector((state: RootState) => state.auth);
+    const { IsAuthenticated = false, user = { userId: "", role: "Empty", email: "", image: "", name: "" }, IsLoading = true } = useSelector((state: RootState) => state.auth) || {};
 
     useEffect(() => {
         dispatch(CheckAuthentication());
@@ -64,7 +64,7 @@ function App() {
 
     if (IsLoading) {
         return <div className='w-full h-screen'>
-            <Loader />;
+            <Loader />
         </div>
     }
     console.log("User Role:", user.role);

@@ -1,36 +1,114 @@
+import { BookOpen, Clock, Users, Search, BookCheck, Layers } from "lucide-react";
+import * as React from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { ArrowRight } from "lucide-react";
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+
+interface ICompleateCourseInfo {
+    _id: string;
+    course: [{
+        _id: string | number;
+        courseId: {
+            _id: string;
+            title: string;
+            description: string;
+            thumbnail: string;
+            instructor: {
+                name: string;
+            };
+            files: Array<{
+                title: string;
+                videoUrl: string;
+                freePreview: boolean;
+            }>;
+        };
+        DateOfPurchase: string;
+        instructorId: string;
+        paid: number;
+    }];
+    leadId: {
+        _id: string;
+        userId: string;
+        name: string;
+        email: string;
+    };
+}
 
 export default function LeadMyCourses() {
     const [myCourseInfo, setMyCourseInfo] = useState<ICompleateCourseInfo[] | null>(null);
     const [search, setSearch] = useState<string>('');
-    const FetchMyCourses = async () => {
+
+    // Calculate course statistics
+    const stats = useMemo(() => {
+        if (!myCourseInfo) return [];
+
+        let totalCourses = 0;
+        let totalLessons = 0;
+        let totalHours = 0;
+
+        myCourseInfo.forEach(enrollment => {
+            enrollment.course.forEach(course => {
+                totalCourses++;
+                totalLessons += course.courseId.files.length;
+                // Assuming each lesson is approximately 30 minutes
+                totalHours += (course.courseId.files.length * 30) / 60;
+            });
+        });
+
+        return [
+            {
+                icon: <Layers className="h-4 w-4" />,
+                value: totalCourses,
+                label: "Enrolled Courses"
+            },
+            {
+                icon: <BookCheck className="h-4 w-4" />,
+                value: totalLessons,
+                label: "Total Lessons"
+            },
+            {
+                icon: <Clock className="h-4 w-4" />,
+                value: `${Math.round(totalHours)}h`,
+                label: "Total Hours"
+            },
+            {
+                icon: <Users className="h-4 w-4" />,
+                value: myCourseInfo.length,
+                label: "Active Courses"
+            }
+        ];
+    }, [myCourseInfo]);
+
+    const FetchMyCourses = useCallback(async () => {
         const url = search
             ? `http://localhost:8000/lead/mycourse/search/${search}`
             : "http://localhost:8000/lead/mycourse/all";
 
-        const response = await fetch(url,{
+        try {
+            const response = await fetch(url, {
                 credentials: "include"
             });
-        const data = await response.json();
+            const data = await response.json();
 
-        if (data.success) {
-            setMyCourseInfo(data.leadCourses);
-            console.log(data.leadCourses)
-        } 
-        else {
-            console.log(data.message);
+            if (data.success) {
+                setMyCourseInfo(data.leadCourses);
+                console.log(data.leadCourses);
+            } else {
+                console.log(data.message);
+                setMyCourseInfo([]);
+            }
+        } catch (error) {
+            console.error("Error fetching courses:", error);
             setMyCourseInfo([]);
         }
-    };
+    }, [search]);
 
     useEffect(() => {
         FetchMyCourses();
-    }, [search]);
+    }, [FetchMyCourses]);
 
     const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -38,49 +116,122 @@ export default function LeadMyCourses() {
     };
 
     return (
-        <div className="w-full h-full">
-            <div className="w-full h-fit flex justify-between max-sm:flex-col max-sm:gap-3">
-                <p className="font-bold text-xl max-sm:text-center max-sm:mb-2">My Journey</p>
-                <form onSubmit={handleSearch} className="w-[60%] flex gap-5 justify-end max-sm:w-full">
-                    <Input
-                        onChange={(e) => setSearch(e.target.value)}
-                        value={search}
-                        name="search"
-                        className="w-[60%] bg-muted"
-                        placeholder="Hinted search text"
-                    />
-                    <Button type="submit" className="p-5">Search</Button>
-                </form>
-            </div>
-
-            <div className="grid grid-cols-4 gap-8 justify-center w-[100%] h-fit mt-12 max-md:grid-cols-2 max-lg:grid-cols-3 max-sm:grid-cols-1 pb-8 max-sm:pb-16">
-                {
-                    myCourseInfo && myCourseInfo.length === 0 ?
-                        <div className="w-[90vw] h-[500px] flex justify-center items-center">
-                            <h1 className="font-bold text-lg text-primary animate-pulse">No courses found. Start your journey today!</h1>
-                        </div> :
-                        myCourseInfo && myCourseInfo.map((course, index) => (
-                            <div key={index} className="w-[100%] rounded-xl bg-muted h-fit flex-col flex overflow-hidden px-2 py-1 pb-5">
-                                <div className="w-[100%] h-fit mt-2 rounded-lg flex justify-center">
-                                    <AspectRatio ratio={16 / 9}>
-                                        <img src={course.course[0].courseId.thumbnail} alt={course.course[0].courseId.title} className="w-full h-full rounded-lg" />
-                                    </AspectRatio>
-                                </div>
-                                <p className="font-bold text-lg truncate text-start mt-1 ml-1">{course.course[0].courseId.title}</p>
-                                <p className="text-neutral-400 text-sm font-medium truncate mt-1 ml-1">{course.course[0].courseId.title}</p>
-                                <div className="w-full h-fit flex justify-between px-2 mt-2 items-center">
-                                    <p className="text-sm font-bold text-primary"></p>
-                                    <Link to={`view-page/${course._id}`}>
-                                        <div className="flex justify-center items-center cursor-pointer gap-2">
-                                            <p className="text-sm font-semibold">Continue</p>
-                                            <ArrowRight size={17} />
-                                        </div>
-                                    </Link>
-                                </div>
+        <div className="min-h-screen bg-background p-4 md:p-6">
+            <div className="max-w-6xl mx-auto space-y-8">
+                {/* Welcome Banner */}
+                <Card className="overflow-hidden border-0 bg-primary text-primary-foreground">
+                    <CardContent className="p-6 flex items-center gap-4">
+                        <div className="flex-shrink-0">
+                            <div className="w-12 h-12 bg-primary-foreground/10 rounded-lg flex items-center justify-center backdrop-blur-sm">
+                                <BookOpen className="h-6 w-6 text-primary-foreground" />
                             </div>
-                        ))
-                }
+                        </div>
+                        <div>
+                            <h1 className="text-2xl font-semibold mb-1">
+                                My Learning Journey
+                            </h1>
+                            <p className="text-primary-foreground/80">
+                                Track your progress and continue learning
+                            </p>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Search Section */}
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h2 className="text-xl font-semibold">Enrolled Courses</h2>
+                    </div>
+                    <form onSubmit={handleSearch} className="flex gap-2 w-full md:w-auto">
+                        <div className="relative flex-1 md:w-64">
+                            <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                            <Input
+                                onChange={(e) => setSearch(e.target.value)}
+                                value={search}
+                                name="search"
+                                className="pl-8 bg-muted"
+                                placeholder="Search courses..."
+                            />
+                        </div>
+                        <Button type="submit" variant="secondary">Search</Button>
+                    </form>
+                </div>
+
+                {/* Statistics Section */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {stats.map((stat, index) => (
+                        <Card key={index} className="border-0">
+                            <CardContent className="p-4 flex items-center gap-3">
+                                <div className="p-2.5 rounded-xl bg-primary/10">
+                                    {React.cloneElement(stat.icon, { className: "h-5 w-5 text-primary" })}
+                                </div>
+                                <div>
+                                    <p className="text-xl font-semibold">{stat.value}</p>
+                                    <p className="text-sm text-muted-foreground">{stat.label}</p>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
+
+                {/* Course Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    {myCourseInfo && myCourseInfo.length === 0 ? (
+                        <div className="col-span-full flex justify-center items-center py-12">
+                            <Card className="border-0 bg-muted p-6 text-center max-w-sm">
+                                <h3 className="text-lg font-medium mb-2">No courses found</h3>
+                                <p className="text-muted-foreground mb-4">Start your learning journey today.</p>
+                                <Link to="/lead/courses">
+                                    <Button variant="secondary" className="w-full">
+                                        Browse Courses
+                                    </Button>
+                                </Link>
+                            </Card> 
+                        </div>                    ) : (
+                        myCourseInfo && myCourseInfo.flatMap((enrolledCourse) => 
+                            enrolledCourse.course.map((course) => (
+                                <Card 
+                                    key={`${enrolledCourse._id}-${course._id}`}
+                                    className="group border-0 bg-card hover:bg-muted transition-colors duration-200"
+                                >
+                                    <div className="relative">
+                                        <AspectRatio ratio={16 / 9}>
+                                            <img 
+                                                src={course.courseId.thumbnail} 
+                                                alt={course.courseId.title} 
+                                                className="w-full h-full object-cover rounded-t-lg"
+                                            />
+                                        </AspectRatio>
+                                    </div>
+                                    
+                                    <CardContent className="p-4 space-y-3">
+                                        <h3 className="font-medium text-base line-clamp-2">
+                                            {course.courseId.title}                                    </h3>
+                                    
+                                    <p className="text-sm text-muted-foreground">by {course.courseId.instructor.name}</p>
+                                    
+                                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                                        <div className="flex items-center gap-1.5">
+                                            <Users className="h-4 w-4" />
+                                            <span>Active</span>
+                                        </div>
+                                        <div className="flex items-center gap-1.5">
+                                            <Clock className="h-4 w-4" />
+                                            <span>{course.courseId.files.length} Lessons</span>
+                                        </div>
+                                    </div>
+
+                                    <Link to={`view-page/${enrolledCourse._id}`} className="block pt-2">
+                                        <Button variant="secondary" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-200">
+                                            Continue Learning
+                                        </Button>
+                                    </Link>
+                                </CardContent>
+                            </Card>
+                        )))
+                    )}
+                </div>
             </div>
         </div>
-    )
+    );
 }

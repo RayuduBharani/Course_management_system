@@ -5,9 +5,9 @@ const initialState: IAuthenticatedProps = {
     user: {
         userId: "",
         role: "Empty",
-        name : "",
-        email : "",
-        image : ""
+        name: "",
+        email: "",
+        image: ""
     },
     IsLoading: true
 }

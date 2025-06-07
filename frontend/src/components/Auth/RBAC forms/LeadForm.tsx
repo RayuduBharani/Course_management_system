@@ -85,6 +85,17 @@ export default function LeadForm() {
             const teamNo = formData.get("team") as string;
             const gender = formData.get("gender") as string;
 
+            // Validate team number
+            if (!teamNo || !teamNo.match(/^Team-([1-9]|10)$/)) {
+                toast({
+                    title: "Invalid team number",
+                    description: "Please select a valid team",
+                    variant: "destructive"
+                });
+                setLoading(false);
+                return;
+            }
+
             // Validate roll number
             const rollNumberVerify = /^[A-Z0-9]{10}$/;
             if (!rollNumberVerify.test(rollNumber)) {
@@ -185,12 +196,11 @@ export default function LeadForm() {
                             <SelectValue placeholder="Select branch" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="CSE">Computer Science</SelectItem>
-                            <SelectItem value="IT">Information Technology</SelectItem>
-                            <SelectItem value="ECE">Electronics & Communication</SelectItem>
-                            <SelectItem value="EEE">Electrical & Electronics</SelectItem>
-                            <SelectItem value="MECH">Mechanical</SelectItem>
-                            <SelectItem value="CIVIL">Civil</SelectItem>
+                            <SelectItem value="CSD">CSD</SelectItem>
+                            <SelectItem value="CSM">CSM</SelectItem>
+                            <SelectItem value="CAI">CSI</SelectItem>
+                            <SelectItem value="CSC">CSC</SelectItem>
+                            <SelectItem value="AID">AID</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
@@ -202,11 +212,16 @@ export default function LeadForm() {
                             <SelectValue placeholder="Select team" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="Team1">Team 1</SelectItem>
-                            <SelectItem value="Team2">Team 2</SelectItem>
-                            <SelectItem value="Team3">Team 3</SelectItem>
-                            <SelectItem value="Team4">Team 4</SelectItem>
-                            <SelectItem value="Team5">Team 5</SelectItem>
+                            <SelectItem value="Team-1">Team 1</SelectItem>
+                            <SelectItem value="Team-2">Team 2</SelectItem>
+                            <SelectItem value="Team-3">Team 3</SelectItem>
+                            <SelectItem value="Team-4">Team 4</SelectItem>
+                            <SelectItem value="Team-5">Team 5</SelectItem>
+                            <SelectItem value="Team-6">Team 6</SelectItem>
+                            <SelectItem value="Team-7">Team 7</SelectItem>
+                            <SelectItem value="Team-8">Team 8</SelectItem>
+                            <SelectItem value="Team-9">Team 9</SelectItem>
+                            <SelectItem value="Team-10">Team 10</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>

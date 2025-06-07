@@ -53,28 +53,27 @@ export default function LeadCourseDetailesView() {
             coursePrice: courseInfo?.price,
             courseTitle: courseInfo?.title
         }
-        try {
-            const response = await fetch("http://localhost:8000/lead/order/create", {
-                method: "POST",
-                headers: {
-                    "Content-type": "application/json"
-                },
-                body: JSON.stringify(paymentPayload)
-            })
-            const data = await response.json()
-            console.log(data)
-            if (data.success) {
-                sessionStorage.setItem("currentOrderId", data.orderId)
-                setApprovalUrl(data.approvalUrl)
-                setIsProcessing(false)
-            }
-            else {
-                toast({
-                    title: "Payment method failed please try again",
-                    variant: "destructive"
+        try {                const response = await fetch("http://localhost:8000/order/create", {
+                    method: "POST",
+                    headers: {
+                        "Content-type": "application/json"
+                    },
+                    body: JSON.stringify(paymentPayload)
                 })
-                setIsProcessing(false)
-            }
+                const data = await response.json()
+                console.log(data)
+                if (data.success) {
+                    sessionStorage.setItem("currentOrderId", data.orderId)
+                    setApprovalUrl(data.approvalUrl)
+                    setIsProcessing(false)
+                }
+                else {
+                    toast({
+                        title: data.message || "Payment method failed please try again",
+                        variant: "destructive"
+                    })
+                    setIsProcessing(false)
+                }
         } catch (err) {
             console.log(err)
             setIsProcessing(false)
