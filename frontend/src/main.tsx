@@ -12,7 +12,7 @@ createRoot(document.getElementById('root')!).render(
   // <StrictMode>
   <Provider store={store}>
     <GoogleOAuthProvider clientId="106160230732-lneq2ntge0rt74v5da9th7194d6uiq3h.apps.googleusercontent.com">
-      <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+      <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
         <BrowserRouter>
           <App />
           <Toaster />
