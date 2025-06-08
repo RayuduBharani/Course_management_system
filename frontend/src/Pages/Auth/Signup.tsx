@@ -88,7 +88,7 @@ export default function Signup() {
 
                 <div className="mt-7 flex flex-col gap-2">
                     <Label htmlFor="password">Password</Label>
-                    <Input required name="password" type="password" id="password" minLength={8} maxLength={10} className="bg-secondary" placeholder="Password" />
+                    <Input required name="password" type="password" id="password" minLength={2} maxLength={20} className="bg-secondary" placeholder="Password" />
                 </div>
 
                 <Button className="w-full mt-7 p-5">{btnLoading ? "Loading..." : "Signup"}</Button>

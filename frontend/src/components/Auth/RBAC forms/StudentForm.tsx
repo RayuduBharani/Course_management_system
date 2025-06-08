@@ -157,24 +157,35 @@ export default function StudentForm() {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="w-full h-full px-10 py-5 flex flex-col items-center gap-3">
-            <FileUpload 
-                onChange={(files) => setSelectedFiles(files)}
-                value={selectedFiles}
-            />
-            {progress !== undefined && progress < 100 && (
-                <Progress value={progress} className="w-full h-2" />
-            )}
-            <div className="flex gap-3 w-full">
-                <div className="gap-3 mt-5 w-[50%]">
-                    <Label htmlFor="rollnumber">Roll Number</Label>
-                    <Input required name="rollNumber" minLength={10} maxLength={10} id="rollnumber" className="bg-background" placeholder="e.g., 21A91A05J5" />
+        <form onSubmit={handleSubmit} className="w-full h-full p-4 md:px-10 md:py-5 flex flex-col items-center gap-3">
+            <div className="w-full max-w-lg">
+                <FileUpload 
+                    onChange={(files) => setSelectedFiles(files)}
+                    value={selectedFiles}
+                />
+                {progress !== undefined && progress < 100 && (
+                    <Progress value={progress} className="w-full h-2 mt-2" />
+                )}
+            </div>
+
+            <div className="flex flex-col md:flex-row gap-3 w-full max-w-lg">
+                <div className="w-full md:w-1/2">
+                    <Label htmlFor="rollnumber" className="text-sm font-medium">Roll Number</Label>
+                    <Input 
+                        required 
+                        name="rollNumber" 
+                        minLength={10} 
+                        maxLength={10} 
+                        id="rollnumber" 
+                        className="mt-1 bg-background p-2 md:p-5" 
+                        placeholder="e.g., 21A91A05J5" 
+                    />
                 </div>
 
-                <div className="gap-3 w-[50%] mt-5">
-                    <Label htmlFor="gender">Gender</Label>
+                <div className="w-full md:w-1/2">
+                    <Label htmlFor="gender" className="text-sm font-medium">Gender</Label>
                     <Select required name="gender">
-                        <SelectTrigger id="gender" className="w-full p-5 bg-background">
+                        <SelectTrigger id="gender" className="mt-1 bg-background p-2 md:p-5">
                             <SelectValue placeholder="Select gender" />
                         </SelectTrigger>
                         <SelectContent>
@@ -186,30 +197,30 @@ export default function StudentForm() {
                 </div>
             </div>
 
-            <div className="flex gap-3 w-full">
-                <div className="gap-3 mt-5 w-[50%]">
-                    <Label htmlFor="branch">Branch</Label>
+            <div className="flex flex-col md:flex-row gap-3 w-full max-w-lg">
+                <div className="w-full md:w-1/2">
+                    <Label htmlFor="branch" className="text-sm font-medium">Branch</Label>
                     <Select required name="branch">
-                        <SelectTrigger id="branch" className="w-full p-5 bg-background">
+                        <SelectTrigger id="branch" className="mt-1 bg-background p-2 md:p-5">
                             <SelectValue placeholder="Select branch" />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="CSD">Computer Science & Design</SelectItem>
                             <SelectItem value="CAI">Computer Science & AI</SelectItem>
                             <SelectItem value="AID">Artificial Intelligence & Data Science</SelectItem>
-                            <SelectItem value="CMS">Computer Science & Machine learing</SelectItem>
+                            <SelectItem value="CMS">Computer Science & Machine learning</SelectItem>
                             <SelectItem value="CSC">Computer Science & Cyber Security</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
 
-                <div className="gap-3 w-[50%] mt-5">
-                    <Label htmlFor="team">Team</Label>
+                <div className="w-full md:w-1/2">
+                    <Label htmlFor="team" className="text-sm font-medium">Team</Label>
                     <Select required name="team">
-                        <SelectTrigger id="team" className="w-full p-5 bg-background">
+                        <SelectTrigger id="team" className="mt-1 bg-background p-2 md:p-5">
                             <SelectValue placeholder="Select team" />
-                        </SelectTrigger>                        
-                        <SelectContent>                            
+                        </SelectTrigger>
+                        <SelectContent>
                             <SelectItem value="Team-1">Team 1</SelectItem>
                             <SelectItem value="Team-2">Team 2</SelectItem>
                             <SelectItem value="Team-3">Team 3</SelectItem>
@@ -225,7 +236,11 @@ export default function StudentForm() {
                 </div>
             </div>
 
-            <Button disabled={loading} type="submit" className="w-[50%] mt-10">
+            <Button 
+                disabled={loading} 
+                type="submit" 
+                className="w-full md:w-1/2 mt-6 md:mt-10"
+            >
                 {loading ? "Submitting..." : "Submit"}
             </Button>
         </form>

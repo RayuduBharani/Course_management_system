@@ -173,25 +173,35 @@ export default function InstructorForm() {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="w-full h-full px-10 py-5 flex flex-col items-center gap-3">
-            <FileUpload 
-                onChange={(files) => setSelectedFiles(files)}
-                value={selectedFiles}
-            />
-            {progress !== undefined && progress < 100 && (
-                <Progress value={progress} className="w-full h-2" />
-            )}
+        <form onSubmit={handleSubmit} className="w-full h-full p-4 md:px-10 md:py-5 flex flex-col items-center gap-3">
+            <div className="w-full max-w-lg">
+                <FileUpload 
+                    onChange={(files) => setSelectedFiles(files)}
+                    value={selectedFiles}
+                />
+                {progress !== undefined && progress < 100 && (
+                    <Progress value={progress} className="w-full h-2 mt-2" />
+                )}
+            </div>
 
-            <div className="flex gap-3 w-full">
-                <div className="gap-3 mt-5 w-[50%]">
-                    <Label htmlFor="rollnumber">Roll Number</Label>
-                    <Input required name="rollNumber" minLength={10} maxLength={10} id="rollnumber" className="bg-background" placeholder="e.g., 21A91A05J5" />
+            <div className="flex flex-col md:flex-row gap-3 w-full max-w-lg">
+                <div className="w-full md:w-1/2">
+                    <Label htmlFor="rollnumber" className="text-sm font-medium">Roll Number</Label>
+                    <Input 
+                        required 
+                        name="rollNumber" 
+                        minLength={10} 
+                        maxLength={10} 
+                        id="rollnumber" 
+                        className="mt-1 bg-background p-2 md:p-5" 
+                        placeholder="e.g., 21A91A05J5" 
+                    />
                 </div>
 
-                <div className="gap-3 w-[50%] mt-5">
-                    <Label htmlFor="gender">Gender</Label>
+                <div className="w-full md:w-1/2">
+                    <Label htmlFor="gender" className="text-sm font-medium">Gender</Label>
                     <Select required name="gender">
-                        <SelectTrigger id="gender" className="w-full p-5 bg-background">
+                        <SelectTrigger id="gender" className="mt-1 bg-background p-2 md:p-5">
                             <SelectValue placeholder="Select gender" />
                         </SelectTrigger>
                         <SelectContent>
@@ -203,11 +213,11 @@ export default function InstructorForm() {
                 </div>
             </div>
 
-            <div className="flex gap-3 w-full">
-                <div className="gap-3 mt-5 w-[50%]">
-                    <Label htmlFor="branch">Branch</Label>
+            <div className="flex flex-col md:flex-row gap-3 w-full max-w-lg">
+                <div className="w-full md:w-1/2">
+                    <Label htmlFor="branch" className="text-sm font-medium">Branch</Label>
                     <Select required name="branch">
-                        <SelectTrigger id="branch" className="w-full p-5 bg-background">
+                        <SelectTrigger id="branch" className="mt-1 bg-background p-2 md:p-5">
                             <SelectValue placeholder="Select branch" />
                         </SelectTrigger>
                         <SelectContent>
@@ -221,32 +231,62 @@ export default function InstructorForm() {
                     </Select>
                 </div>
 
-                <div className="gap-3 w-[50%] mt-5">
-                    <Label htmlFor="college">College</Label>
-                    <Input required name="college" id="college" className="bg-background" placeholder="Enter your college name" />
+                <div className="w-full md:w-1/2">
+                    <Label htmlFor="college" className="text-sm font-medium">College</Label>
+                    <Input 
+                        required 
+                        name="college" 
+                        id="college" 
+                        className="mt-1 bg-background p-2 md:p-5" 
+                        placeholder="Enter your college name" 
+                    />
                 </div>
             </div>
 
-            <div className="flex gap-3 w-full">
-                <div className="gap-3 mt-5 w-[50%]">
-                    <Label htmlFor="linkedIn">LinkedIn Profile</Label>
-                    <Input required name="linkedIn" id="linkedIn" type="url" className="bg-background" placeholder="https://linkedin.com/in/username" />
+            <div className="flex flex-col md:flex-row gap-3 w-full max-w-lg">
+                <div className="w-full md:w-1/2">
+                    <Label htmlFor="linkedIn" className="text-sm font-medium">LinkedIn Profile</Label>
+                    <Input 
+                        required 
+                        name="linkedIn" 
+                        id="linkedIn" 
+                        type="url" 
+                        className="mt-1 bg-background p-2 md:p-5" 
+                        placeholder="https://linkedin.com/in/username" 
+                    />
                 </div>
 
-                <div className="gap-3 w-[50%] mt-5">
-                    <Label htmlFor="gitHub">GitHub Profile</Label>
-                    <Input required name="gitHub" id="gitHub" type="url" className="bg-background" placeholder="https://github.com/username" />
+                <div className="w-full md:w-1/2">
+                    <Label htmlFor="gitHub" className="text-sm font-medium">GitHub Profile</Label>
+                    <Input 
+                        required 
+                        name="gitHub" 
+                        id="gitHub" 
+                        type="url" 
+                        className="mt-1 bg-background p-2 md:p-5" 
+                        placeholder="https://github.com/username" 
+                    />
                 </div>
             </div>
 
-            <div className="flex gap-3 w-full">
-                <div className="gap-3 mt-5 w-[50%]">
-                    <Label htmlFor="UPI">UPI ID</Label>
-                    <Input required name="UPI" id="UPI" className="bg-background" placeholder="Enter your UPI ID" />
+            <div className="flex flex-col md:flex-row gap-3 w-full max-w-lg">
+                <div className="w-full md:w-1/2">
+                    <Label htmlFor="UPI" className="text-sm font-medium">UPI ID</Label>
+                    <Input 
+                        required 
+                        name="UPI" 
+                        id="UPI" 
+                        className="mt-1 bg-background p-2 md:p-5" 
+                        placeholder="Enter your UPI ID" 
+                    />
                 </div>
             </div>
 
-            <Button disabled={loading} type="submit" className="w-[50%] mt-10">
+            <Button 
+                disabled={loading} 
+                type="submit" 
+                className="w-full md:w-1/2 mt-6 md:mt-10"
+            >
                 {loading ? "Submitting..." : "Submit"}
             </Button>
         </form>
