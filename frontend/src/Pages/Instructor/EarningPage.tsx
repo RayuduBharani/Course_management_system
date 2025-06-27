@@ -106,7 +106,7 @@ export default function EarningPage() {
         try {
             setIsLoading(true);
             setError(null);
-            const response = await fetch("http://localhost:8000/instructor/earning/orders", {
+            const response = await fetch("http://13.233.183.222:8000/instructor/earning/orders", {
                 credentials: "include",
             });
             const result = await response.json();

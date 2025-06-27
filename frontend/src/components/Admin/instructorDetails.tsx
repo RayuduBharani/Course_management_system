@@ -55,7 +55,7 @@ export default function InstructorDetails() {
     const [instructor, setInstructor] = useState<InstructorProfile | null>(null);
     const param = location.pathname.split("/")[3];    const fetchInstructorEarnings = useCallback(async () => {
         try {
-            const response = await fetch(`http://localhost:8000/admin/instructor/oneuser/${param}`, {
+            const response = await fetch(`http://13.233.183.222:8000/admin/instructor/oneuser/${param}`, {
                 credentials: "include",
             });
             const data = await response.json();
@@ -71,7 +71,7 @@ export default function InstructorDetails() {
 
     const fetchInstructorProfile = useCallback(async () => {
         try {
-            const response = await fetch(`http://localhost:8000/admin/instructor/profile/${param}`, {
+            const response = await fetch(`http://13.233.183.222:8000/admin/instructor/profile/${param}`, {
                 credentials: "include",
             });
             const data = await response.json();

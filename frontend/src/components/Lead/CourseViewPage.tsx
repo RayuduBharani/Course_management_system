@@ -23,7 +23,7 @@ export default function LeadCourseDetailesView() {
     const [approvalUrl, setApprovalUrl] = useState("")
     const [isProcessing, setIsProcessing] = useState(false)
     const FetchCourseInfo = async () => {
-        const response = await fetch(`http://localhost:8000/courses/get/${id}`)
+        const response = await fetch(`http://13.233.183.222:8000/courses/get/${id}`)
         const data = await response.json()
         setCourseInfo(data)
     }
@@ -53,7 +53,7 @@ export default function LeadCourseDetailesView() {
             coursePrice: courseInfo?.price,
             courseTitle: courseInfo?.title
         }
-        try {                const response = await fetch("http://localhost:8000/order/create", {
+        try {                const response = await fetch("http://13.233.183.222:8000/order/create", {
                     method: "POST",
                     headers: {
                         "Content-type": "application/json"

@@ -61,7 +61,7 @@ export default function Orders() {
 
     const fetchInstructorEarnings = async () => {
         try {
-            const response = await fetch("http://localhost:8000/admin/course/orders", {
+            const response = await fetch("http://13.233.183.222:8000/admin/course/orders", {
                 credentials: "include",
             });
             

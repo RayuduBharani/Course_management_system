@@ -60,7 +60,7 @@ export default function CoursesHomepage() {
   const fetchDashboardData = useCallback(async () => {
     try {
       setIsLoading(true);
-      const coursesResponse = await fetch("http://localhost:8000/student/mycourse/all", {
+      const coursesResponse = await fetch("http://13.233.183.222:8000/student/mycourse/all", {
         credentials: "include"
       });
       const coursesData = await coursesResponse.json();

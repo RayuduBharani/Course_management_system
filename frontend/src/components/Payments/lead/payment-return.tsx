@@ -27,7 +27,7 @@ export default function PaymentReturn() {
                 };
                 
                 try {
-                    const response = await fetch("http://localhost:8000/order/capture", {
+                    const response = await fetch("http://13.233.183.222:8000/order/capture", {
                         method: "POST",
                         headers: {
                             "Content-type": "application/json"

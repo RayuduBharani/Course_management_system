@@ -43,7 +43,7 @@ export default function WithdrawalPage() {
 
     const fetchWithdrawalHistory = async () => {
         try {
-            const response = await fetch("http://localhost:8000/instructor/withdrawal/history", {
+            const response = await fetch("http://13.233.183.222:8000/instructor/withdrawal/history", {
                 credentials: "include"
             });
             const data = await response.json();
@@ -57,7 +57,7 @@ export default function WithdrawalPage() {
 
     const fetchTotalEarnings = useCallback(async () => {
         try {
-            const ordersResponse = await fetch("http://localhost:8000/instructor/earning/orders", {
+            const ordersResponse = await fetch("http://13.233.183.222:8000/instructor/earning/orders", {
                 credentials: "include"
             });
             const orders = await ordersResponse.json();
@@ -114,7 +114,7 @@ export default function WithdrawalPage() {
 
         setIsLoading(true);
         try {
-            const response = await fetch("http://localhost:8000/instructor/withdrawal/request", {
+            const response = await fetch("http://13.233.183.222:8000/instructor/withdrawal/request", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

@@ -11,7 +11,7 @@ const initialState : FindInstructorCourses = {
 export const FetchInstructorCourses = createAsyncThunk(
     "instructor/courses",
     async () => {
-        const response = await fetch("http://localhost:8000/instructor/course/get", {
+        const response = await fetch("http://13.233.183.222:8000/instructor/course/get", {
             method: "GET",
             credentials: "include"
         })

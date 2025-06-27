@@ -47,7 +47,7 @@ export default function AdminCourseDetailesView() {
         try {
             setIsLoading(true)
             setError(null)
-            const response = await fetch(`http://localhost:8000/courses/get/${id}`)
+            const response = await fetch(`http://13.233.183.222:8000/courses/get/${id}`)
             if (!response.ok) {
                 throw new Error('Failed to fetch course information')
             }
@@ -73,7 +73,7 @@ export default function AdminCourseDetailesView() {
     const handleDelete = async (courseId: string) => {
         try {
             setIsLoading(true)
-            const response = await fetch(`http://localhost:8000/admin/course/delete/${courseId}`, {
+            const response = await fetch(`http://13.233.183.222:8000/admin/course/delete/${courseId}`, {
                 method: "PUT"
             })
             const data = await response.json()

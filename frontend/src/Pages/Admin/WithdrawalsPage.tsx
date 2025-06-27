@@ -50,7 +50,7 @@ export default function AdminWithdrawalsPage() {
 
     const fetchWithdrawalRequests = async () => {
         try {
-            const response = await fetch("http://localhost:8000/admin/withdrawals", {
+            const response = await fetch("http://13.233.183.222:8000/admin/withdrawals", {
                 credentials: "include"
             });
             const data = await response.json();
@@ -71,7 +71,7 @@ export default function AdminWithdrawalsPage() {
 
         setIsLoading(true);
         try {
-            const response = await fetch(`http://localhost:8000/admin/withdrawals/${selectedRequest._id}`, {
+            const response = await fetch(`http://13.233.183.222:8000/admin/withdrawals/${selectedRequest._id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json"

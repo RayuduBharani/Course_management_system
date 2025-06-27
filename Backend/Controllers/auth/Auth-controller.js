@@ -105,7 +105,6 @@ const signin = async (req, res) => {
                     res.cookie(process.env.JWT_KEY, token, { 
                         httpOnly: true, 
                         secure: process.env.NODE_ENV === 'production',
-                        sameSite: 'strict',
                         path: '/',
                         expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) 
                     }).json({ 
@@ -234,7 +233,6 @@ const Google = async (req, res) => {
             res.cookie(process.env.JWT_KEY, token, { 
                 httpOnly: true, 
                 secure: process.env.NODE_ENV === 'production',
-                sameSite: 'strict',
                 path: '/',
                 expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) 
             }).json({ 
@@ -277,7 +275,6 @@ const GitHub = async (req, res) => {
                 res.cookie(process.env.JWT_KEY, token, { 
                     httpOnly: true, 
                     secure: process.env.NODE_ENV === 'production',
-                    sameSite: 'strict',
                     path: '/',
                     expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) 
                 }).json({ 

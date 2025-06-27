@@ -10,7 +10,7 @@ export const FetchViewCourses = createAsyncThunk(
   "/mycourses/view-page",
   async (id:string) => {
     const response = await fetch(
-      `http://localhost:8000/lead/progress-page/viewcourse/${id}`,
+      `http://13.233.183.222:8000/lead/progress-page/viewcourse/${id}`,
       {
         credentials: "include",
       }

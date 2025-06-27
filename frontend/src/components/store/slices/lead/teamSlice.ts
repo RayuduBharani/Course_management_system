@@ -40,7 +40,7 @@ const initialState: TeamState = {
 export const FindTeamMembers = createAsyncThunk(
     "/lead/members",
     async () => {
-        const response = await fetch("http://localhost:8000/lead/team/members", {
+        const response = await fetch("http://13.233.183.222:8000/lead/team/members", {
             credentials: "include"
         });
         const data = await response.json();
@@ -51,7 +51,7 @@ export const FindTeamMembers = createAsyncThunk(
 export const sendTeamMessage = createAsyncThunk(
     "/lead/members/message",
     async ({ memberId, message }: { memberId: string; message: string }) => {
-        const response = await fetch(`http://localhost:8000/lead/team/message/${memberId}`, {
+        const response = await fetch(`http://13.233.183.222:8000/lead/team/message/${memberId}`, {
             method: 'POST',
             credentials: "include",
             headers: {

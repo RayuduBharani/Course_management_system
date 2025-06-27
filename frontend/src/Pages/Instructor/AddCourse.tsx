@@ -196,7 +196,7 @@ const AddCourse = () => {
         };
 
         console.log("Submitting form data: ", formSubmissionData);
-        fetch('http://localhost:8000/instructor/course/add', {
+        fetch('http://13.233.183.222:8000/instructor/course/add', {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

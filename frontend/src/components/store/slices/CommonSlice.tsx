@@ -13,7 +13,7 @@ const initialState: AllCoursesinitialState = {
 export const fetchAllCourses = createAsyncThunk(
     "courses/fetchAll",
     async () => {
-        const response = await fetch("http://localhost:8000/courses/Allcourses");
+        const response = await fetch("http://13.233.183.222:8000/courses/Allcourses");
         const data = await response.json();
         return data;
     }

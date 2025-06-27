@@ -43,7 +43,7 @@ export default function Signup() {
             email: email,
             password: password
         }
-        const response = await fetch("http://localhost:8000/api/auth/signup", {
+        const response = await fetch("http://13.233.183.222:8000/api/auth/signup", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
