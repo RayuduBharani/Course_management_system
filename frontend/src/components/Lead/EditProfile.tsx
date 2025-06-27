@@ -173,6 +173,7 @@ export default function EditProfile() {
                                 />
                             </div>
                             <Button onClick={()=>{
+                                // eslint-disable-next-line @typescript-eslint/no-unused-expressions
                                 progress &&
                                 progress == 100 ? 
                                 handleDialog()

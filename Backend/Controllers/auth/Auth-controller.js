@@ -101,7 +101,8 @@ const signin = async (req, res) => {
                 }, process.env.JWT_KEY);
 
                 // Ensure only one response is sent
-                if (!res.headersSent) {                    res.cookie(process.env.JWT_KEY, token, { 
+                if (!res.headersSent) {                    
+                    res.cookie(process.env.JWT_KEY, token, { 
                         httpOnly: true, 
                         secure: process.env.NODE_ENV === 'production',
                         sameSite: 'strict',

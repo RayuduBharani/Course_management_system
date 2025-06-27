@@ -1,3 +1,4 @@
+/* eslint-disable no-empty-pattern */
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 const initialState: ViewCourseinitialState = {
@@ -30,6 +31,7 @@ export const ProgressSlice = createSlice({
 
       })
       .addCase(FetchViewCourses.fulfilled,(state,action)=>{
+        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
         state.isLoading=false,
         state.courseData=action.payload.leadCourses//put the backend res name like {leaadCourse:leadCourse}
       })

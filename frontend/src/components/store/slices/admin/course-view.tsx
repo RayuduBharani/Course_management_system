@@ -48,6 +48,7 @@ export const AdminSlice = createSlice({
 })
 
 
+// eslint-disable-next-line no-empty-pattern
 export const {} =AdminSlice.actions
 
 export default AdminSlice.reducer

@@ -1,3 +1,4 @@
+/* eslint-disable no-empty-pattern */
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 
@@ -43,6 +44,7 @@ const ProfileSlice = createSlice({
                 state.isLoading = true
             })
             .addCase(UpdateLeadProfileInfo.fulfilled, (state, action) => {
+                // eslint-disable-next-line @typescript-eslint/no-unused-expressions
                 state.isLoading = false,
                     state.profileInfo = action.payload
             })

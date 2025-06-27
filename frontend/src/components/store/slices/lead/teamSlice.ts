@@ -113,8 +113,9 @@ const teamSlice = createSlice({
             .addCase(FindTeamMembers.rejected, (state) => {
                 state.isLoading = false;
             })
-            .addCase(sendTeamMessage.fulfilled, (state, action) => {
+            .addCase(sendTeamMessage.fulfilled, () => {
                 // Handle success message if needed
+
             });
     },
 });

@@ -43,6 +43,7 @@ export const StudentProgressSlice = createSlice({
             state.isLoading=true
         })
         .addCase(FetchStudentCourse.fulfilled,(state,action)=>{
+            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
             state.isLoading=false,
             state.courseData=action.payload.studentCourses
         })
@@ -56,6 +57,7 @@ export const StudentProgressSlice = createSlice({
 });
 
 
+// eslint-disable-next-line no-empty-pattern
 export const {} = StudentProgressSlice.actions
 
 export default StudentProgressSlice.reducer

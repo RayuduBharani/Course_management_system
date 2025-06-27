@@ -80,5 +80,4 @@ const instructorProfileSlice = createSlice({
     }
 })
 
-export const { } = instructorProfileSlice.actions
 export default instructorProfileSlice.reducer
