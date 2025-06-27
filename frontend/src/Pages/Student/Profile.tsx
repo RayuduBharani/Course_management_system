@@ -1,3 +1,4 @@
+ 
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -41,8 +42,7 @@ export default function StudentProfile() {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const { isLoading, profileInfo } = useSelector((state: RootState) => state.studentProfile);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [myCourses, setMyCourses] = useState<EnrolledCourse[]>([]);
+  const [, setMyCourses] = useState<EnrolledCourse[]>([]);
   const [stats, setStats] = useState<StatItem[]>([
     { icon: <BookOpen className="h-5 w-5" />, label: "Enrolled Courses", value: "0" },
     { icon: <GraduationCap className="h-5 w-5" />, label: "Total Lessons", value: "0" },

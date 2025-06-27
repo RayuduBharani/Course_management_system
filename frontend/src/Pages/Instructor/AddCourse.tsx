@@ -34,13 +34,6 @@ const AddCourse = () => {
         Level: "",
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [uploadProgress, setUploadProgress] = useState<Record<number, number>>({});
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [isUploading, setIsUploading] = useState(false);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [error, setError] = useState<string | null>(null);
-
     const addSection = () => {
         setSections((prev) => [
             ...prev,
@@ -67,18 +60,17 @@ const AddCourse = () => {
     const handleFileChange = async (id: number, file: File | null) => {
         if (file) {
             try {
-                setIsUploading(true);
-                setError(null);
-                
                 // Validate file type
                 if (!file.type.startsWith('video/')) {
-                    throw new Error('Please upload a valid video file');
+                    alert('Please upload a valid video file');
+                    return;
                 }
 
                 // Validate file size (e.g., max 100MB)
                 const maxSize = 100 * 1024 * 1024; // 100MB in bytes
                 if (file.size > maxSize) {
-                    throw new Error('File size should be less than 100MB');
+                    alert('File size should be less than 100MB');
+                    return;
                 }
 
                 const storage = getStorage(app);
@@ -89,34 +81,26 @@ const AddCourse = () => {
                     "state_changed",
                     (snapshot) => {
                         const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                        setUploadProgress(prev => ({
-                            ...prev,
-                            [id]: Math.round(progress)
-                        }));
                         console.log(`Upload is ${progress}% done`);
                     },
                     (error) => {
                         console.error("Error uploading video: ", error);
-                        setError(`Error uploading video: ${error.message}`);
-                        setIsUploading(false);
+                        alert(`Error uploading video: ${error.message}`);
                     },
                     async () => {
                         try {
                             const videoUrl: string = await getDownloadURL(uploadTask.snapshot.ref);
                             console.log("Video uploaded and available at: ", videoUrl);
                             handleInputChange(id, "videoUrl", videoUrl);
-                            setIsUploading(false);
                         } catch (error) {
                             console.error("Error getting download URL: ", error);
-                            setError("Error getting video URL after upload");
-                            setIsUploading(false);
+                            alert("Error getting video URL after upload");
                         }
                     }
                 );
             } catch (error) {
                 console.error("Error during file upload: ", error);
-                setError(error instanceof Error ? error.message : "Error uploading file");
-                setIsUploading(false);
+                alert(error instanceof Error ? error.message : "Error uploading file");
             }
         }
     };
@@ -124,18 +108,17 @@ const AddCourse = () => {
     const handleThumbnailChange = async (file: File | null) => {
         if (file) {
             try {
-                setIsUploading(true);
-                setError(null);
-
                 // Validate file type
                 if (!file.type.startsWith('image/')) {
-                    throw new Error('Please upload a valid image file');
+                    alert('Please upload a valid image file');
+                    return;
                 }
 
                 // Validate file size (e.g., max 5MB)
                 const maxSize = 5 * 1024 * 1024; // 5MB in bytes
                 if (file.size > maxSize) {
-                    throw new Error('File size should be less than 5MB');
+                    alert('File size should be less than 5MB');
+                    return;
                 }
 
                 const storage = getStorage(app);
@@ -150,8 +133,7 @@ const AddCourse = () => {
                     },
                     (error) => {
                         console.error("Error uploading thumbnail: ", error);
-                        setError(`Error uploading thumbnail: ${error.message}`);
-                        setIsUploading(false);
+                        alert(`Error uploading thumbnail: ${error.message}`);
                     },
                     async () => {
                         try {
@@ -161,18 +143,15 @@ const AddCourse = () => {
                                 ...prevData,
                                 thumbnail: thumbnailUrl,
                             }));
-                            setIsUploading(false);
                         } catch (error) {
                             console.error("Error getting download URL: ", error);
-                            setError("Error getting thumbnail URL after upload");
-                            setIsUploading(false);
+                            alert("Error getting thumbnail URL after upload");
                         }
                     }
                 );
             } catch (error) {
                 console.error("Error during thumbnail upload: ", error);
-                setError(error instanceof Error ? error.message : "Error uploading thumbnail");
-                setIsUploading(false);
+                alert(error instanceof Error ? error.message : "Error uploading thumbnail");
             }
         }
     };
