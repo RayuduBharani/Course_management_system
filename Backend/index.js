@@ -26,7 +26,7 @@ const app = express();
 app.use(express.json())
 
 app.use(cors({
-    origin: ['http://localhost:5173' , "https://course-management-system-1-a96d.onrender.com" , "https://cms-bharani.vercel.app"], // or whatever port your Vite frontend runs on
+    origin: ['http://localhost:5173',"http://localhost:4173" , "https://course-management-system-1-a96d.onrender.com" , "https://cms-bharani.vercel.app"], // or whatever port your Vite frontend runs on
     credentials: true
 }));
 
