@@ -61,7 +61,7 @@ export default function Orders() {
 
     const fetchInstructorEarnings = async () => {
         try {
-            const response = await fetch("http://13.233.183.222:8000/admin/course/orders", {
+            const response = await fetch("https://course-management-system-2-2wm4.onrender.com/admin/course/orders", {
                 credentials: "include",
             });
             

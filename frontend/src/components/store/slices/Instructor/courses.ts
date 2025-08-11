@@ -11,7 +11,7 @@ const initialState : FindInstructorCourses = {
 export const FetchInstructorCourses = createAsyncThunk(
     "instructor/courses",
     async () => {
-        const response = await fetch("http://13.233.183.222:8000/instructor/course/get", {
+        const response = await fetch("https://course-management-system-2-2wm4.onrender.com/instructor/course/get", {
             method: "GET",
             credentials: "include"
         })

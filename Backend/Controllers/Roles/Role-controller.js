@@ -142,6 +142,7 @@ const TeamLeadRole = async (req, res) => {
 
         res.cookie(process.env.JWT_KEY, token, {
             httpOnly: true,
+            sameSite: 'None',
             secure: process.env.NODE_ENV === 'production',
             expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
         }).json({
@@ -217,6 +218,7 @@ const StudentRole = async (req, res) => {
 
         res.cookie(process.env.JWT_KEY, token, {
             httpOnly: true,
+            sameSite: 'None',
             secure: process.env.NODE_ENV === 'production',
             expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
         }).json({

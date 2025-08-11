@@ -196,7 +196,7 @@ const AddCourse = () => {
         };
 
         console.log("Submitting form data: ", formSubmissionData);
-        fetch('http://13.233.183.222:8000/instructor/course/add', {
+        fetch('https://course-management-system-2-2wm4.onrender.com/instructor/course/add', {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

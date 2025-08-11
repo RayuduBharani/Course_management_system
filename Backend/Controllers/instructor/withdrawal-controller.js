@@ -12,7 +12,7 @@ const createWithdrawalRequest = async (req, res) => {
         const decode = jwt.verify(token, process.env.JWT_KEY);
         
         // Validate minimum withdrawal amount (500 INR)
-        if (amount < 500) {
+        if (amount < 100) {
             return res.status(400).json({
                 success: false,
                 message: "Minimum withdrawal amount is ₹500"

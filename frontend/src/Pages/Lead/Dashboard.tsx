@@ -43,7 +43,7 @@ export default function LeadDashboard() {
         await dispatch(fetchAllCourses());
         
         // Fetch team's enrolled courses
-        const coursesResponse = await fetch("http://13.233.183.222:8000/lead/mycourse/all", {
+        const coursesResponse = await fetch("https://course-management-system-2-2wm4.onrender.com/lead/mycourse/all", {
           credentials: "include"
         });
         const coursesData = await coursesResponse.json();

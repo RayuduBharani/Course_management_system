@@ -23,7 +23,7 @@ export default function StudentCourseDetailesView() {
     const [isProcessing, setIsProcessing] = useState(false)
     
     const FetchCourseInfo = useCallback(async () => {
-        const response = await fetch(`http://13.233.183.222:8000/courses/get/${id}`)
+        const response = await fetch(`https://course-management-system-2-2wm4.onrender.com/courses/get/${id}`)
         const data = await response.json()
         setCourseInfo(data)
     }, [id])
@@ -54,7 +54,7 @@ export default function StudentCourseDetailesView() {
             courseTitle: courseInfo?.title
         }
         try {
-            const response = await fetch("http://13.233.183.222:8000/order/create/stu", {
+            const response = await fetch("https://course-management-system-2-2wm4.onrender.com/order/create/stu", {
                 method: "POST",
                 headers: {
                     "Content-type": "application/json"

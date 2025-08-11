@@ -10,7 +10,7 @@ export const FetchViewCourses = createAsyncThunk(
   "/mycourses/view-page",
   async (id:string) => {
     const response = await fetch(
-      `http://13.233.183.222:8000/lead/progress-page/viewcourse/${id}`,
+      `https://course-management-system-2-2wm4.onrender.com/lead/progress-page/viewcourse/${id}`,
       {
         credentials: "include",
       }

@@ -105,13 +105,14 @@ const signin = async (req, res) => {
                     res.cookie(process.env.JWT_KEY, token, { 
                         httpOnly: true, 
                         secure: process.env.NODE_ENV === 'production',
+                        sameSite: 'None',
                         path: '/',
                         expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) 
                     }).json({ 
                         success: true, 
                         role: SignInData.role, 
-                        message: "Login Success", 
-                        user: SignInData 
+                        message: "Login Success",
+                        user: SignInData
                     });
                 }            } else {
                 // Ensure only one response is sent
@@ -234,6 +235,7 @@ const Google = async (req, res) => {
                 httpOnly: true, 
                 secure: process.env.NODE_ENV === 'production',
                 path: '/',
+                sameSite : "None",
                 expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) 
             }).json({ 
                 success: true, 
@@ -276,6 +278,7 @@ const GitHub = async (req, res) => {
                     httpOnly: true, 
                     secure: process.env.NODE_ENV === 'production',
                     path: '/',
+                    sameSite: 'None',
                     expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) 
                 }).json({ 
                     success: true, 
@@ -307,7 +310,7 @@ const GitHub = async (req, res) => {
                 }, process.env.JWT_KEY);
                 const decoded = jwt.verify(token, process.env.JWT_KEY);
                 if (decoded) {
-                    res.cookie("token", token, { httpOnly: true, secure: false })
+                    res.cookie("token", token, { httpOnly: true, secure: false , sameSite: 'None'})
                         .json({ success: true, message: "Login Success" })
                 }
             }

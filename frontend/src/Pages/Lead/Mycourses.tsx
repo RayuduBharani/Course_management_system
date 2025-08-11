@@ -84,8 +84,8 @@ export default function LeadMyCourses() {
 
     const FetchMyCourses = useCallback(async () => {
         const url = search
-            ? `http://13.233.183.222:8000/lead/mycourse/search/${search}`
-            : "http://13.233.183.222:8000/lead/mycourse/all";
+            ? `https://course-management-system-2-2wm4.onrender.com/lead/mycourse/search/${search}`
+            : "https://course-management-system-2-2wm4.onrender.com/lead/mycourse/all";
 
         try {
             const response = await fetch(url, {

@@ -19,7 +19,7 @@ export default function ViewCourse() {
     const [courseInfo, setCourseInfo] = useState<ICourse>()
 
     const FetchCourseInfo = async () => {
-        const response = await fetch(`http://13.233.183.222:8000/courses/get/${id}`)
+        const response = await fetch(`https://course-management-system-2-2wm4.onrender.com/courses/get/${id}`)
         const data = await response.json()
         setCourseInfo(data)
     }
@@ -33,7 +33,7 @@ export default function ViewCourse() {
     }
 
     const handleDelete = async (id: string) => {
-        const response = await fetch(`http://13.233.183.222:8000/admin/course/delete/${id}`, {
+        const response = await fetch(`https://course-management-system-2-2wm4.onrender.com/admin/course/delete/${id}`, {
             method: "PUT"
         })
         const data = await response.json();

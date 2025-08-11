@@ -46,7 +46,7 @@ export default function AdminInstructors() {
         try {
             setIsLoading(true);
             setError(null);
-            const response = await fetch('http://13.233.183.222:8000/admin/instructor/all', {
+            const response = await fetch('https://course-management-system-2-2wm4.onrender.com/admin/instructor/all', {
                 credentials: 'include' // Include credentials for cross-origin requests
             });
             

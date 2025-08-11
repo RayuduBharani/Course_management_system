@@ -13,7 +13,7 @@ const initialState: AllCoursesinitialState = {
 export const fetchAllCourses = createAsyncThunk(
     "courses/fetchAll",
     async () => {
-        const response = await fetch("http://13.233.183.222:8000/courses/Allcourses");
+        const response = await fetch("https://course-management-system-2-2wm4.onrender.com/courses/Allcourses");
         const data = await response.json();
         return data;
     }

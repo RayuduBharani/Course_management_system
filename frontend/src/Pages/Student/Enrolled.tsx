@@ -85,8 +85,8 @@ export default function StudentEnrolledCourses() {
 
     const FetchMyCourses = useCallback(async () => {
         const url = search
-            ? `http://13.233.183.222:8000/student/mycourse/search/${search}`
-            : "http://13.233.183.222:8000/student/mycourse/all";
+            ? `https://course-management-system-2-2wm4.onrender.com/student/mycourse/search/${search}`
+            : "https://course-management-system-2-2wm4.onrender.com/student/mycourse/all";
 
         const response = await fetch(url, {
             credentials: "include"

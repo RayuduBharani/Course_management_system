@@ -57,7 +57,7 @@ export default function StudentProfile() {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await fetch("http://13.233.183.222:8000/student/mycourse/all", {
+        const response = await fetch("https://course-management-system-2-2wm4.onrender.com/student/mycourse/all", {
           credentials: "include"
         });
         const data = await response.json();
