@@ -42,11 +42,32 @@ export default function AuthIcons() {
   });
 
   useGoogleOneTapLogin({
-    onSuccess: (credentialResponse) => {
-      console.log(credentialResponse);
+    onSuccess: async (credentialResponse) => {
+      try {
+        if (!credentialResponse.credential) {
+          console.error('No credential in response');
+          return;
+        }
+        // Decode the JWT credential from Google One Tap
+        const base64Payload = credentialResponse.credential.split('.')[1];
+        const decodedPayload = JSON.parse(atob(base64Payload));
+
+        const newData = {
+          name: decodedPayload.name,
+          email: decodedPayload.email,
+          image: decodedPayload.picture,
+          role: "Empty"
+        };
+
+        const response = await dispatch(GoogleAuth(newData));
+        console.log(response.payload, " google one-tap data");
+        navigate("/check/verify");
+      } catch (error) {
+        console.error('Google One Tap login failed:', error);
+      }
     },
     onError: () => {
-      console.log('Login Failed');
+      console.log('Google One Tap Login Failed');
     },
   });
 

@@ -16,7 +16,7 @@ interface Course {
   subtitle: string;
   description: string;
   thumbnail: string;
-  price: string;  // Changed from number to string to match backend data
+  price: number;
   instructor: {
     name: string;
     _id: string;
