@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../lib/api";
 import { useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import Loader from "../Loading"
@@ -19,7 +20,7 @@ export default function ViewCourse() {
     const [courseInfo, setCourseInfo] = useState<ICourse>()
 
     const FetchCourseInfo = async () => {
-        const response = await fetch(`https://course-management-system-2-2wm4.onrender.com/courses/get/${id}`)
+        const response = await fetch(`${API_BASE_URL}/courses/get/${id}`)
         const data = await response.json()
         setCourseInfo(data)
     }
@@ -33,8 +34,9 @@ export default function ViewCourse() {
     }
 
     const handleDelete = async (id: string) => {
-        const response = await fetch(`https://course-management-system-2-2wm4.onrender.com/admin/course/delete/${id}`, {
-            method: "PUT"
+        const response = await fetch(`${API_BASE_URL}/admin/course/${id}`, {
+            method: "DELETE",
+            credentials: "include"
         })
         const data = await response.json();
         if (data.success) {

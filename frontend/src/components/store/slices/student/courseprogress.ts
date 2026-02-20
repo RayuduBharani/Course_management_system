@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../../../lib/api";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 
@@ -17,7 +18,7 @@ export const FetchStudentCourse =  createAsyncThunk(
     '/student/mycourses/view-page',
     async (id:string) => {
         const response = await fetch(
-            `https://course-management-system-2-2wm4.onrender.com/student/progress-page/viewcourse/${id}`,
+            `${API_BASE_URL}/student/progress-page/viewcourse/${id}`,
             {
                 credentials:'include',
             }

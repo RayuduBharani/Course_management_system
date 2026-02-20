@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const courseSchema = mongoose.Schema({
-    instructor: { type: mongoose.Schema.Types.ObjectId, ref: "Instructors" },
+    instructor: { type: mongoose.Schema.Types.ObjectId, ref: "Instructors", required: true },
     thumbnail: { type: String, default : "https://i.pinimg.com/736x/af/44/ea/af44ea07fa5bfd828004747f62f63bc3.jpg"},
     title: { type: String, required: true },
     subtitle: { type: String, required: true },
@@ -31,14 +31,14 @@ const courseSchema = mongoose.Schema({
         enum: ["Beginner", "Intermediate", "Advanced", "All levels"]
     },
     leads: [{
-        leadId: { type: mongoose.Schema.Types.ObjectId, ref: "leaders" },
-        paidAmount: String,
+        leadId: { type: mongoose.Schema.Types.ObjectId, ref: "Leaders" },
+        paidAmount: { type: Number, default: 0 },
     },
     ],
     students: [
         {
             studentId: { type: mongoose.Schema.Types.ObjectId, ref: "students" },
-            paidAmount: String,
+            paidAmount: { type: Number, default: 0 },
         }
     ],
     requirements: { type: String, required: true },
@@ -51,9 +51,13 @@ const courseSchema = mongoose.Schema({
             title: String
         }
     ],
-    isPublished: { type: Boolean, default: true },
-    price: { type: Number, required: true },
+    isPublished: { type: Boolean, default: false },
+    price: { type: Number, required: true, min: 0 },
 
 }, { timestamps: true })
+courseSchema.index({ instructor: 1 });
+courseSchema.index({ category: 1 });
+courseSchema.index({ isPublished: 1 });
+
 const courseModel = mongoose.model("courses", courseSchema)
 module.exports = courseModel

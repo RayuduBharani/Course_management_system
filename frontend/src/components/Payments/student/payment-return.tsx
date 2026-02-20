@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../../lib/api";
 import Loader from "@/components/Loading";
 import { RootState } from "@/components/store/store";
 import { useEffect, useState } from "react";
@@ -23,7 +24,7 @@ export default function StudentPaymentReturn() {
                     orderId: currentOrderId,
                     studentId : user.userId
                 }
-                try {                const response = await fetch("https://course-management-system-2-2wm4.onrender.com/order/capture/stu", {
+                try {                const response = await fetch(`${API_BASE_URL}/order/capture/stu`, {
                         method: "POST",
                         headers: {
                             "Content-type": "application/json"

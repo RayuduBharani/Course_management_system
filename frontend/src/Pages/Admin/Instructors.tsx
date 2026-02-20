@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../lib/api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -46,7 +47,7 @@ export default function AdminInstructors() {
         try {
             setIsLoading(true);
             setError(null);
-            const response = await fetch('https://course-management-system-2-2wm4.onrender.com/admin/instructor/all', {
+            const response = await fetch(`${API_BASE_URL}/admin/instructor/all`, {
                 credentials: 'include' // Include credentials for cross-origin requests
             });
             

@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../lib/api";
 import {
     Table,
     TableBody,
@@ -61,7 +62,7 @@ export default function Orders() {
 
     const fetchInstructorEarnings = async () => {
         try {
-            const response = await fetch("https://course-management-system-2-2wm4.onrender.com/admin/course/orders", {
+            const response = await fetch(`${API_BASE_URL}/admin/courseview/orders`, {
                 credentials: "include",
             });
             

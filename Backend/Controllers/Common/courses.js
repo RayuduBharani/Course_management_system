@@ -6,12 +6,10 @@ const Allcourses = async (req, res) => {
     await db()
     try {
         const AllcoursesList = await courseModel.find({ isPublished: true }).populate("instructor")        
-        if(AllcoursesList){
-            res.send(AllcoursesList)
-        }
+        res.status(200).json({ success: true, courses: AllcoursesList })
     }
     catch (err) {
-        res.send({ success: false, message: err.message })
+        res.status(500).json({ success: false, message: err.message })
     }
 }
 
@@ -20,10 +18,14 @@ const SingleCourseView = async (req,res) => {
     const {id} = req.params
     try {
         const CourseData = await courseModel.findOne({_id : id}).populate("instructor")
-        res.send(CourseData)
+        if (CourseData) {
+            res.status(200).json({ success: true, course: CourseData })
+        } else {
+            res.status(404).json({ success: false, message: "Course not found" })
+        }
     } 
     catch (err) {
-        res.send({ success: false, message: err.message })
+        res.status(500).json({ success: false, message: err.message })
     }
 }
 

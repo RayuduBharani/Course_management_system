@@ -3,7 +3,8 @@ const mongoose = require('mongoose');
 const OrderSchema = mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "users"
+        ref: "users",
+        required: true
     },
     userEmail: {
         type: String,
@@ -12,7 +13,7 @@ const OrderSchema = mongoose.Schema({
     orderStatus: {
         type: String,
         required: true,
-        enum: ["Pending", "Approval", "Rejected"]
+        enum: ["Pending", "Approved", "Rejected"]
     },
     paymentMethod: {
         type: String,
@@ -43,10 +44,16 @@ const OrderSchema = mongoose.Schema({
         required: true,
     },
     coursePrice: {
-        type: mongoose.Schema.Types.Decimal128,
+        type: Number,
         required: true,
+        min: 0
     }
 } , { timestamps: true })
+
+OrderSchema.index({ userId: 1 });
+OrderSchema.index({ instructorId: 1 });
+OrderSchema.index({ orderStatus: 1 });
+OrderSchema.index({ userId: 1, courseId: 1 });
 
 const OrderModel = mongoose.model("orders", OrderSchema)
 module.exports = OrderModel

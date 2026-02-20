@@ -1,8 +1,9 @@
 const mongoose = require('mongoose');
-const InstuctureSchema = new mongoose.Schema({
+const InstructorSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "users"
+        ref: "users",
+        required: true
     },
     name: {
         type: String,
@@ -19,7 +20,7 @@ const InstuctureSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
-        unque: true
+        unique: true
     },
     profileImg: {
         type: String,
@@ -44,6 +45,7 @@ const InstuctureSchema = new mongoose.Schema({
     gender : {
         type : String ,
         required : true ,
+        enum : ["Male", "Female", "Other"]
     },
     college : {
         type : String ,
@@ -53,6 +55,10 @@ const InstuctureSchema = new mongoose.Schema({
         type : String ,
         required : true
     }
-})
-const InstuctureModel = mongoose.model("Instructors", InstuctureSchema);
-module.exports = InstuctureModel;
+}, { timestamps: true })
+
+InstructorSchema.index({ userId: 1 });
+InstructorSchema.index({ email: 1 });
+
+const InstructorModel = mongoose.model("Instructors", InstructorSchema);
+module.exports = InstructorModel;

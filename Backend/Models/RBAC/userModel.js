@@ -3,15 +3,23 @@ const mongoose = require('mongoose');
 const userSchema = new mongoose.Schema({
     name : {
         type : String,
-        required : true
+        required : true,
+        trim : true,
+        minlength : 2,
+        maxlength : 100
     },
     email : {
         type : String,
-        required : true
+        required : true,
+        unique : true,
+        lowercase : true,
+        match : [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, 'Please provide a valid email address']
     },
     password : {
         type : String,
-        required : true
+        required : true,
+        select : false,
+        minlength : 6
     },
     image : {
         type : String ,
@@ -23,6 +31,8 @@ const userSchema = new mongoose.Schema({
         default : "Empty"
     }
 },{timestamps : true})
+
+userSchema.index({ email: 1 });
 
 const userModel = mongoose.model("users" , userSchema)
 module.exports = userModel

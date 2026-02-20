@@ -2,6 +2,9 @@ const LeadModel = require("../../Models/RBAC/LeadModel");
 const StudentModel = require("../../Models/RBAC/StudentModel");
 const db = require("../../Utils/DB/db");
 const jwt = require("jsonwebtoken");
+const { COOKIE_NAME } = require("../auth/Auth-controller");
+
+const JWT_SECRET = process.env.JWT_SECRET;
 
 const sendMessageToTeamMember = async (req, res) => {
     await db();
@@ -10,8 +13,8 @@ const sendMessageToTeamMember = async (req, res) => {
         const { message } = req.body;
         
         // Verify the lead
-        const token = req.cookies[process.env.JWT_KEY];
-        const decode = jwt.verify(token, process.env.JWT_KEY);
+        const token = req.cookies[COOKIE_NAME];
+        const decode = jwt.verify(token, JWT_SECRET);
         const findLead = await LeadModel.findOne({ userId: decode.userId });
         
         if (!findLead) {

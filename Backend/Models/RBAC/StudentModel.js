@@ -21,7 +21,8 @@ const StudentSchema = new mongoose.Schema({
     },
     gender : {
         type : String ,
-        required : true
+        required : true,
+        enum : ["Male", "Female", "Other"]
     },
     branch: {
         type: String,
@@ -53,6 +54,8 @@ const StudentSchema = new mongoose.Schema({
         }
     ]
 } , {timestamps : true});
+
+StudentSchema.index({ userId: 1 });
 
 const StudentModel = mongoose.model("students", StudentSchema);
 module.exports = StudentModel;

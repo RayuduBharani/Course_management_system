@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../../../lib/api";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 const initialState : InstructorProfileInitialstate= {
@@ -23,7 +24,7 @@ const initialState : InstructorProfileInitialstate= {
 export const FetchProfileInfo = createAsyncThunk(
     "instructor/profile",
     async () => {
-        const response = await fetch("https://course-management-system-2-2wm4.onrender.com/instructor/profile/view", {
+        const response = await fetch(`${API_BASE_URL}/instructor/profile/view`, {
             method: "GET",
             credentials: "include"
         })
@@ -36,7 +37,7 @@ export const FetchProfileInfo = createAsyncThunk(
 export const UpdateInstructorProfileInfo = createAsyncThunk(
     "instructor/profile/update",
     async (formData : FORMDATA) => {
-        const response = await fetch("https://course-management-system-2-2wm4.onrender.com/instructor/profile/update", {
+        const response = await fetch(`${API_BASE_URL}/instructor/profile/update`, {
             method: "PUT",
             credentials: "include",
             headers : {

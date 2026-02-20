@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../../../lib/api";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 import type { FindInstructorCourses } from "@/lib/admin-types";
@@ -11,7 +12,7 @@ const initialState : FindInstructorCourses = {
 export const FetchInstructorCourses = createAsyncThunk(
     "instructor/courses",
     async () => {
-        const response = await fetch("https://course-management-system-2-2wm4.onrender.com/instructor/course/get", {
+        const response = await fetch(`${API_BASE_URL}/instructor/course/get`, {
             method: "GET",
             credentials: "include"
         })

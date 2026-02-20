@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../lib/api";
 import { useState, useEffect, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -43,7 +44,7 @@ export default function WithdrawalPage() {
 
     const fetchWithdrawalHistory = async () => {
         try {
-            const response = await fetch("https://course-management-system-2-2wm4.onrender.com/instructor/withdrawal/history", {
+            const response = await fetch(`${API_BASE_URL}/instructor/withdrawal/history`, {
                 credentials: "include"
             });
             const data = await response.json();
@@ -57,7 +58,7 @@ export default function WithdrawalPage() {
 
     const fetchTotalEarnings = useCallback(async () => {
         try {
-            const ordersResponse = await fetch("https://course-management-system-2-2wm4.onrender.com/instructor/earning/orders", {
+            const ordersResponse = await fetch(`${API_BASE_URL}/instructor/earning/orders`, {
                 credentials: "include"
             });
             const orders = await ordersResponse.json();
@@ -114,7 +115,7 @@ export default function WithdrawalPage() {
 
         setIsLoading(true);
         try {
-            const response = await fetch("https://course-management-system-2-2wm4.onrender.com/instructor/withdrawal/request", {
+            const response = await fetch(`${API_BASE_URL}/instructor/withdrawal/request`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../../lib/api";
 import Loader from "@/components/Loading";
 import { RootState } from "@/components/store/store";
 import { toast } from "@/hooks/use-toast";
@@ -27,7 +28,7 @@ export default function PaymentReturn() {
                 };
                 
                 try {
-                    const response = await fetch("https://course-management-system-2-2wm4.onrender.com/order/capture", {
+                    const response = await fetch(`${API_BASE_URL}/order/capture`, {
                         method: "POST",
                         headers: {
                             "Content-type": "application/json"

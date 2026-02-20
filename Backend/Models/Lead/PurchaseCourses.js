@@ -28,10 +28,14 @@ const LeadCoursePurchaseSchema = new mongoose.Schema({
             },
             paid: {
                 required: true,
-                type: Number
+                type: Number,
+                min: 0
             }
         }
     ]
 }, { timestamps: true })
+
+LeadCoursePurchaseSchema.index({ leadId: 1 });
+
 const LeadCoursePurchaseModel = mongoose.model("leadCourses", LeadCoursePurchaseSchema)
 module.exports = LeadCoursePurchaseModel

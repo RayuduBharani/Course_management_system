@@ -30,7 +30,7 @@ export default function EditProfile() {
         rollNumber: profileInfo?.data.rollNumber,
         gender: profileInfo?.data.gender,
         branch: profileInfo?.data.branch,
-        profileImg: profileInfo?.data.profileImg
+        profileImg: profileInfo?.data?.profileImg
     });
 
     const handleDialog = () => {

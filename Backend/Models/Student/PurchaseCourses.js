@@ -24,11 +24,14 @@ const StudentCoursePurchaseSchema = new mongoose.Schema({
             },
             paid : {
                 required : true ,
-                type : Number
+                type : Number,
+                min : 0
             }
         }
     ]
 } , {timestamps : true})
+
+StudentCoursePurchaseSchema.index({ studentId: 1 });
 
 const StudentCoursePurchaseModel = mongoose.model("studentCourses" , StudentCoursePurchaseSchema)
 

@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../lib/api";
 import { useState, useEffect } from "react";
 import {
     Card,
@@ -50,7 +51,7 @@ export default function AdminWithdrawalsPage() {
 
     const fetchWithdrawalRequests = async () => {
         try {
-            const response = await fetch("https://course-management-system-2-2wm4.onrender.com/admin/withdrawals", {
+            const response = await fetch(`${API_BASE_URL}/admin/withdrawals/withdrawals`, {
                 credentials: "include"
             });
             const data = await response.json();
@@ -71,7 +72,7 @@ export default function AdminWithdrawalsPage() {
 
         setIsLoading(true);
         try {
-            const response = await fetch(`https://course-management-system-2-2wm4.onrender.com/admin/withdrawals/${selectedRequest._id}`, {
+            const response = await fetch(`${API_BASE_URL}/admin/withdrawals/withdrawals/${selectedRequest._id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json"

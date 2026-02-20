@@ -8,26 +8,26 @@ export default function PrivateComponent({ IsAuthenticated, user, IsLoading, chi
         return <Loader />
     }    // Allow access to verify page for authenticated users with Empty role
     if (IsAuthenticated && user.role === "Empty" && !location.pathname.includes("/check/verify")) {
-        return <Navigate to="/check/verify" />
+        return <Navigate to="/check/verify" replace />
     }
 
     // Allow access to auth pages for unauthenticated users
     const isAuthRoute = location.pathname.includes("/auth/signin") || location.pathname.includes("/auth/signup") || location.pathname.includes("/auth/home");
     if (!IsAuthenticated && !isAuthRoute) {
-        return <Navigate to="/auth/signin" />
+        return <Navigate to="/auth/signin" replace />
     }
 
     // Prevent authenticated users with roles from accessing auth pages
     if (IsAuthenticated && user.role !== "Empty" && isAuthRoute) {
         switch (user.role) {
             case "Admin":
-                return <Navigate to="/Admin/courses" />
+                return <Navigate to="/Admin/courses" replace />
             case "Instructor":
-                return <Navigate to="/instructor/dashboard" />
+                return <Navigate to="/instructor/dashboard" replace />
             case "Lead":
-                return <Navigate to="/lead/dashboard" />
+                return <Navigate to="/lead/dashboard" replace />
             case "Student":
-                return <Navigate to="/student/dashboard" />
+                return <Navigate to="/student/dashboard" replace />
         }
     }
 
@@ -35,17 +35,17 @@ export default function PrivateComponent({ IsAuthenticated, user, IsLoading, chi
     if (IsAuthenticated && (location.pathname.includes("/auth/signin") || location.pathname.includes("/auth/signup") || location.pathname.includes("/auth/home"))) {
         switch (user.role) {
             case "Admin":
-                return <Navigate to="/Admin/courses" />
+                return <Navigate to="/Admin/courses" replace />
             case "Instructor":
-                return <Navigate to="/instructor/dashboard" />
+                return <Navigate to="/instructor/dashboard" replace />
             case "Lead":
-                return <Navigate to="/lead/dashboard" />
+                return <Navigate to="/lead/dashboard" replace />
             case "Student":
-                return <Navigate to="/student/dashboard" />
+                return <Navigate to="/student/dashboard" replace />
             case "Empty":
-                return <Navigate to="/check/verify" />
+                return <Navigate to="/check/verify" replace />
             default:
-                return <Navigate to="/check/verify" />
+                return <Navigate to="/check/verify" replace />
         }
     }
 
@@ -57,13 +57,13 @@ export default function PrivateComponent({ IsAuthenticated, user, IsLoading, chi
         if (user.role !== "Empty" && currentPath.includes("check/verify")) {
             switch (userRole) {
                 case "admin":
-                    return <Navigate to="/Admin/courses" />
+                    return <Navigate to="/Admin/courses" replace />
                 case "instructor":
-                    return <Navigate to="/instructor/dashboard" />
+                    return <Navigate to="/instructor/dashboard" replace />
                 case "lead":
-                    return <Navigate to="/lead/dashboard" />
+                    return <Navigate to="/lead/dashboard" replace />
                 case "student":
-                    return <Navigate to="/student/dashboard" />
+                    return <Navigate to="/student/dashboard" replace />
             }
         }
 
@@ -79,13 +79,13 @@ export default function PrivateComponent({ IsAuthenticated, user, IsLoading, chi
             if (currentPath.toLowerCase().includes(path) && userRole !== role) {
                 switch (userRole) {
                     case "admin":
-                        return <Navigate to="/Admin/courses" />
+                        return <Navigate to="/Admin/courses" replace />
                     case "instructor":
-                        return <Navigate to="/instructor/dashboard" />
+                        return <Navigate to="/instructor/dashboard" replace />
                     case "lead":
-                        return <Navigate to="/lead/dashboard" />
+                        return <Navigate to="/lead/dashboard" replace />
                     case "student":
-                        return <Navigate to="/student/dashboard" />
+                        return <Navigate to="/student/dashboard" replace />
                 }
             }
         }

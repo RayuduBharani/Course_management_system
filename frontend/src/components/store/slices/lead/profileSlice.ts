@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../../../lib/api";
 /* eslint-disable no-empty-pattern */
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
@@ -10,7 +11,7 @@ const initialState: InitialState = {
 export const LeadProfileInfo = createAsyncThunk(
     "/lead/dashboard",
     async () => {
-        const response = await fetch("https://course-management-system-2-2wm4.onrender.com/lead/profile/info", {
+        const response = await fetch(`${API_BASE_URL}/lead/profile/info`, {
             credentials: "include"
         })
         const data = await response.json()
@@ -21,7 +22,7 @@ export const LeadProfileInfo = createAsyncThunk(
 export const UpdateLeadProfileInfo = createAsyncThunk(
     "/lead/profile",
     async (formData: IUpdateProfileData) => {
-        const response = await fetch("https://course-management-system-2-2wm4.onrender.com/lead/profile/update", {
+        const response = await fetch(`${API_BASE_URL}/lead/profile/update`, {
             credentials: "include",
             method: "PUT",
             headers: {

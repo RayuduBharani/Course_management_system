@@ -6,12 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "@/hooks/use-toast";
-import { FormEvent } from "react";
+import { FormEvent, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 
 export default function SignIn() {
     const dispatch = useDispatch<AppDispatch>()
+    const [loading, setLoading] = useState(false)
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault()
         const formData = new FormData(event.currentTarget)
@@ -30,19 +31,28 @@ export default function SignIn() {
             email: email,
             password: password
         }
-        dispatch(LoginUser(newData)).then((data) => {
-            if(data.payload.success){
+        try {
+            setLoading(true)
+            const data = await dispatch(LoginUser(newData))
+            if(data.payload?.success){
                 toast({
                     title : data.payload.message
                 })
             }
             else {
                 toast({
-                    title : data.payload.message,
+                    title : data.payload?.message || "Login failed",
                     variant : "destructive"
                 })
             }
-        })
+        } catch {
+            toast({
+                title: "Something went wrong",
+                variant: "destructive"
+            })
+        } finally {
+            setLoading(false)
+        }
     }
     return (
         <>
@@ -58,15 +68,15 @@ export default function SignIn() {
                 <p className="font-bold text-xl">Welcome to <span className="text-primary">CMS</span></p> 
                 <div className="mt-10 flex flex-col gap-2">
                     <Label htmlFor="email">Mail ID</Label>
-                    <Input name="email" id="email" type="email" className="bg-secondary" placeholder="Email ID" />
+                    <Input name="email" id="email" type="email" className="bg-secondary" placeholder="Email ID" required />
                 </div>
 
                 <div className="mt-7 flex flex-col gap-2">
                     <Label htmlFor="password">Password</Label>
-                    <Input name="password" type="password" id="password" className="bg-secondary" placeholder="Password" />
+                    <Input name="password" type="password" id="password" className="bg-secondary" placeholder="Password" required minLength={6} />
                 </div>
 
-                <Button className="w-full mt-7   p-5">Signin</Button>
+                <Button className="w-full mt-7   p-5" disabled={loading}>{loading ? "Signing in..." : "Signin"}</Button>
                 <Separator className="bg-neutral-400 mt-5" />
                 <p className="text-xs mt-2 font-bold text-end ">dont't have an account ? <Link to='/auth/signup'><span className="text-primary cursor-pointer"> signup</span></Link></p>
                 <AuthIcons/>

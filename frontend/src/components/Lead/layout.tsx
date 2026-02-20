@@ -95,7 +95,7 @@ export function LeadLayout() {
                                 href: "profile",
                                 icon: (
                                     <img
-                                        src={profileInfo?.data.profileImg}
+                                        src={profileInfo?.data?.profileImg || ""}
                                         className="h-7 w-7 flex-shrink-0 rounded-full"
                                         width={50}
                                         height={50}

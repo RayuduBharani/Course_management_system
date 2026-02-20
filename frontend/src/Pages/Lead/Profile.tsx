@@ -44,7 +44,7 @@ export default function LeadProfile() {
                                 {/* Profile Image */}
                                 <div className="relative">
                                     <Avatar className="w-24 h-24 border-4 border-primary-foreground/10">
-                                        <AvatarImage src={profileInfo?.data.profileImg} alt={profileInfo?.data.name} />
+                                        <AvatarImage src={profileInfo?.data?.profileImg} alt={profileInfo?.data?.name} />
                                         <AvatarFallback className="text-xl bg-primary-foreground/10">
                                             {profileInfo?.data.name.split(' ').map(n => n[0]).join('')}
                                         </AvatarFallback>

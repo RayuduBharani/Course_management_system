@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../lib/api";
 import React, { useEffect, useState, useMemo } from "react";
 import { BookOpen, Users, Star, Award, GraduationCap } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -43,7 +44,7 @@ export default function LeadDashboard() {
         await dispatch(fetchAllCourses());
         
         // Fetch team's enrolled courses
-        const coursesResponse = await fetch("https://course-management-system-2-2wm4.onrender.com/lead/mycourse/all", {
+        const coursesResponse = await fetch(`${API_BASE_URL}/lead/mycourse/all`, {
           credentials: "include"
         });
         const coursesData = await coursesResponse.json();
@@ -204,8 +205,8 @@ export default function LeadDashboard() {
                     <div className="relative">
                       <AspectRatio ratio={16/9}>
                         <img 
-                          src={course.course[0].courseId.thumbnail}
-                          alt={course.course[0].courseId.title}
+                          src={course.course?.[0]?.courseId?.thumbnail}
+                          alt={course.course?.[0]?.courseId?.title || 'Course'}
                           className="w-full h-full object-cover rounded-t-lg"
                         />
                       </AspectRatio>                      <Badge 
@@ -217,11 +218,11 @@ export default function LeadDashboard() {
                     </div>
                     <CardContent className="p-4">
                       <h3 className="font-medium text-base mb-2 group-hover:text-primary transition-colors line-clamp-1">
-                        {course.course[0].courseId.title}
+                        {course.course?.[0]?.courseId?.title || 'Untitled Course'}
                       </h3>
                       <div className="flex items-center justify-between">
                         <div className="text-sm text-muted-foreground">
-                          {course.course[0].courseId.files.length} lessons
+                          {course.course?.[0]?.courseId?.files?.length || 0} lessons
                         </div>                        <Button variant="secondary" size="sm" 
                           className="group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-200">
                           View Details

@@ -1,25 +1,36 @@
 const db = require("../../Utils/DB/db");
 const jwt = require('jsonwebtoken');
 const WithdrawalRequestModel = require("../../Models/Instructor/WithdrawalRequest");
-const InstuctureModel = require("../../Models/RBAC/InstructorModel");
+const InstructorModel = require("../../Models/RBAC/InstructorModel");
 const OrderModel = require("../../Models/Common/OrderModel");
+const { COOKIE_NAME } = require("../auth/Auth-controller");
+
+const JWT_SECRET = process.env.JWT_SECRET;
 
 const createWithdrawalRequest = async (req, res) => {
     await db();
     try {
         const { amount, remarks } = req.body;
-        const token = req.cookies[process.env.JWT_KEY];
-        const decode = jwt.verify(token, process.env.JWT_KEY);
-        
+        const token = req.cookies[COOKIE_NAME];
+        const decode = jwt.verify(token, JWT_SECRET);
+
+        const numAmount = Number(amount);
+        if (isNaN(numAmount) || numAmount <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Please provide a valid withdrawal amount"
+            });
+        }
+
         // Validate minimum withdrawal amount (500 INR)
-        if (amount < 100) {
+        if (numAmount < 500) {
             return res.status(400).json({
                 success: false,
                 message: "Minimum withdrawal amount is ₹500"
             });
         }
 
-        const instructor = await InstuctureModel.findOne({ userId: decode.userId });
+        const instructor = await InstructorModel.findOne({ userId: decode.userId });
         if (!instructor) {
             return res.status(404).json({
                 success: false,
@@ -42,11 +53,11 @@ const createWithdrawalRequest = async (req, res) => {
         // Calculate total earnings from approved orders
         const orders = await OrderModel.find({
             instructorId: instructor._id,
-            $or: [{ orderStatus: "Approval" }, { orderStatus: "approval" }]
+            orderStatus: "Approved"
         });
 
         const totalEarnings = orders.reduce((sum, order) => 
-            sum + parseFloat(order.coursePrice), 0
+            sum + (Number(order.coursePrice) || 0), 0
         );
 
         // Calculate already withdrawn amount
@@ -59,7 +70,7 @@ const createWithdrawalRequest = async (req, res) => {
             sum + withdrawal.amount, 0
         );
 
-        const availableBalance = totalEarnings - totalWithdrawn;        if (amount > availableBalance) {
+        const availableBalance = totalEarnings - totalWithdrawn;        if (numAmount > availableBalance) {
             return res.status(400).json({
                 success: false,
                 message: "Withdrawal amount cannot be greater than available balance"
@@ -76,7 +87,7 @@ const createWithdrawalRequest = async (req, res) => {
 
         const newWithdrawalRequest = new WithdrawalRequestModel({
             instructorId: instructor._id,
-            amount,
+            amount: numAmount,
             upiId: instructor.UPI,
             remarks
         });
@@ -99,10 +110,10 @@ const createWithdrawalRequest = async (req, res) => {
 const getWithdrawalHistory = async (req, res) => {
     await db();
     try {
-        const token = req.cookies[process.env.JWT_KEY];
-        const decode = jwt.verify(token, process.env.JWT_KEY);
+        const token = req.cookies[COOKIE_NAME];
+        const decode = jwt.verify(token, JWT_SECRET);
         
-        const instructor = await InstuctureModel.findOne({ userId: decode.userId });
+        const instructor = await InstructorModel.findOne({ userId: decode.userId });
         if (!instructor) {
             return res.status(404).json({
                 success: false,
@@ -122,11 +133,11 @@ const getWithdrawalHistory = async (req, res) => {
         // Get total earnings
         const orders = await OrderModel.find({
             instructorId: instructor._id,
-            orderStatus: "Approval"
+            orderStatus: "Approved"
         });
 
         const totalEarnings = orders.reduce((sum, order) => 
-            sum + parseFloat(order.coursePrice), 0
+            sum + (Number(order.coursePrice) || 0), 0
         );
 
         // Calculate available balance

@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../lib/api";
 import AuthIcons from "@/components/Auth/AuthIcons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,6 +36,16 @@ export default function Signup() {
                 title: "Invalid email format",
                 variant: "destructive"
             })
+            setBtnLoading(false);
+            return;
+        }
+        
+        if (password.length < 6) {
+            toast({
+                title: "Password must be at least 6 characters",
+                variant: "destructive"
+            })
+            setBtnLoading(false);
             return;
         }
         
@@ -43,7 +54,8 @@ export default function Signup() {
             email: email,
             password: password
         }
-        const response = await fetch("https://course-management-system-2-2wm4.onrender.com/api/auth/signup", {
+        try {
+        const response = await fetch(`${API_BASE_URL}/api/auth/signup`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -57,13 +69,19 @@ export default function Signup() {
                 title: data.message
             })
             navigate("/auth/signin")
-            setBtnLoading(false)
         }
         else {
             toast({
                 title: data.message,
                 variant: "destructive"
             })
+        }
+        } catch {
+            toast({
+                title: "Something went wrong. Please try again.",
+                variant: "destructive"
+            })
+        } finally {
             setBtnLoading(false)
         }
     }
@@ -88,7 +106,7 @@ export default function Signup() {
 
                 <div className="mt-7 flex flex-col gap-2">
                     <Label htmlFor="password">Password</Label>
-                    <Input required name="password" type="password" id="password" minLength={2} maxLength={20} className="bg-secondary" placeholder="Password" />
+                    <Input required name="password" type="password" id="password" minLength={6} maxLength={20} className="bg-secondary" placeholder="Password" />
                 </div>
 
                 <Button className="w-full mt-7 p-5">{btnLoading ? "Loading..." : "Signup"}</Button>

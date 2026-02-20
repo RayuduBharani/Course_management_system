@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../lib/api";
 import { BookOpen, Clock, Users, Search, BookCheck, Layers } from "lucide-react";
 import * as React from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -84,8 +85,8 @@ export default function LeadMyCourses() {
 
     const FetchMyCourses = useCallback(async () => {
         const url = search
-            ? `https://course-management-system-2-2wm4.onrender.com/lead/mycourse/search/${search}`
-            : "https://course-management-system-2-2wm4.onrender.com/lead/mycourse/all";
+            ? `${API_BASE_URL}/lead/mycourse/search/${search}`
+            : `${API_BASE_URL}/lead/mycourse/all`;
 
         try {
             const response = await fetch(url, {

@@ -5,19 +5,17 @@ const db = require("../../Utils/DB/db")
 const StudentViewCurrentCourse = async (req, res) => {
     await db();
     const {id} = req.params
-    // console.log(id)
     try {
         const studentCourses = await StudentCoursePurchaseModel.find({_id : id}).populate("studentId").populate("course.courseId");
-        if(studentCourses){
-            res.send({success : true , studentCourses : studentCourses})
+        if(studentCourses && studentCourses.length > 0){
+            res.status(200).json({success : true , studentCourses : studentCourses})
         }
         else {
-            res.send({success : false , message : "he is not purchasing any courses"})
+            res.status(404).json({success : false , message : "Course not found"})
         }
     }
     catch (err) {
-        console.log("error " ,err)
-        res.send({success : false , message : err.message})
+        res.status(500).json({success : false , message : err.message})
     }
 }
 

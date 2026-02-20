@@ -57,10 +57,9 @@ const CreateOrder = async (req, res) => {
 
         paypal.payment.create(create_payment_json, async function (err, paymentInfo) {
             if (err) {
-                console.log(err)
-                return res.status(err.httpStatusCode).json({
+                return res.status(err.httpStatusCode || 500).json({
                     success: false,
-                    message: err
+                    message: "Payment creation failed"
                 })
             }
             else {
@@ -89,20 +88,17 @@ const CreateOrder = async (req, res) => {
     }
     catch (err) {
         res.status(500).json({ success: false, message: err.message })
-        console.log(err)
     }
 }
 
 const CapturePayment = async (req, res) => {
     await db()
     const { paymentId, payerId, orderId, leadId } = req.body;
-    console.log("Starting payment capture with:", { paymentId, payerId, orderId, leadId });
     
     try {
         // Find lead
         const LeadProfileId = await LeadModel.findOne({ userId: leadId });
         if (!LeadProfileId) {
-            console.error("Lead not found for userId:", leadId);
             return res.status(404).json({
                 success: false,
                 message: "Lead not found"
@@ -112,7 +108,6 @@ const CapturePayment = async (req, res) => {
         // Find order
         let order = await OrderModel.findById(String(orderId));
         if (!order) {
-            console.error("Order not found for ID:", orderId);
             return res.status(404).json({
                 success: false,
                 message: "Order not found"
@@ -125,33 +120,26 @@ const CapturePayment = async (req, res) => {
             transactions: [{
                 amount: {
                     currency: "USD",
-                    total: parseFloat(order.coursePrice.toString()).toFixed(2)
+                    total: Number(order.coursePrice).toFixed(2)
                 }
             }]
         };
 
-        console.log("Executing PayPal payment with:", execute_payment_json);
-
         // Verify and execute the payment with PayPal
         paypal.payment.execute(paymentId, execute_payment_json, async function(error, payment) {
             if (error) {
-                console.error("PayPal execution error:", error);
                 return res.status(500).json({
                     success: false,
                     message: error.message || "Payment execution failed"
                 });
             }
 
-            console.log("PayPal payment executed successfully:", payment);
-
             try {
                 // Update order status
-                order.orderStatus = "Approval";
+                order.orderStatus = "Approved";
                 order.paymentId = paymentId;
                 order.payerId = payerId;
                 await order.save();
-                
-                console.log("Order updated successfully:", order);
 
                 // Check if lead already has purchased courses
                 let leadCourses = await LeadCoursePurchaseModel.findOne({
@@ -204,15 +192,13 @@ const CapturePayment = async (req, res) => {
                     message: "Payment successful and course access granted"
                 });
             } catch (saveError) {
-                console.error("Database update error:", saveError);
                 res.status(500).json({
                     success: false,
-                    message: "Payment verified but failed to update records: " + saveError.message
+                    message: "Payment verified but failed to update records"
                 });
             }
         });
     } catch (err) {
-        console.error("Payment capture error:", err);
         res.status(500).json({
             success: false,
             message: err.message || "Payment capture failed"

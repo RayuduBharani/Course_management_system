@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../lib/api";
  
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -57,7 +58,7 @@ export default function StudentProfile() {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await fetch("https://course-management-system-2-2wm4.onrender.com/student/mycourse/all", {
+        const response = await fetch(`${API_BASE_URL}/student/mycourse/all`, {
           credentials: "include"
         });
         const data = await response.json();

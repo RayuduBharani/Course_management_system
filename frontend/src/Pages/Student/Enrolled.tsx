@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../lib/api";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -85,8 +86,8 @@ export default function StudentEnrolledCourses() {
 
     const FetchMyCourses = useCallback(async () => {
         const url = search
-            ? `https://course-management-system-2-2wm4.onrender.com/student/mycourse/search/${search}`
-            : "https://course-management-system-2-2wm4.onrender.com/student/mycourse/all";
+            ? `${API_BASE_URL}/student/mycourse/search/${search}`
+            : `${API_BASE_URL}/student/mycourse/all`;
 
         const response = await fetch(url, {
             credentials: "include"

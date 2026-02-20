@@ -1,18 +1,21 @@
 const jwt = require('jsonwebtoken');
 const db = require('../../Utils/DB/db');
 const courseModel = require('../../Models/Instructor/Courses');
-const InstuctureModel = require('../../Models/RBAC/InstructorModel');
+const InstructorModel = require('../../Models/RBAC/InstructorModel');
 const OrderModel = require('../../Models/Common/OrderModel');
-const WithdrawalRequest = require('../../Models/Instructor/WithdrawalRequest'); // Assuming the path to WithdrawalRequest model
+const WithdrawalRequest = require('../../Models/Instructor/WithdrawalRequest');
+const { COOKIE_NAME } = require('../auth/Auth-controller');
 
 const AddCourse = async (req, res) => {
     await db()
     const AddCourseInfo = req.body
     try {
-        const token = req.cookies[process.env.JWT_KEY]
-        // const token = req.headers.authorization.split(' ')[1]
-        const decode = jwt.verify(token, process.env.JWT_KEY)
-        const instructor = await InstuctureModel.findOne({ userId: decode.userId });
+        const token = req.cookies[COOKIE_NAME]
+        const decode = jwt.verify(token, process.env.JWT_SECRET)
+        const instructor = await InstructorModel.findOne({ userId: decode.userId });
+        if (!instructor) {
+            return res.status(404).json({ success: false, message: "Instructor not found" })
+        }
         const NewAddCourseData = {
             instructor: instructor._id,
             title: AddCourseInfo.title,
@@ -26,49 +29,42 @@ const AddCourse = async (req, res) => {
             requirements: AddCourseInfo.requirements,
             files: AddCourseInfo.files,
             thumbnail: AddCourseInfo.thumbnail,
-            price: AddCourseInfo.price
+            price: AddCourseInfo.price,
+            isPublished: true
         }
 
         const Course = await courseModel.create(NewAddCourseData)
         instructor.courseId.push(Course._id)
         await instructor.save();
-        await InstuctureModel.updateOne({ _id: decode.userId }, { $set: { courseId: instructor.courseId } })
         if (Course) {
-            res.send({ success: true, message: "Course Added" })
+            res.status(201).json({ success: true, message: "Course Added" })
         }
         else {
-            res.send({ success: false, message: "Some err happened" })
+            res.status(500).json({ success: false, message: "Failed to add course" })
         }
     }
     catch (err) {
-        res.send({ success: false, message: err.message })
-        console.log(err)
+        console.error(err)
+        res.status(500).json({ success: false, message: "Failed to add course" })
     }
 }
 
 const GetInstructorCourses = async (req, res) => {
     await db()
     try {
-        console.log("Getting instructor courses...")
-        const token = req.cookies[process.env.JWT_KEY]
+        const token = req.cookies[COOKIE_NAME]
         if (!token) {
-            console.log("No token found in cookies")
             return res.status(401).json({ success: false, message: "No authentication token" })
         }
-        console.log("Token found:", token.substring(0, 10) + "...")
         
-        const decode = jwt.verify(token, process.env.JWT_KEY)
-        console.log("Decoded user ID:", decode.userId)
+        const decode = jwt.verify(token, process.env.JWT_SECRET)
         
-        const FindInstructor = await InstuctureModel.find({ userId: decode.userId })
+        const FindInstructor = await InstructorModel.find({ userId: decode.userId })
         if (!FindInstructor || FindInstructor.length === 0) {
-            console.log("No instructor found for userId:", decode.userId)
             return res.status(404).json({ success: false, message: "Instructor not found" })
         }
-        console.log("Found instructor:", FindInstructor[0]._id)
         
         const InstructorCourses = await courseModel.find({ instructor: FindInstructor[0]._id, isPublished: true }).populate("instructor")
-        console.log("Found courses:", InstructorCourses.length)
         
         res.json({ success: true, courses: InstructorCourses })
     }
@@ -81,9 +77,9 @@ const GetInstructorCourses = async (req, res) => {
 const GetOrderDetailes = async (req,res) => {
     await db()
     try {
-        const token = req.cookies[process.env.JWT_KEY]
-        const decode = jwt.verify(token, process.env.JWT_KEY)
-        const findInstructor = await InstuctureModel.findOne({userId : decode.userId})
+        const token = req.cookies[COOKIE_NAME]
+        const decode = jwt.verify(token, process.env.JWT_SECRET)
+        const findInstructor = await InstructorModel.findOne({userId : decode.userId})
         
         // Get all orders for this instructor
         const findOrders = await OrderModel.find({instructorId : findInstructor._id})
@@ -94,14 +90,13 @@ const GetOrderDetailes = async (req,res) => {
             status: { $in: ['pending', 'approved'] }
         })
 
-        // Calculate total approved/completed course payments
         const completedPayments = findOrders
-            .filter(order => order.orderStatus === "Approval")
-            .reduce((total, order) => total + parseFloat(order.coursePrice), 0)
+            .filter(order => order.orderStatus === "Approved")
+            .reduce((total, order) => total + (Number(order.coursePrice) || 0), 0)
 
         // Calculate total withdrawn/pending withdrawal amount
-        const withdrawnAmount = withdrawalRequests.reduce((total, req) => {
-            return total + req.amount
+        const withdrawnAmount = withdrawalRequests.reduce((total, wr) => {
+            return total + wr.amount
         }, 0)
 
         // Calculate available balance

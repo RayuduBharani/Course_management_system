@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../../../lib/api";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface TeamMember {
@@ -40,7 +41,7 @@ const initialState: TeamState = {
 export const FindTeamMembers = createAsyncThunk(
     "/lead/members",
     async () => {
-        const response = await fetch("https://course-management-system-2-2wm4.onrender.com/lead/team/members", {
+        const response = await fetch(`${API_BASE_URL}/lead/team/members`, {
             credentials: "include"
         });
         const data = await response.json();
@@ -51,7 +52,7 @@ export const FindTeamMembers = createAsyncThunk(
 export const sendTeamMessage = createAsyncThunk(
     "/lead/members/message",
     async ({ memberId, message }: { memberId: string; message: string }) => {
-        const response = await fetch(`https://course-management-system-2-2wm4.onrender.com/lead/team/message/${memberId}`, {
+        const response = await fetch(`${API_BASE_URL}/lead/team/message/${memberId}`, {
             method: 'POST',
             credentials: "include",
             headers: {

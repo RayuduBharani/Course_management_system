@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../../../lib/api";
 /* eslint-disable no-empty-pattern */
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
@@ -10,7 +11,7 @@ export const FetchViewCourses = createAsyncThunk(
   "/mycourses/view-page",
   async (id:string) => {
     const response = await fetch(
-      `https://course-management-system-2-2wm4.onrender.com/lead/progress-page/viewcourse/${id}`,
+      `${API_BASE_URL}/lead/progress-page/viewcourse/${id}`,
       {
         credentials: "include",
       }

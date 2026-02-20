@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../lib/api";
 import { ChangeEvent, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -196,7 +197,7 @@ const AddCourse = () => {
         };
 
         console.log("Submitting form data: ", formSubmissionData);
-        fetch('https://course-management-system-2-2wm4.onrender.com/instructor/course/add', {
+        fetch(`${API_BASE_URL}/instructor/course/add`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

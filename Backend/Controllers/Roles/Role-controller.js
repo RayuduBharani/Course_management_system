@@ -1,18 +1,31 @@
-const InstuctureModel = require('../../Models/RBAC/InstructorModel');
+const InstructorModel = require('../../Models/RBAC/InstructorModel');
 const userModel = require('../../Models/RBAC/userModel');
 const db = require('../../Utils/DB/db');
 const LeadModel = require('../../Models/RBAC/LeadModel');
 const StudentModel = require('../../Models/RBAC/StudentModel');
 const jwt = require("jsonwebtoken");
+const { COOKIE_NAME } = require('../auth/Auth-controller');
 
 // Helper function to verify token
 const verifyAuthToken = (req) => {
-    const token = req.cookies[process.env.JWT_KEY];
+    const token = req.cookies[COOKIE_NAME];
     if (!token) {
         throw new Error("Authentication token not found");
     }
-    return jwt.verify(token, process.env.JWT_KEY);
+    return jwt.verify(token, process.env.JWT_SECRET);
 };
+
+const signToken = (payload) => {
+    return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' });
+};
+
+const getCookieOptions = () => ({
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+    path: '/',
+    expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+});
 
 // Instructor Role 
 const InstructureRole = async (req, res) => {
@@ -20,7 +33,7 @@ const InstructureRole = async (req, res) => {
     const UserInfo = req.body;
     try {
         const decode = verifyAuthToken(req);
-        const existingInstructor = await InstuctureModel.findOne({ email: decode.email });
+        const existingInstructor = await InstructorModel.findOne({ email: decode.email });
         if (existingInstructor) {
             return res.status(400).json({
                 success: false,
@@ -28,7 +41,7 @@ const InstructureRole = async (req, res) => {
             });
         }
 
-        const NewInstructorData = new InstuctureModel({
+        const NewInstructorData = new InstructorModel({
             userId: decode.userId,
             name: decode.name,
             rollNumber: UserInfo.rollNumber,
@@ -58,19 +71,15 @@ const InstructureRole = async (req, res) => {
         
         await NewInstructorData.save();
 
-        const token = jwt.sign({
+        const token = signToken({
             userId: NewInstructorData.userId,
             name: NewInstructorData.name,
             image: NewInstructorData.profileImg,
             email: NewInstructorData.email,
             role: NewInstructorData.role
-        }, process.env.JWT_KEY);
+        });
 
-        res.cookie(process.env.JWT_KEY, token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-        }).json({
+        res.cookie(COOKIE_NAME, token, getCookieOptions()).json({
             success: true,
             message: "You are registered as an Instructor",
             role: NewInstructorData.role,
@@ -131,21 +140,16 @@ const TeamLeadRole = async (req, res) => {
         
         await NewLeadData.save();
 
-        const token = jwt.sign({
+        const token = signToken({
             userId: NewLeadData.userId,
             name: NewLeadData.name,
             image: NewLeadData.profileImg,
             email: NewLeadData.email,
             role: NewLeadData.role,
             team: NewLeadData.teamNo
-        }, process.env.JWT_KEY);
+        });
 
-        res.cookie(process.env.JWT_KEY, token, {
-            httpOnly: true,
-            sameSite: 'None',
-            secure: process.env.NODE_ENV === 'production',
-            expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-        }).json({
+        res.cookie(COOKIE_NAME, token, getCookieOptions()).json({
             success: true,
             message: "You are registered as a Lead",
             role: NewLeadData.role,
@@ -207,21 +211,16 @@ const StudentRole = async (req, res) => {
         
         await NewStudentData.save();
 
-        const token = jwt.sign({
+        const token = signToken({
             userId: NewStudentData.userId,
             name: NewStudentData.name,
             image: NewStudentData.profileImg,
             email: NewStudentData.email,
             role: NewStudentData.role,
             team: NewStudentData.teamNum
-        }, process.env.JWT_KEY);
+        });
 
-        res.cookie(process.env.JWT_KEY, token, {
-            httpOnly: true,
-            sameSite: 'None',
-            secure: process.env.NODE_ENV === 'production',
-            expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-        }).json({
+        res.cookie(COOKIE_NAME, token, getCookieOptions()).json({
             success: true,
             message: "You are registered as a Student",
             role: NewStudentData.role,

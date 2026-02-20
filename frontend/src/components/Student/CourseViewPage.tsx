@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../lib/api";
 import { useEffect, useState, useCallback } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import Loader from "../Loading"
@@ -23,7 +24,7 @@ export default function StudentCourseDetailesView() {
     const [isProcessing, setIsProcessing] = useState(false)
     
     const FetchCourseInfo = useCallback(async () => {
-        const response = await fetch(`https://course-management-system-2-2wm4.onrender.com/courses/get/${id}`)
+        const response = await fetch(`${API_BASE_URL}/courses/get/${id}`)
         const data = await response.json()
         setCourseInfo(data)
     }, [id])
@@ -54,7 +55,7 @@ export default function StudentCourseDetailesView() {
             courseTitle: courseInfo?.title
         }
         try {
-            const response = await fetch("https://course-management-system-2-2wm4.onrender.com/order/create/stu", {
+            const response = await fetch(`${API_BASE_URL}/order/create/stu`, {
                 method: "POST",
                 headers: {
                     "Content-type": "application/json"

@@ -77,6 +77,8 @@ interface ILeadFormData {
 }
 
 interface ICourse {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    students: any;
     _id: string;
     instructor: {
         branch: string;
@@ -100,12 +102,7 @@ interface ICourse {
     level: 'Beginner' | 'Intermediate' | 'Advanced' | 'All levels';
     leads: {
         leadId: string,
-        paidAmount: string,
-        _id: string
-    }[];
-    students: {
-        studentId: string,
-        paidAmount: string,
+        paidAmount: number,
         _id: string
     }[];
     requirements: string;
@@ -118,7 +115,7 @@ interface ICourse {
     }[];
     createdAt?: Date;
     updatedAt?: Date;
-    price: string;
+    price: number;
     objectives: string;
 }
 
@@ -194,18 +191,6 @@ interface ILeadProfileResponse {
         gender: string
         __v: number
     }
-}
-
-interface ILeadProfileResponse {
-    _id: string;
-    data: {
-        name: string;
-        rollNumber: string;
-        gender: string;
-        branch: string;
-        profileImg: string;
-        _id: string
-    };
 }
 
 interface InitialState {
@@ -328,4 +313,28 @@ interface FORMDATA {
     branch: string;
     UPI: string;
     profileImg?: string;
+}
+
+interface EarningData {
+    _id: string;
+    orderStatus: "Pending" | "Approval" | "Rejected";
+    courseTitle: string;
+    userEmail: string;
+    coursePrice: {
+        $numberDecimal: string;
+    };
+    paymentMethod: string;
+    orderDate: string;
+}
+
+interface InstructorProfile {
+    name: string;
+    email: string;
+    profileImg: string;
+    branch: string;
+    college: string;
+    gitHub: string;
+    linkedIn: string;
+    courseId: string[];
+    rollNumber: string;
 }

@@ -1,6 +1,6 @@
 const express = require('express');
 const { GetMyCourse, SearchCourses } = require('../../Controllers/student/mycourse-controller');
-const router = express()
+const router = express.Router()
 
 
 router.get("/all" , GetMyCourse)

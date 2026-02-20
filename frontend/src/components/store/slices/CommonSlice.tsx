@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../../lib/api";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 interface AllCoursesinitialState {
@@ -13,7 +14,7 @@ const initialState: AllCoursesinitialState = {
 export const fetchAllCourses = createAsyncThunk(
     "courses/fetchAll",
     async () => {
-        const response = await fetch("https://course-management-system-2-2wm4.onrender.com/courses/Allcourses");
+        const response = await fetch(`${API_BASE_URL}/courses/Allcourses`);
         const data = await response.json();
         return data;
     }

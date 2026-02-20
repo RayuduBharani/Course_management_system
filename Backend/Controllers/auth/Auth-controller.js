@@ -4,13 +4,35 @@ const bcrypt = require('bcryptjs');
 const userModel = require('../../Models/RBAC/userModel');
 require('dotenv').config()
 
-// signup
+const COOKIE_NAME = 'cms_auth_token';
+const JWT_EXPIRY = '7d';
+const COOKIE_MAX_AGE = 7 * 24 * 60 * 60 * 1000; // 7 days
 
+const getCookieOptions = () => ({
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+    path: '/',
+    expires: new Date(Date.now() + COOKIE_MAX_AGE)
+});
+
+const signToken = (payload) => {
+    return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: JWT_EXPIRY });
+};
+
+const sanitizeUser = (user) => ({
+    userId: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    image: user.image
+});
+
+// signup
 const signup = async (req, res) => {
     await db()
     const UserInfo = req.body
     
-    // Validate required fields
     if (!UserInfo.email || !UserInfo.password || !UserInfo.name) {
         return res.status(400).json({ 
             success: false, 
@@ -20,7 +42,7 @@ const signup = async (req, res) => {
     }
 
     try {
-        const ExistedUser = await userModel.findOne({ email: UserInfo.email })
+        const ExistedUser = await userModel.findOne({ email: UserInfo.email.toLowerCase() })
         if (ExistedUser) {
             return res.status(409).json({ 
                 success: false, 
@@ -29,7 +51,6 @@ const signup = async (req, res) => {
             });
         }
 
-        // Email format validation
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(UserInfo.email)) {
             return res.status(400).json({ 
@@ -39,7 +60,6 @@ const signup = async (req, res) => {
             });
         }
 
-        // Password strength validation
         if (UserInfo.password.length < 6) {
             return res.status(400).json({ 
                 success: false, 
@@ -53,9 +73,9 @@ const signup = async (req, res) => {
         
         const NewUserInfo = new userModel({
             name: UserInfo.name,
-            email: UserInfo.email.toLowerCase(), // Store email in lowercase
+            email: UserInfo.email.toLowerCase(),
             password: hash,
-            image: UserInfo.image || "", // Default empty string if no image
+            image: UserInfo.image || "",
             role: "Empty"
         })
         
@@ -82,80 +102,72 @@ const signup = async (req, res) => {
     }
 }
 
-// signin 
-
+// signin
 const signin = async (req, res) => {
     await db();
     const UserInfo = req.body;
-    try {
-        const SignInData = await userModel.findOne({ email: UserInfo.email });
-        if (SignInData) {
-            const CheckPassword = bcrypt.compareSync(UserInfo.password, SignInData.password);
-            if (CheckPassword) {
-                const token = jwt.sign({
-                    email: SignInData.email,
-                    name: SignInData.name,
-                    userId: SignInData._id,
-                    role: SignInData.role,
-                    image: SignInData.image
-                }, process.env.JWT_KEY);
 
-                // Ensure only one response is sent
-                if (!res.headersSent) {                    
-                    res.cookie(process.env.JWT_KEY, token, { 
-                        httpOnly: true, 
-                        secure: process.env.NODE_ENV === 'production',
-                        sameSite: 'None',
-                        path: '/',
-                        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) 
-                    }).json({ 
-                        success: true, 
-                        role: SignInData.role, 
-                        message: "Login Success",
-                        user: SignInData
-                    });
-                }            } else {
-                // Ensure only one response is sent
-                if (!res.headersSent) {
-                    res.status(401).json({ 
-                        success: false, 
-                        message: "Invalid credentials",
-                        error: "auth/invalid-password"
-                    });
-                }
-            }
-        } else {
-            // Ensure only one response is sent
-            if (!res.headersSent) {
-                res.status(404).json({ 
-                    success: false, 
-                    message: "Account not found. Please register first.", 
-                    error: "auth/user-not-found"
-                });
-            }
+    if (!UserInfo.email || !UserInfo.password) {
+        return res.status(400).json({
+            success: false,
+            message: "Please provide email and password",
+            error: "auth/missing-fields"
+        });
+    }
+
+    try {
+        const SignInData = await userModel.findOne({ email: UserInfo.email.toLowerCase() }).select('+password');
+        if (!SignInData) {
+            return res.status(404).json({ 
+                success: false, 
+                message: "Account not found. Please register first.", 
+                error: "auth/user-not-found"
+            });
         }
+
+        const CheckPassword = bcrypt.compareSync(UserInfo.password, SignInData.password);
+        if (!CheckPassword) {
+            return res.status(401).json({ 
+                success: false, 
+                message: "Invalid credentials",
+                error: "auth/invalid-password"
+            });
+        }
+
+        const userPayload = sanitizeUser(SignInData);
+        const token = signToken(userPayload);
+
+        res.cookie(COOKIE_NAME, token, getCookieOptions()).json({ 
+            success: true, 
+            role: SignInData.role, 
+            message: "Login Success",
+            user: userPayload
+        });
     } catch (err) {
-        // Ensure only one response is sent
-        if (!res.headersSent) {
-            res.status(500).send({ success: false, message: err.message });
-        }
-        console.log(err);
+        console.error("Signin Error:", err);
+        res.status(500).json({ 
+            success: false, 
+            message: "An error occurred during login",
+            error: "auth/signin-failed"
+        });
     }
 };
 
-
-// logout 
-
+// logout
 const logout = async (req, res) => {
-    res.clearCookie(process.env.JWT_KEY).send({
+    res.clearCookie(COOKIE_NAME, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+        path: '/',
+    }).json({
         success : true ,
-        message : "Cookie removed"
+        message : "Logged out successfully"
     })
 }
 
 const VerifyToken = async (req, res, next) => {
-    const cookiename = process.env.JWT_KEY;
-    const token = req.cookies[cookiename];
+    const token = req.cookies[COOKIE_NAME];
     
     if (!token) {
         return res.status(401).json({
@@ -166,16 +178,13 @@ const VerifyToken = async (req, res, next) => {
     }
 
     try {
-        const decoded = jwt.verify(token, process.env.JWT_KEY);
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
         if (!decoded) {
             throw new Error("Invalid token");
         }
         req.user = decoded;
         next();
     } catch (error) {
-        console.error("Token Verification Error:", error);
-        
-        // Handle different types of JWT errors
         if (error.name === "TokenExpiredError") {
             return res.status(401).json({
                 success: false,
@@ -200,13 +209,35 @@ const VerifyToken = async (req, res, next) => {
     }
 }
 
+// Role-based authorization middleware
+const authorizeRoles = (...roles) => {
+    return (req, res, next) => {
+        if (!req.user || !roles.includes(req.user.role)) {
+            return res.status(403).json({
+                success: false,
+                message: "You do not have permission to access this resource",
+                error: "auth/forbidden"
+            });
+        }
+        next();
+    };
+};
+
 // Google Auth 
 const Google = async (req, res) => {
     await db();
     const userInfo = req.body;
 
+    if (!userInfo.email || !userInfo.name) {
+        return res.status(400).json({
+            success: false,
+            message: "Missing required Google auth fields",
+            error: "auth/missing-fields"
+        });
+    }
+
     try {
-        let user = await userModel.findOne({ email: userInfo.email })
+        let user = await userModel.findOne({ email: userInfo.email.toLowerCase() })
 
         if (!user) {
             const generatePass = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8);
@@ -215,37 +246,25 @@ const Google = async (req, res) => {
 
             user = new userModel({
                 name: userInfo.name,
-                email: userInfo.email,
+                email: userInfo.email.toLowerCase(),
                 image: userInfo.image,
                 password: hash,
-                role: userInfo.role || "Empty"
+                role: "Empty" // Always default to Empty - never trust client-provided role
             });
 
             await user.save();
-        }        const token = jwt.sign({
-            name: user.name,
-            email: user.email,
-            image: user.image,
-            role: user.role,
-            userId: user._id
-        }, process.env.JWT_KEY, { expiresIn: '7d' });
-        const decoded = jwt.verify(token, process.env.JWT_KEY)
-        if (decoded) {
-            res.cookie(process.env.JWT_KEY, token, { 
-                httpOnly: true, 
-                secure: process.env.NODE_ENV === 'production',
-                path: '/',
-                sameSite : "None",
-                expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) 
-            }).json({ 
-                success: true, 
-                role: user.role, 
-                message: "Successfully logged in with Google",
-                user 
-            })
         }
 
-    }    catch (err) {
+        const userPayload = sanitizeUser(user);
+        const token = signToken(userPayload);
+
+        res.cookie(COOKIE_NAME, token, getCookieOptions()).json({ 
+            success: true, 
+            role: user.role, 
+            message: "Successfully logged in with Google",
+            user: userPayload
+        });
+    } catch (err) {
         console.error("Google Auth Error:", err);
         res.status(500).json({ 
             success: false, 
@@ -255,67 +274,47 @@ const Google = async (req, res) => {
     }
 }
 
-
-// Git Auth 
-
+// GitHub Auth 
 const GitHub = async (req, res) => {
     await db()
     const UserInfo = req.body
-    try {
-        const ExistedUser = await userModel.findOne({ email: UserInfo.email })
-        if (ExistedUser) {
-            const token = jwt.sign({
-                name: ExistedUser.name,
-                email: ExistedUser.email,
-                image: ExistedUser.image,
-                role: ExistedUser.role,
-                userId: ExistedUser._id
-            }, process.env.JWT_KEY, { expiresIn: '7d' })
 
-            const decoded = jwt.verify(token, process.env.JWT_KEY);
-            if (decoded) {
-                res.cookie(process.env.JWT_KEY, token, { 
-                    httpOnly: true, 
-                    secure: process.env.NODE_ENV === 'production',
-                    path: '/',
-                    sameSite: 'None',
-                    expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) 
-                }).json({ 
-                    success: true, 
-                    role: ExistedUser.role, 
-                    message: "Successfully logged in with GitHub",
-                    user: ExistedUser
-                });
-            }
-        }
-        else {
+    if (!UserInfo.email || !UserInfo.name) {
+        return res.status(400).json({
+            success: false,
+            message: "Missing required GitHub auth fields",
+            error: "auth/missing-fields"
+        });
+    }
+
+    try {
+        let user = await userModel.findOne({ email: UserInfo.email.toLowerCase() })
+        
+        if (!user) {
             const generatePass = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8);
             const salt = bcrypt.genSaltSync(10);
             const hash = bcrypt.hashSync(generatePass, salt);
-            const NewUserData = new userModel({
+            
+            user = new userModel({
                 name: UserInfo.name,
-                email: UserInfo.email,
+                email: UserInfo.email.toLowerCase(),
                 image: UserInfo.image,
                 password: hash,
-                role: UserInfo.role
-            })
-            const data = await NewUserData.save()
-            if (data) {
-                const token = jwt.sign({
-                    name: data.name,
-                    email: data.email,
-                    image: data.image,
-                    role: data.role,
-                    userId: data._id
-                }, process.env.JWT_KEY);
-                const decoded = jwt.verify(token, process.env.JWT_KEY);
-                if (decoded) {
-                    res.cookie("token", token, { httpOnly: true, secure: false , sameSite: 'None'})
-                        .json({ success: true, message: "Login Success" })
-                }
-            }
+                role: "Empty" // Always default to Empty - never trust client-provided role
+            });
+            await user.save();
         }
-    }    catch (err) {
+
+        const userPayload = sanitizeUser(user);
+        const token = signToken(userPayload);
+
+        res.cookie(COOKIE_NAME, token, getCookieOptions()).json({ 
+            success: true, 
+            role: user.role, 
+            message: "Successfully logged in with GitHub",
+            user: userPayload
+        });
+    } catch (err) {
         console.error("GitHub Auth Error:", err);
         res.status(500).json({ 
             success: false, 
@@ -325,4 +324,4 @@ const GitHub = async (req, res) => {
     }
 }
 
-module.exports = { signin, signup, logout, Google, GitHub, VerifyToken }
+module.exports = { signin, signup, logout, Google, GitHub, VerifyToken, authorizeRoles, COOKIE_NAME }

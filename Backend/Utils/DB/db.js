@@ -1,15 +1,20 @@
 const mongoose = require('mongoose');
 require('dotenv').config();
 
-// 'mongodb+srv://Bharani_Rayudu:Bharani@cluster0.bsh0jfz.mongodb.net/CMS?retryWrites=true&w=majority&appName=Cluster0'
-// mongodb://localhost:27017/CMS
-const db = async () => {    
+let isConnected = false;
+
+const db = async () => {
+    if (isConnected) return;
     try {
-        await mongoose.connect(process.env.MONGO_URI);
+        await mongoose.connect(process.env.MONGO_URI, {
+            maxPoolSize: 10,
+            serverSelectionTimeoutMS: 5000,
+        });
+        isConnected = true;
         console.log('MongoDB connected');
     } 
     catch (error) {
-        console.error(error.message);
+        console.error('MongoDB connection error:', error.message);
         process.exit(1);
     }
 };

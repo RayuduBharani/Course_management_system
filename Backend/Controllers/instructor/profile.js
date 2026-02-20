@@ -1,21 +1,24 @@
-const InstuctureModel = require("../../Models/RBAC/InstructorModel")
+const InstructorModel = require("../../Models/RBAC/InstructorModel")
 const userModel = require("../../Models/RBAC/userModel")
 const db = require("../../Utils/DB/db")
 const jwt = require("jsonwebtoken")
+const { COOKIE_NAME } = require("../auth/Auth-controller")
 
 
 const instructorProfile = async (req, res) => {
     await db()
     try {
-        const token = req.cookies[process.env.JWT_KEY]
-        const decode = jwt.verify(token, process.env.JWT_KEY)
-        const findProfileInfo = await InstuctureModel.findOne({ userId: decode.userId })
+        const token = req.cookies[COOKIE_NAME]
+        const decode = jwt.verify(token, process.env.JWT_SECRET)
+        const findProfileInfo = await InstructorModel.findOne({ userId: decode.userId })
         if (findProfileInfo) {
-            res.send(findProfileInfo)
+            res.status(200).json(findProfileInfo)
+        } else {
+            res.status(404).json({ success: false, message: "Profile not found" })
         }
     }
     catch (err) {
-        res.send({ success: false, message: err.message })
+        res.status(500).json({ success: false, message: "Failed to fetch profile" })
     }
 }
 
@@ -23,13 +26,13 @@ const updateProfile = async (req,res) => {
     await db()
     const UpdateProfileData = req.body
     try {
-        const token = req.cookies[process.env.JWT_KEY]
-        const decode = jwt.verify(token, process.env.JWT_KEY)
+        const token = req.cookies[COOKIE_NAME]
+        const decode = jwt.verify(token, process.env.JWT_SECRET)
 
-        const FindUserInfo = await InstuctureModel.findOne({ userId: decode.userId })
+        const FindUserInfo = await InstructorModel.findOne({ userId: decode.userId })
         const FindUserProfile = await userModel.findById(decode.userId)
 
-        if (FindUserInfo && FindUserInfo) {
+        if (FindUserInfo && FindUserProfile) {
             FindUserInfo.name = UpdateProfileData.name || FindUserInfo.name
             FindUserInfo.rollNumber = UpdateProfileData.rollNumber || FindUserInfo.rollNumber
             FindUserInfo.branch = UpdateProfileData.branch || FindUserInfo.branch
@@ -44,12 +47,14 @@ const updateProfile = async (req,res) => {
             FindUserProfile.image = UpdateProfileData.profileImg || FindUserProfile.image
             await FindUserInfo.save()
             await FindUserProfile.save()
-            res.send({success : true , message : "Profile Updated"})
+            res.status(200).json({success : true , message : "Profile Updated"})
+        } else {
+            res.status(404).json({ success: false, message: "Profile not found" })
         }
     }
     catch (err) {
-        console.log(err)
-        res.send({ success: false, message: err.message })
+        console.error(err)
+        res.status(500).json({ success: false, message: "Failed to update profile" })
     }
 }
 

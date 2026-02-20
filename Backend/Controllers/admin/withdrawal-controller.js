@@ -46,6 +46,7 @@ const processWithdrawalRequest = async (req, res) => {
         if (remarks) {
             withdrawalRequest.remarks = remarks;
         }
+        withdrawalRequest.processedAt = new Date();
 
         await withdrawalRequest.save();
 

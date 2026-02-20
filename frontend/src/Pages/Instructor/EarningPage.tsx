@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../lib/api";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { DollarSign, Users, TrendingUp, Search, Wallet, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -106,7 +107,7 @@ export default function EarningPage() {
         try {
             setIsLoading(true);
             setError(null);
-            const response = await fetch("https://course-management-system-2-2wm4.onrender.com/instructor/earning/orders", {
+            const response = await fetch(`${API_BASE_URL}/instructor/earning/orders`, {
                 credentials: "include",
             });
             const result = await response.json();

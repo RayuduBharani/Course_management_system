@@ -1,6 +1,6 @@
 const OrderModel = require("../../Models/Common/OrderModel")
 const courseModel = require("../../Models/Instructor/Courses")
-const InstuctureModel = require("../../Models/RBAC/InstructorModel")
+const InstructorModel = require("../../Models/RBAC/InstructorModel")
 const db = require("../../Utils/DB/db")
 
 
@@ -8,16 +8,11 @@ const db = require("../../Utils/DB/db")
 const fetchAllTheInstructors = async(req , res) => {
     await db()
     try {
-        const data = await InstuctureModel.find()
-        if (data) {
-            res.send(data)
-        }
-        else {
-            res.send({ success: false, message: "Some err happened" })
-        }
+        const data = await InstructorModel.find()
+        res.status(200).json({ success: true, data: data || [] })
     }
     catch (err) {
-        res.send({ success: false, message: err.message })
+        res.status(500).json({ success: false, message: "Failed to fetch instructors" })
     }
 }
 
@@ -26,12 +21,10 @@ const fetchTheInstructorsCourses = async(req,res)=> {
     const userId = req.params.id
     try {
         const findData = await OrderModel.find({instructorId : userId}).populate("instructorId")
-        if(findData){
-            res.send(findData)  
-        }
+        res.status(200).json({ success: true, data: findData || [] })
     }
     catch (err) {
-       res.send({success : false , message : err.message}) 
+       res.status(500).json({ success: false, message: "Failed to fetch instructor courses" })
     }
 }
 

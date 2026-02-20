@@ -10,15 +10,15 @@ const CourseDeletion = async (req, res) => {
         const findTheCourse = await courseModel.findOne({ _id: id })
         if (findTheCourse) {
             findTheCourse.isPublished = false
-            findTheCourse.save()
-            res.send({ success: true, message: "Course Unpublished" })
+            await findTheCourse.save()
+            res.status(200).json({ success: true, message: "Course Unpublished" })
         }
         else {
-            res.send({ success: false, message: "Some err happened" })
+            res.status(404).json({ success: false, message: "Course not found" })
         }
     }
     catch (err) {
-        res.send({ success: false, message: err.message })
+        res.status(500).json({ success: false, message: "Failed to unpublish course" })
     }
 }
 
@@ -30,13 +30,13 @@ const LeadCourseView = async (req, res) => {
     try {
         const findAllCourses = await courseModel.findOne({ _id: id })
         if (findAllCourses) {
-            res.send({ sucess: true, findAllCourses: findAllCourses })
+            res.status(200).json({ success: true, findAllCourses: findAllCourses })
         } else {
-            res.send({ sucess: false, message: "Error getting in courses!" })
+            res.status(404).json({ success: false, message: "Course not found" })
         }
     }
     catch (err) {
-        res.send({ sucess: false, message: err.message })
+        res.status(500).json({ success: false, message: "Failed to fetch course" })
     }
 
 }
@@ -44,13 +44,11 @@ const LeadCourseView = async (req, res) => {
 const accessOrders = async (req, res) => {
     await db()
     try {
-        const orders = await OrderModel.find()
-        if(orders){
-            res.send(orders)
-        }
+        const orders = await OrderModel.find().sort({ createdAt: -1 })
+        res.status(200).json({ success: true, orders: orders || [] })
     } 
     catch (err) {
-        res.send({success : false , message : err.message})
+        res.status(500).json({ success: false, message: "Failed to fetch orders" })
     }
 }
 

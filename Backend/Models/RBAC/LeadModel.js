@@ -38,8 +38,12 @@ const LeadShema = mongoose.Schema({
     },
     gender : {
         type : String ,
-        required : true
+        required : true,
+        enum : ["Male", "Female", "Other"]
     }
 } , {timestamps : true})
+
+LeadShema.index({ userId: 1 });
+
 const LeadModel = mongoose.model("Leaders", LeadShema);
 module.exports = LeadModel;

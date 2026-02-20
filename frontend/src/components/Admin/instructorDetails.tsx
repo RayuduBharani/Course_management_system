@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../lib/api";
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -22,29 +23,7 @@ import {
 } from "lucide-react";
 import { Input } from "../ui/input";
 
-interface EarningData {
-    _id: string;
-    orderStatus: "Pending" | "Approval" | "Rejected";
-    courseTitle: string;
-    userEmail: string;
-    coursePrice: {
-        $numberDecimal: string;
-    };
-    paymentMethod: string;
-    orderDate: string;
-}
 
-interface InstructorProfile {
-    name: string;
-    email: string;
-    profileImg: string;
-    branch: string;
-    college: string;
-    gitHub: string;
-    linkedIn: string;
-    courseId: string[];
-    rollNumber: string;
-}
 
 export default function InstructorDetails() {
     const navigate = useNavigate();
@@ -55,7 +34,7 @@ export default function InstructorDetails() {
     const [instructor, setInstructor] = useState<InstructorProfile | null>(null);
     const param = location.pathname.split("/")[3];    const fetchInstructorEarnings = useCallback(async () => {
         try {
-            const response = await fetch(`https://course-management-system-2-2wm4.onrender.com/admin/instructor/oneuser/${param}`, {
+            const response = await fetch(`${API_BASE_URL}/admin/instructor/oneuser/${param}`, {
                 credentials: "include",
             });
             const data = await response.json();
@@ -71,7 +50,7 @@ export default function InstructorDetails() {
 
     const fetchInstructorProfile = useCallback(async () => {
         try {
-            const response = await fetch(`https://course-management-system-2-2wm4.onrender.com/admin/instructor/profile/${param}`, {
+            const response = await fetch(`${API_BASE_URL}/admin/instructor/profile/${param}`, {
                 credentials: "include",
             });
             const data = await response.json();

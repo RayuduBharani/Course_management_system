@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../../lib/api";
 import { useEffect, useState, useCallback } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import Loader from "../Loading"
@@ -47,7 +48,7 @@ export default function AdminCourseDetailesView() {
         try {
             setIsLoading(true)
             setError(null)
-            const response = await fetch(`https://course-management-system-2-2wm4.onrender.com/courses/get/${id}`)
+            const response = await fetch(`${API_BASE_URL}/courses/get/${id}`)
             if (!response.ok) {
                 throw new Error('Failed to fetch course information')
             }
@@ -73,8 +74,9 @@ export default function AdminCourseDetailesView() {
     const handleDelete = async (courseId: string) => {
         try {
             setIsLoading(true)
-            const response = await fetch(`https://course-management-system-2-2wm4.onrender.com/admin/course/delete/${courseId}`, {
-                method: "PUT"
+            const response = await fetch(`${API_BASE_URL}/admin/course/${courseId}`, {
+                method: "DELETE",
+                credentials: "include"
             })
             const data = await response.json()
             if (data.success) {
