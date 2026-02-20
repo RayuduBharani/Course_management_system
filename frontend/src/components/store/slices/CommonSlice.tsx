@@ -31,7 +31,7 @@ const courseSlice = createSlice({
             })
             .addCase(fetchAllCourses.fulfilled, (state, action) => {
                 state.isLoading = false;
-                state.courses = action.payload
+                state.courses = Array.isArray(action.payload?.courses) ? action.payload.courses : [];
             })
             .addCase(fetchAllCourses.rejected, (state) => {
                 state.isLoading = false;
