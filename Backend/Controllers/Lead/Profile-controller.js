@@ -31,6 +31,9 @@ const UpdateProfile = async (req, res) => {
         const UpdateProfileData = req.body
 
         const FindUserInfo = await LeadModel.findOne({ userId: decode.userId })
+        if (!FindUserInfo) {
+            return res.status(404).json({ success: false, message: "Profile not found" })
+        }
         const FindUserProfile = await userModel.findById(FindUserInfo.userId)
 
         if(FindUserInfo && FindUserProfile) {

@@ -53,9 +53,9 @@ export default function LeadMyCourses() {
         myCourseInfo.forEach(enrollment => {
             enrollment.course.forEach(course => {
                 totalCourses++;
-                totalLessons += course.courseId.files.length;
+                totalLessons += course.courseId?.files?.length || 0;
                 // Assuming each lesson is approximately 30 minutes
-                totalHours += (course.courseId.files.length * 30) / 60;
+                totalHours += ((course.courseId?.files?.length || 0) * 30) / 60;
             });
         });
 
@@ -198,8 +198,8 @@ export default function LeadMyCourses() {
                                     <div className="relative">
                                         <AspectRatio ratio={16 / 9}>
                                             <img 
-                                                src={course.courseId.thumbnail} 
-                                                alt={course.courseId.title} 
+                                                src={course.courseId?.thumbnail} 
+                                                alt={course.courseId?.title || 'Course'} 
                                                 className="w-full h-full object-cover rounded-t-lg"
                                             />
                                         </AspectRatio>
@@ -207,9 +207,9 @@ export default function LeadMyCourses() {
                                     
                                     <CardContent className="p-4 space-y-3">
                                         <h3 className="font-medium text-base line-clamp-2">
-                                            {course.courseId.title}                                    </h3>
+                                            {course.courseId?.title || 'Untitled Course'}                                    </h3>
                                     
-                                    <p className="text-sm text-muted-foreground">by {course.courseId.instructor.name}</p>
+                                    <p className="text-sm text-muted-foreground">by {course.courseId?.instructor?.name || 'Unknown Instructor'}</p>
                                     
                                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
                                         <div className="flex items-center gap-1.5">
@@ -218,7 +218,7 @@ export default function LeadMyCourses() {
                                         </div>
                                         <div className="flex items-center gap-1.5">
                                             <Clock className="h-4 w-4" />
-                                            <span>{course.courseId.files.length} Lessons</span>
+                                            <span>{course.courseId?.files?.length || 0} Lessons</span>
                                         </div>
                                     </div>
 

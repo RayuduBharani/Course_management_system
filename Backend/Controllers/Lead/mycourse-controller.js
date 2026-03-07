@@ -12,6 +12,9 @@ const GetMyCourse = async (req, res) => {
         const token = req.cookies[COOKIE_NAME]
         const decode = jwt.verify(token, JWT_SECRET)
         const leadData = await LeadModel.findOne({userId : decode.userId})
+        if (!leadData) {
+            return res.status(200).json({success : true , leadCourses : [], message : "Lead profile not found. Please complete your profile setup."})
+        }
         const leadCourses = await LeadCoursePurchaseModel.find({leadId : leadData._id}).populate("leadId").populate("course.courseId");
         if(leadCourses && leadCourses.length > 0){
             res.status(200).json({success : true , leadCourses : leadCourses})

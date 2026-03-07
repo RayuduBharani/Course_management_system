@@ -64,7 +64,7 @@ export default function StudentEnrolledCourses() {
         // Calculate total lessons across all courses
         const totalLessons = myCourseInfo.reduce((acc, enrollment) => {
             const courseLessons = enrollment.course.reduce((courseAcc, course) => 
-                courseAcc + course.courseId.files.length, 0);
+                courseAcc + (course.courseId?.files?.length || 0), 0);
             return acc + courseLessons;
         }, 0);
 
@@ -194,8 +194,8 @@ export default function StudentEnrolledCourses() {
                                 <div className="relative">
                                     <AspectRatio ratio={16 / 9}>
                                         <img 
-                                            src={courseItem.courseId.thumbnail} 
-                                            alt={courseItem.courseId.title} 
+                                            src={courseItem.courseId?.thumbnail} 
+                                            alt={courseItem.courseId?.title || 'Course'} 
                                             className="w-full h-full object-cover rounded-t-lg"
                                         />
                                     </AspectRatio>
@@ -203,19 +203,19 @@ export default function StudentEnrolledCourses() {
                                 
                                 <CardContent className="p-4 space-y-3">
                                     <h3 className="font-medium text-base line-clamp-2">
-                                        {courseItem.courseId.title}
+                                        {courseItem.courseId?.title || 'Untitled Course'}
                                     </h3>
                                     
-                                    <p className="text-sm text-muted-foreground">by {courseItem.courseId.instructor.name}</p>
+                                    <p className="text-sm text-muted-foreground">by {courseItem.courseId?.instructor?.name || 'Unknown Instructor'}</p>
                                     
                                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
                                         <div className="flex items-center gap-1.5">
                                             <Users className="h-4 w-4" />
-                                            <span>{courseItem.courseId.students.length}</span>
+                                            <span>{courseItem.courseId?.students?.length || 0}</span>
                                         </div>
                                         <div className="flex items-center gap-1.5">
                                             <Clock className="h-4 w-4" />
-                                            <span>{courseItem.courseId.files.length} Lessons</span>
+                                            <span>{courseItem.courseId?.files?.length || 0} Lessons</span>
                                         </div>
                                     </div>
                                     

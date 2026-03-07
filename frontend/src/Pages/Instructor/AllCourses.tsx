@@ -152,7 +152,7 @@ export default function InstructorAllCourses() {
                                 </div>
                                 <div>
                                     <p className="text-sm font-medium text-muted-foreground">Total Students</p>
-                                    <h3 className="text-2xl font-bold">{stats[1].value}</h3>
+                                    <h3 className="text-2xl font-bold">{stats[1]?.value || '0+'}</h3>
                                 </div>
                             </div>
                         </CardContent>
@@ -166,7 +166,7 @@ export default function InstructorAllCourses() {
                                 </div>
                                 <div>
                                     <p className="text-sm font-medium text-muted-foreground">Avg Rating</p>
-                                    <h3 className="text-2xl font-bold">{stats[2].value}</h3>
+                                    <h3 className="text-2xl font-bold">{stats[2]?.value || '0.0'}</h3>
                                 </div>
                             </div>
                         </CardContent>
@@ -180,7 +180,7 @@ export default function InstructorAllCourses() {
                                 </div>
                                 <div>
                                     <p className="text-sm font-medium text-muted-foreground">Total Lessons</p>
-                                    <h3 className="text-2xl font-bold">{stats[3].value}</h3>
+                                    <h3 className="text-2xl font-bold">{stats[3]?.value || '0+'}</h3>
                                 </div>
                             </div>
                         </CardContent>
@@ -242,7 +242,7 @@ export default function InstructorAllCourses() {
                                         </h3>
                                     </Link>
                                     
-                                    <p className="text-muted-foreground text-sm">by {course.instructor.name}</p>
+                                    <p className="text-muted-foreground text-sm">by {course.instructor?.name || 'Unknown Instructor'}</p>
                                     
                                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
                                         <div className="flex items-center gap-1.5">

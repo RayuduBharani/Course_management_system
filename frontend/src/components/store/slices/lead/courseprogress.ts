@@ -34,7 +34,7 @@ export const ProgressSlice = createSlice({
       .addCase(FetchViewCourses.fulfilled,(state,action)=>{
         // eslint-disable-next-line @typescript-eslint/no-unused-expressions
         state.isLoading=false,
-        state.courseData=action.payload.leadCourses//put the backend res name like {leaadCourse:leadCourse}
+        state.courseData=action.payload?.leadCourses || []//put the backend res name like {leaadCourse:leadCourse}
       })
       .addCase(FetchViewCourses.rejected,(state)=>{
         state.isLoading=false

@@ -35,6 +35,9 @@ const StdentUpdateProfile = async (req, res) => {
         const UpdateProfileData = req.body
 
         const FindUserInfo = await StudentModel.findOne({ userId: decode.userId })
+        if (!FindUserInfo) {
+            return res.status(404).json({ success: false, message: "Student profile not found" })
+        }
         const FindUserProfile = await userModel.findById(FindUserInfo.userId)
 
         if (FindUserInfo && FindUserProfile) {

@@ -40,6 +40,18 @@ export default function StudentCourseEnrollDetailesPage() {
     return <Loader />;
   }
 
+  if (!courseData || courseData.length === 0 || !courseData[0]?.course?.[0]?.courseId) {
+    return (
+      <div className="min-h-screen bg-gray-50/50 p-4 lg:p-6">
+        <div className="max-w-7xl mx-auto text-center py-20">
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Course not found</h2>
+          <p className="text-gray-500 mb-4">The course you're looking for doesn't exist or has been removed.</p>
+          <Button onClick={() => navigate(-1)} variant="outline">Go Back</Button>
+        </div>
+      </div>
+    );
+  }
+
   function handleCourse(index: number) {
     setValue(index + 1);
     setVideoLoad(true);

@@ -46,7 +46,7 @@ export const StudentProgressSlice = createSlice({
         .addCase(FetchStudentCourse.fulfilled,(state,action)=>{
             // eslint-disable-next-line @typescript-eslint/no-unused-expressions
             state.isLoading=false,
-            state.courseData=action.payload.studentCourses
+            state.courseData=action.payload?.studentCourses || []
         })
         .addCase(FetchStudentCourse.rejected,(state)=>{
             state.isLoading=false

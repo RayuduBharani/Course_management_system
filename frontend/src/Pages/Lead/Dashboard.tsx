@@ -264,12 +264,12 @@ export default function LeadDashboard() {
                     <h3 className="font-medium text-base group-hover:text-primary transition-colors line-clamp-2">
                       {course.title}
                     </h3>
-                    <p className="text-sm text-muted-foreground">by {course.instructor.name}</p>
+                    <p className="text-sm text-muted-foreground">by {course.instructor?.name || 'Unknown Instructor'}</p>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1.5">
                         <Star className="h-4 w-4 text-primary fill-current" />
                         <span className="text-sm font-medium">4.8</span>
-                        <span className="text-sm text-muted-foreground">({course.students.length})</span>
+                        <span className="text-sm text-muted-foreground">({course.students?.length || 0})</span>
                       </div>
                       <div className="text-base font-semibold text-primary">₹{course.price}</div>
                     </div>

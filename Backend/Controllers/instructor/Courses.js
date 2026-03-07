@@ -80,6 +80,13 @@ const GetOrderDetailes = async (req,res) => {
         const token = req.cookies[COOKIE_NAME]
         const decode = jwt.verify(token, process.env.JWT_SECRET)
         const findInstructor = await InstructorModel.findOne({userId : decode.userId})
+        if (!findInstructor) {
+            return res.send({
+                orders: [],
+                availableBalance: 0,
+                withdrawalRequests: []
+            })
+        }
         
         // Get all orders for this instructor
         const findOrders = await OrderModel.find({instructorId : findInstructor._id})

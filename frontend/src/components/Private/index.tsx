@@ -77,6 +77,10 @@ export default function PrivateComponent({ IsAuthenticated, user, IsLoading, chi
 
         for (const [role, path] of Object.entries(validSections)) {
             if (currentPath.toLowerCase().includes(path) && userRole !== role) {
+                // If user has Empty role trying to access role-specific sections, redirect to verify
+                if (userRole === "empty") {
+                    return <Navigate to="/check/verify" replace />
+                }
                 switch (userRole) {
                     case "admin":
                         return <Navigate to="/Admin/courses" replace />
