@@ -8,7 +8,6 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
 } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import Videoplayer from "../Common/VideoPlayer/Videoplayer"
@@ -22,16 +21,13 @@ export default function ViewCourse() {
     const FetchCourseInfo = async () => {
         const response = await fetch(`${API_BASE_URL}/courses/get/${id}`)
         const data = await response.json()
-        setCourseInfo(data)
+        setCourseInfo(data.course)
     }
     useEffect(() => {
         FetchCourseInfo()
     }, [id])
 
-    const [open, setOpen] = useState(false)
-    const handleDailog = () => {
-        setOpen(!open)
-    }
+    const [selectedVideo, setSelectedVideo] = useState<{ title: string; videoUrl: string } | null>(null)
 
     const handleDelete = async (id: string) => {
         const response = await fetch(`${API_BASE_URL}/admin/course/${id}`, {
@@ -138,53 +134,46 @@ export default function ViewCourse() {
                                 <h2 className="text-xl font-semibold mb-4">Course Curriculum</h2>
                                 <div className="space-y-2">
                                     {courseInfo.files.map((video, index) => (
-                                        <Dialog key={index} open={open} onOpenChange={setOpen}>
-                                            <div className={`
-                                                flex items-center gap-3 p-3 rounded-lg transition-colors duration-200
-                                                ${video.freePreview 
-                                                    ? "hover:bg-gray-50 cursor-pointer" 
-                                                    : "opacity-75 cursor-not-allowed"
-                                                }
-                                            `}>
-                                                {video.freePreview ? (
-                                                    <DialogTrigger className="flex items-center gap-3 w-full text-left">
-                                                        <i className="fa-regular fa-circle-play text-primary"></i>
-                                                        <span className="text-gray-700">{video.title}</span>
-                                                        <Badge variant="secondary" className="ml-auto">Preview</Badge>
-                                                    </DialogTrigger>
-                                                ) : (
-                                                    <div className="flex items-center gap-3 w-full">
-                                                        <i className="fa-solid fa-lock text-gray-400"></i>
-                                                        <span className="text-gray-500">{video.title}</span>
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <DialogContent className="sm:max-w-[800px]">
-                                                <DialogHeader>
-                                                    <DialogTitle className="text-xl font-semibold text-center mb-4">
-                                                        {video.title}
-                                                    </DialogTitle>
-                                                </DialogHeader>
-                                                <div className="relative rounded-lg overflow-hidden">
-                                                    <Videoplayer
-                                                        width="100%"
-                                                        height="450px"
-                                                        videoUrl={video.videoUrl}
-                                                    />
-                                                </div>
-                                                <Button 
-                                                    className="w-full mt-4" 
-                                                    variant="outline"
-                                                    onClick={handleDailog}
-                                                >
-                                                    Close Preview
-                                                </Button>
-                                            </DialogContent>
-                                        </Dialog>
+                                        <div
+                                            key={index}
+                                            className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors duration-200"
+                                            onClick={() => setSelectedVideo({ title: video.title, videoUrl: video.videoUrl })}
+                                        >
+                                            <i className="fa-regular fa-circle-play text-primary"></i>
+                                            <span className="text-gray-700">{video.title}</span>
+                                            {video.freePreview && (
+                                                <Badge variant="secondary" className="ml-auto">Preview</Badge>
+                                            )}
+                                        </div>
                                     ))}
                                 </div>
                             </CardContent>
                         </Card>
+
+                        {/* Video Dialog */}
+                        <Dialog open={!!selectedVideo} onOpenChange={(open) => { if (!open) setSelectedVideo(null) }}>
+                            <DialogContent className="sm:max-w-[800px]">
+                                <DialogHeader>
+                                    <DialogTitle className="text-xl font-semibold text-center mb-4">
+                                        {selectedVideo?.title}
+                                    </DialogTitle>
+                                </DialogHeader>
+                                <div className="relative rounded-lg overflow-hidden">
+                                    <Videoplayer
+                                        width="100%"
+                                        height="450px"
+                                        videoUrl={selectedVideo?.videoUrl ?? ""}
+                                    />
+                                </div>
+                                <Button
+                                    className="w-full mt-4"
+                                    variant="outline"
+                                    onClick={() => setSelectedVideo(null)}
+                                >
+                                    Close
+                                </Button>
+                            </DialogContent>
+                        </Dialog>
                     </div>
 
                     {/* Sidebar */}

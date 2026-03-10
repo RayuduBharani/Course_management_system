@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { hourglass } from "ldrs";
 import BookLoader from "@/components/Loading/BookLoader";
-import { FetchAdminCourseView } from "@/components/store/slices/admin/course-view";
+import { FetchInstructorCourseView } from "@/components/store/slices/admin/course-view";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -44,8 +44,8 @@ export default function InstructorCourseEnrollDetailesPage() {
         }
         
         setLoading(true);
-        const result = await dispatch(FetchAdminCourseView(id)).unwrap();
-        setStudents(result.students || []);
+        const result = await dispatch(FetchInstructorCourseView(id)).unwrap();
+        setStudents(result.course?.students || []);
       } catch (error) {
         const errorMessage =
           error instanceof Error ? error.message : "Failed to fetch course data";

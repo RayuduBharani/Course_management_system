@@ -22,7 +22,17 @@ export const FetchAdminCourseView = createAsyncThunk(
         })
         const data = await response.json();
         return data;
+    }
+)
 
+export const FetchInstructorCourseView = createAsyncThunk(
+    'instructor/mycourses/view-page',
+    async (id: string) => {
+        const response = await fetch(`${API_BASE_URL}/courses/get/${id}`, {
+            credentials: 'include'
+        })
+        const data = await response.json();
+        return data;
     }
 )
 
@@ -40,6 +50,16 @@ export const AdminSlice = createSlice({
                 state.courseData = action.payload.findAllCourses
             })
             .addCase(FetchAdminCourseView.rejected, (state) => {
+                state.isLoading = false
+            })
+            .addCase(FetchInstructorCourseView.pending, (state) => {
+                state.isLoading = true;
+            })
+            .addCase(FetchInstructorCourseView.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.courseData = action.payload.course
+            })
+            .addCase(FetchInstructorCourseView.rejected, (state) => {
                 state.isLoading = false
             })
 

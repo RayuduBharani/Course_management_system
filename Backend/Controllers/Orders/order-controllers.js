@@ -206,4 +206,57 @@ const CapturePayment = async (req, res) => {
     }
 }
 
-module.exports = { CreateOrder, CapturePayment }
+// ─── DIRECT PURCHASE (PayPal bypassed) ───────────────────────────────────────
+const DirectPurchaseLead = async (req, res) => {
+    await db();
+    const { userId, userEmail, instructorId, courseId, coursePrice, courseTitle } = req.body;
+    try {
+        const LeadProfileId = await LeadModel.findOne({ userId });
+        if (!LeadProfileId) {
+            return res.status(404).json({ success: false, message: "Lead not found" });
+        }
+
+        // Create order with Approved status directly (no PayPal)
+        const newOrder = new OrderModel({
+            userId,
+            userEmail,
+            orderStatus: "Approved",
+            paymentMethod: "direct",
+            orderDate: Date.now(),
+            paymentId: "direct",
+            payerId: "direct",
+            instructorId,
+            courseId,
+            coursePrice,
+            courseTitle
+        });
+        await newOrder.save();
+
+        // Upsert PurchaseCourses
+        let leadCourses = await LeadCoursePurchaseModel.findOne({ leadId: LeadProfileId._id });
+        if (leadCourses) {
+            const courseExists = leadCourses.course.some(c => c.courseId.toString() === courseId.toString());
+            if (!courseExists) {
+                leadCourses.course.push({ courseId, courseTitle, instructorId, paid: coursePrice });
+                await leadCourses.save();
+            }
+        } else {
+            leadCourses = new LeadCoursePurchaseModel({
+                leadId: LeadProfileId._id,
+                course: [{ courseId, courseTitle, instructorId, paid: coursePrice }]
+            });
+            await leadCourses.save();
+        }
+
+        // Update course enrollment
+        await courseModel.findByIdAndUpdate(courseId, {
+            $addToSet: { leads: { leadId: LeadProfileId._id, paidAmount: coursePrice } }
+        });
+
+        res.json({ success: true, message: "Course purchased successfully" });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+module.exports = { CreateOrder, CapturePayment, DirectPurchaseLead }

@@ -1,12 +1,16 @@
 const express = require('express');
-const { CreateOrder, CapturePayment } = require('../../Controllers/Orders/order-controllers');
-const { StudentCreateModel, StudentCapturePayment } = require('../../Controllers/Orders/student/order-controller');
+const { CreateOrder, CapturePayment, DirectPurchaseLead } = require('../../Controllers/Orders/order-controllers');
+const { StudentCreateModel, StudentCapturePayment, DirectPurchaseStudent } = require('../../Controllers/Orders/student/order-controller');
 const router = express.Router()
 
-router.post("/create", CreateOrder)
-router.post("/capture", CapturePayment)
+// PayPal routes (commented out - using direct purchase instead)
+// router.post("/create", CreateOrder)
+// router.post("/capture", CapturePayment)
+// router.post("/create/stu", StudentCreateModel)
+// router.post("/capture/stu", StudentCapturePayment)
 
-router.post("/create/stu", StudentCreateModel)
-router.post("/capture/stu", StudentCapturePayment)
+// Direct purchase routes (no payment gateway)
+router.post("/direct", DirectPurchaseLead)
+router.post("/direct/stu", DirectPurchaseStudent)
 
 module.exports = router

@@ -20,13 +20,12 @@ export default function StudentCourseDetailesView() {
     const { id } = useParams()
     const navigate = useNavigate()
     const [courseInfo, setCourseInfo] = useState<ICourse>()
-    const [approvalUrl, setApprovalUrl] = useState("")
     const [isProcessing, setIsProcessing] = useState(false)
     
     const FetchCourseInfo = useCallback(async () => {
         const response = await fetch(`${API_BASE_URL}/courses/get/${id}`)
         const data = await response.json()
-        setCourseInfo(data)
+        setCourseInfo(data.course)
     }, [id])
 
     useEffect(() => {
@@ -35,49 +34,34 @@ export default function StudentCourseDetailesView() {
 
     const { user } = useSelector((state: RootState) => state.auth)
 
-    if (approvalUrl != "") {
-        window.location.href = approvalUrl
-    }
-
-    const handleCreatePayment = async () => {
+    const handleDirectOrder = async () => {
         setIsProcessing(true)
-        const paymentPayload = {
+        const orderPayload = {
             userId: user.userId,
             userEmail: user.email,
-            orderStatus: "Pending",
-            paymentMethod: "paypal",
-            orderDate: Date.now(),
-            paymentId: "",
-            payerId: "",
             instructorId: courseInfo?.instructor._id,
             courseId: courseInfo?._id,
             coursePrice: courseInfo?.price,
             courseTitle: courseInfo?.title
         }
         try {
-            const response = await fetch(`${API_BASE_URL}/order/create/stu`, {
+            const response = await fetch(`${API_BASE_URL}/order/direct/stu`, {
                 method: "POST",
-                headers: {
-                    "Content-type": "application/json"
-                },
-                body: JSON.stringify(paymentPayload)
+                headers: { "Content-type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify(orderPayload)
             })
             const data = await response.json()
-            console.log(data)
             if (data.success) {
-                sessionStorage.setItem("currentOrderId", data.orderId)
-                setApprovalUrl(data.approvalUrl)
-                setIsProcessing(false)
-            }
-            else {
-                toast({
-                    title: "Payment method failed please try again",
-                    variant: "destructive"
-                })
-                setIsProcessing(false)
+                toast({ title: "Course purchased successfully!" })
+                navigate("/student/mycourses")
+            } else {
+                toast({ title: data.message || "Order failed, please try again", variant: "destructive" })
             }
         } catch (err) {
             console.log(err)
+            toast({ title: "Something went wrong, please try again", variant: "destructive" })
+        } finally {
             setIsProcessing(false)
         }
     }
@@ -128,7 +112,7 @@ export default function StudentCourseDetailesView() {
                                 </div>
                                 <div className="mt-1.5 flex flex-col gap-3">
                                     <p className="font-bold text-lg pl-3">  ₹ {courseInfo.price} </p>
-                                    <Button disabled={isProcessing} onClick={handleCreatePayment} className="w-full">{isProcessing ? "Processing payment ..." : "Buy Now"}</Button>
+                                    <Button disabled={isProcessing} onClick={handleDirectOrder} className="w-full">{isProcessing ? "Processing ..." : "Order Now"}</Button>
                                 </div>
                             </div>
                         </div>

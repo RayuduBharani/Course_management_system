@@ -209,4 +209,57 @@ const StudentCapturePayment = async (req, res) => {
     }
 }
 
-module.exports = { StudentCreateModel, StudentCapturePayment }
+// ─── DIRECT PURCHASE (PayPal bypassed) ───────────────────────────────────────
+const DirectPurchaseStudent = async (req, res) => {
+    await db();
+    const { userId, userEmail, instructorId, courseId, coursePrice, courseTitle } = req.body;
+    try {
+        const FindStudentInfo = await StudentModel.findOne({ userId });
+        if (!FindStudentInfo) {
+            return res.status(404).json({ success: false, message: "Student not found" });
+        }
+
+        // Create order with Approved status directly (no PayPal)
+        const newOrder = new OrderModel({
+            userId,
+            userEmail,
+            orderStatus: "Approved",
+            paymentMethod: "direct",
+            orderDate: Date.now(),
+            paymentId: "direct",
+            payerId: "direct",
+            instructorId,
+            courseId,
+            coursePrice: Number(coursePrice),
+            courseTitle
+        });
+        await newOrder.save();
+
+        // Upsert PurchaseCourses
+        let studentCourses = await StudentCoursePurchaseModel.findOne({ studentId: FindStudentInfo._id });
+        if (studentCourses) {
+            const courseExists = studentCourses.course.some(c => c.courseId.toString() === courseId.toString());
+            if (!courseExists) {
+                studentCourses.course.push({ courseId, courseTitle, instructorId, paid: coursePrice });
+                await studentCourses.save();
+            }
+        } else {
+            studentCourses = new StudentCoursePurchaseModel({
+                studentId: FindStudentInfo._id,
+                course: [{ courseId, courseTitle, instructorId, paid: coursePrice }]
+            });
+            await studentCourses.save();
+        }
+
+        // Update course enrollment
+        await courseModel.findByIdAndUpdate(courseId, {
+            $addToSet: { students: { studentId: FindStudentInfo._id, paidAmount: coursePrice } }
+        });
+
+        res.json({ success: true, message: "Course purchased successfully" });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+module.exports = { StudentCreateModel, StudentCapturePayment, DirectPurchaseStudent }

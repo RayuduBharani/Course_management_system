@@ -53,7 +53,7 @@ export default function AdminCourseDetailesView() {
                 throw new Error('Failed to fetch course information')
             }
             const data = await response.json()
-            setCourseInfo(data)
+            setCourseInfo(data.course)
         } catch (err) {
             setError(err instanceof Error ? err.message : 'An error occurred')
             setCourseInfo(null)
