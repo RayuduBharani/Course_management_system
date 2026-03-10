@@ -5,8 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Button } from "../ui/button";
 import { useNavigate } from "react-router-dom";
 import { ChangeEvent, FormEvent, useState } from "react";
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import app from "./../../lib/firebase";
+import { uploadToCloudinary } from "@/lib/cloudinary";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../store/store";
 import { UpdateInstructorProfileInfo } from "../store/slices/Instructor/profile";
@@ -67,40 +66,10 @@ export default function InstructorProfileUpdate() {
 
     try {
       if (profileImg) {
-        const storage = getStorage(app);
-        const storageRef = ref(storage, `Profiles/${Date.now()}_${profileImg.name}`);
-        const uploadTask = uploadBytesResumable(storageRef, profileImg);
-
-        uploadTask.on(
-          "state_changed",
-          (snapshot) => {
-            const prog = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-            setProgress(prog);
-          },
-          (error) => {
-            console.error("Upload failed:", error);
-            toast({
-              title: "Error uploading image",
-              description: "Please try again",
-              variant: "destructive"
-            });
-            setIsSubmitting(false);
-          },
-          async () => {
-            try {
-              const imgUrl = await getDownloadURL(uploadTask.snapshot.ref);
-              await submitProfileData({ ...formData, profileImg: imgUrl });
-            } catch (error) {
-              console.error("Error getting download URL:", error);
-              toast({
-                title: "Error updating profile",
-                description: "Please try again",
-                variant: "destructive"
-              });
-              setIsSubmitting(false);
-            }
-          }
-        );
+        const imgUrl = await uploadToCloudinary(profileImg, "Profiles", (prog) => {
+          setProgress(prog);
+        });
+        await submitProfileData({ ...formData, profileImg: imgUrl });
       } else {
         await submitProfileData(formData);
       }

@@ -12,8 +12,7 @@ import {
 import { courseSchemaFields } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { getDownloadURL, getStorage, ref, uploadBytesResumable } from "firebase/storage";
-import app from "@/lib/firebase";
+import { uploadToCloudinary } from "@/lib/cloudinary";
 import Videoplayer from "@/components/Common/VideoPlayer/Videoplayer";
 import { useNavigate } from "react-router-dom";
 
@@ -61,44 +60,19 @@ const AddCourse = () => {
     const handleFileChange = async (id: number, file: File | null) => {
         if (file) {
             try {
-                // Validate file type
                 if (!file.type.startsWith('video/')) {
                     alert('Please upload a valid video file');
                     return;
                 }
-
-                // Validate file size (e.g., max 100MB)
-                const maxSize = 100 * 1024 * 1024; // 100MB in bytes
+                const maxSize = 100 * 1024 * 1024;
                 if (file.size > maxSize) {
                     alert('File size should be less than 100MB');
                     return;
                 }
-
-                const storage = getStorage(app);
-                const storageRef = ref(storage, `CourseVideos/${Date.now()}_${file.name}`);
-                const uploadTask = uploadBytesResumable(storageRef, file);
-
-                uploadTask.on(
-                    "state_changed",
-                    (snapshot) => {
-                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                        console.log(`Upload is ${progress}% done`);
-                    },
-                    (error) => {
-                        console.error("Error uploading video: ", error);
-                        alert(`Error uploading video: ${error.message}`);
-                    },
-                    async () => {
-                        try {
-                            const videoUrl: string = await getDownloadURL(uploadTask.snapshot.ref);
-                            console.log("Video uploaded and available at: ", videoUrl);
-                            handleInputChange(id, "videoUrl", videoUrl);
-                        } catch (error) {
-                            console.error("Error getting download URL: ", error);
-                            alert("Error getting video URL after upload");
-                        }
-                    }
-                );
+                const videoUrl = await uploadToCloudinary(file, "CourseVideos", (progress) => {
+                    console.log(`Upload is ${progress}% done`);
+                });
+                handleInputChange(id, "videoUrl", videoUrl);
             } catch (error) {
                 console.error("Error during file upload: ", error);
                 alert(error instanceof Error ? error.message : "Error uploading file");
@@ -109,47 +83,22 @@ const AddCourse = () => {
     const handleThumbnailChange = async (file: File | null) => {
         if (file) {
             try {
-                // Validate file type
                 if (!file.type.startsWith('image/')) {
                     alert('Please upload a valid image file');
                     return;
                 }
-
-                // Validate file size (e.g., max 5MB)
-                const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+                const maxSize = 5 * 1024 * 1024;
                 if (file.size > maxSize) {
                     alert('File size should be less than 5MB');
                     return;
                 }
-
-                const storage = getStorage(app);
-                const storageRef = ref(storage, `CourseThumbnails/${Date.now()}_${file.name}`);
-                const uploadTask = uploadBytesResumable(storageRef, file);
-
-                uploadTask.on(
-                    "state_changed",
-                    (snapshot) => {
-                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                        console.log(`Thumbnail upload is ${progress}% done`);
-                    },
-                    (error) => {
-                        console.error("Error uploading thumbnail: ", error);
-                        alert(`Error uploading thumbnail: ${error.message}`);
-                    },
-                    async () => {
-                        try {
-                            const thumbnailUrl: string = await getDownloadURL(uploadTask.snapshot.ref);
-                            console.log("Thumbnail uploaded and available at: ", thumbnailUrl);
-                            setFormData((prevData) => ({
-                                ...prevData,
-                                thumbnail: thumbnailUrl,
-                            }));
-                        } catch (error) {
-                            console.error("Error getting download URL: ", error);
-                            alert("Error getting thumbnail URL after upload");
-                        }
-                    }
-                );
+                const thumbnailUrl = await uploadToCloudinary(file, "CourseThumbnails", (progress) => {
+                    console.log(`Thumbnail upload is ${progress}% done`);
+                });
+                setFormData((prevData) => ({
+                    ...prevData,
+                    thumbnail: thumbnailUrl,
+                }));
             } catch (error) {
                 console.error("Error during thumbnail upload: ", error);
                 alert(error instanceof Error ? error.message : "Error uploading thumbnail");

@@ -14,8 +14,7 @@ import { Button } from "../ui/button";
 import { ChangeEvent, FormEvent, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../store/store";
-import { getDownloadURL, getStorage, ref, uploadBytesResumable } from "firebase/storage";
-import app from "@/lib/firebase";
+import { uploadToCloudinary } from "@/lib/cloudinary";
 import { toast } from "@/hooks/use-toast";
 import { StudentUpdateProfileInfo } from "../store/slices/student/profileSlice";
 
@@ -59,43 +58,34 @@ export default function StudentEditProfile() {
         setProfileImg(event[0])
     }
 
-    const handleProfileSubmit = (event: FormEvent<HTMLFormElement>) => {
+    const handleProfileSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (profileImg) {
-            const storage = getStorage(app)
-            const storageRef = ref(storage, `Profiles/${Date.now()}_${profileImg.name}`)
-            const uploadTask = uploadBytesResumable(storageRef, profileImg)
-            uploadTask.on(
-                "state_changed",
-                (snapshot) => {
-                    const prog = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-                    setProgress(prog)
-                },
-                (err) => {
-                    console.error("Upload failed", err)
-                },
-                async () => {
-                    const imgUrl: string = await getDownloadURL(uploadTask.snapshot.ref)
-                    const NewData = {
-                        _id: updateData._id,
-                        rollNumber: updateData.rollNumber,
-                        branch: updateData.branch,
-                        profileImg: imgUrl,
-                        gender: updateData.gender,
-                        name: updateData.name,
-                        teamNum : updateData.teamNum
-                    }
-                    console.log(NewData)
-                    dispatch(StudentUpdateProfileInfo(NewData))
-                        .then((data) => {
-                            console.log(data.payload)
-                            setOpen(false)
-                        })
-                        .catch((err) => {
-                            console.log(err)
-                        })
-                }
-            )
+            try {
+                const imgUrl = await uploadToCloudinary(profileImg, "Profiles", (prog) => {
+                    setProgress(prog);
+                });
+                const NewData = {
+                    _id: updateData._id,
+                    rollNumber: updateData.rollNumber,
+                    branch: updateData.branch,
+                    profileImg: imgUrl,
+                    gender: updateData.gender,
+                    name: updateData.name,
+                    teamNum: updateData.teamNum
+                };
+                console.log(NewData);
+                dispatch(StudentUpdateProfileInfo(NewData))
+                    .then((data) => {
+                        console.log(data.payload);
+                        setOpen(false);
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                    });
+            } catch (err) {
+                console.error("Upload failed", err);
+            }
         }
         else {
             dispatch(StudentUpdateProfileInfo(updateData))

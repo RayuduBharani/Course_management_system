@@ -12,14 +12,7 @@ import {
 } from "@/components/ui/select";
 import { FormEvent, useState } from "react";
 import { useDispatch } from "react-redux";
-import { 
-    getStorage, 
-    ref, 
-    uploadBytesResumable,
-    getDownloadURL 
-} from "firebase/storage";
-import { FirebaseError } from 'firebase/app';
-import app from "@/lib/firebase";
+import { uploadToCloudinary } from "@/lib/cloudinary";
 import { Progress } from "@/components/ui/progress";
 import { FetchInstructor } from "@/components/store/slices/authSlice";
 import { toast } from "@/hooks/use-toast";
@@ -32,44 +25,10 @@ export default function InstructorForm() {
     const [loading, setLoading] = useState<boolean>(false);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
-    const uploadToFirebase = async (file: File): Promise<string> => {
-        try {            const storage = getStorage(app);            const timestamp = Date.now();
-            const fileExtension = file.name.split('.').pop();
-            const uniqueFileName = `${timestamp}_${Math.random().toString(36).substring(2)}.${fileExtension}`;
-            const storageRef = ref(storage, `Profiles/${uniqueFileName}`);
-            
-            const uploadTask = uploadBytesResumable(storageRef, file);
-            
-            return new Promise((resolve, reject) => {
-                uploadTask.on(
-                    "state_changed",
-                    (snapshot) => {
-                        const prog = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-                        setProgress(prog);
-                    },
-                    (error) => {
-                        console.error("Upload failed:", error);
-                        if (error instanceof FirebaseError) {
-                            reject(new Error(`Firebase upload failed: ${error.message}`));
-                        } else {
-                            reject(new Error("File upload failed"));
-                        }
-                    },
-                    async () => {
-                        try {
-                            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-                            resolve(downloadURL);
-                        } catch (error) {
-                            console.error("Failed to get download URL:", error);
-                            reject(new Error("Failed to get file URL"));
-                        }
-                    }
-                );
-            });
-        } catch (error) {
-            console.error("Firebase initialization error:", error);
-            throw new Error("Failed to initialize upload");
-        }
+    const uploadFile = async (file: File): Promise<string> => {
+        return uploadToCloudinary(file, "Profiles", (prog) => {
+            setProgress(prog);
+        });
     };
 
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -132,7 +91,7 @@ export default function InstructorForm() {
             }
 
             // Upload image and get URL
-            const profileImgUrl = await uploadToFirebase(selectedFiles[0]);
+            const profileImgUrl = await uploadFile(selectedFiles[0]);
 
             // Submit form data
             const instructorData = {
